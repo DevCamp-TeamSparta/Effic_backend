@@ -1,14 +1,8 @@
 {
-  "prettier/prettier": [
-    "error",
-    {
-      "singleQuote": true,
-      "parser": "flow",
-      "trailingComma": "all",
-      "tabWidth": 2,
-      "semi": true,
-      "arrowParens": "always",
-      "endOfLine": "auto"
-    }
-  ]
+  "singleQuote": true,
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": true,
+  "arrowParens": "always",
+  "endOfLine": "auto"
 }
