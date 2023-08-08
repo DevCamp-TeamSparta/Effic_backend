@@ -1,0 +1,7 @@
+### Create new user
+POST http://localhost:3000/users/login
+content-type: application/json
+
+{
+    "email": "asdf@sparta.com"
+}
