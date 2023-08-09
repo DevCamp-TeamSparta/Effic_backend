@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsString,
   IsArray,
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -19,6 +20,10 @@ export class CreateUserDto {
   @IsOptional()
   name?: string;
 
+  @IsBoolean()
+  @IsOptional()
+  advertisementOpt?: boolean;
+
   @IsString()
   @IsOptional()
   accessKey?: string;
@@ -26,4 +31,12 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   serviceId?: string;
+
+  @IsString()
+  @IsOptional()
+  accessToken?: string;
+
+  @IsString()
+  @IsOptional()
+  refreshToken?: string;
 }
