@@ -3,11 +3,11 @@ POST http://localhost:3000/users/signup
 content-type: application/json
 
 {
-    "email": "asdf2@sparta.com",
+    "email": "asdf@sparta.com",
     "name": "asdf",
     "number": ["010-1234-1234"],
-    "access_key": "asdf",
-    "service_id": "asdf"
+    "accessKey": "asdf",
+    "serviceId": "asdf"
 }
 
 ### login
@@ -15,14 +15,15 @@ Post http://localhost:3000/users/login
 Content-Type: application/json
 
 {
-    "email": "adf@sparta.com"
+    "email": "sdf@sparta.com"
 }
 
 ### update User-info
-Patch http://localhost:3000/users/7
+Patch http://localhost:3000/users/1
 Content-Type: application/json
 
 {
-    "access_key": "asdf",
-    "service_id": "asdf",
+    "accessKey": "asd133",
+    "serviceId": "asd313",
+    "email": "asd@sparta.com"
 }

@@ -18,37 +18,42 @@ export class UsersController {
   @Post('/login')
   async checkUserInfo(@Body() createUserDto: CreateUserDto) {
     const email = createUserDto.email;
-    await this.usersService.checkUserInfo(email);
-    return { email };
+    const user = await this.usersService.checkUserInfo(email);
+
+    const accessToken = this.usersService.generateAccessToken(user);
+    const refreshToken = this.usersService.generateRefreshToken(user);
+    await this.usersService.saveRefreshToken(user, refreshToken);
+
+    return { email, accessToken };
   }
 
   @Post('/signup')
   async createUser(@Body() createUserDto: CreateUserDto) {
-    const { email, name, number, access_key, service_id } = createUserDto;
+    const { email, name, number, accessKey, serviceId } = createUserDto;
     await this.usersService.createUser(
       email,
       name,
       number,
-      access_key,
-      service_id,
+      accessKey,
+      serviceId,
     );
-    return { email, name, number, access_key, service_id };
+    return { email, name, number, accessKey, serviceId };
   }
 
-  @Patch('/:user_id')
+  @Patch('/:userId')
   async updateUser(
-    @Param('user_id') user_id: string,
+    @Param('userId') userId: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    await this.usersService.updateUser(parseInt(user_id), updateUserDto);
+    await this.usersService.updateUser(parseInt(userId), updateUserDto);
   }
 
   // 마이페이지
-  @Get('/:user_id')
-  async findUser(@Param('user_id') user_id: string) {
-    const user = await this.usersService.findUser(parseInt(user_id));
+  @Get('/:userId')
+  async findUser(@Param('userId') userId: string) {
+    const user = await this.usersService.findUser(parseInt(userId));
     if (!user) {
-      throw new NotFoundException('user not found!');
+      throw new NotFoundException('User not found!');
     }
     return user;
   }

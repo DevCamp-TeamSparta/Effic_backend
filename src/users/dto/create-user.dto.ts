@@ -21,9 +21,9 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  access_key?: string;
+  accessKey?: string;
 
   @IsString()
   @IsOptional()
-  service_id?: string;
+  serviceId?: string;
 }

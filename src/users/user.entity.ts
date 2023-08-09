@@ -10,7 +10,7 @@ import {
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
-  user_id: number;
+  userId: number;
 
   @Column({ type: 'varchar', nullable: false, unique: true })
   email: string;
@@ -22,10 +22,13 @@ export class User extends BaseEntity {
   number: string[];
 
   @Column({ type: 'varchar', nullable: true })
-  access_key: string;
+  accessKey: string;
 
   @Column({ type: 'varchar', nullable: true })
-  service_id: string;
+  serviceId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  refreshToken: string;
 
   // @OneToMany(() => Message,, (message) => message.user, { cascade: true })
   // messages: Messages[];
