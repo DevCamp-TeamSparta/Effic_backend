@@ -15,7 +15,7 @@ Post http://localhost:3000/users/login
 Content-Type: application/json
 
 {
-    "email": "asdf3@sparta.com"
+    "email": "asd@sparta.com"
 }
 
 ### update User-info
@@ -24,10 +24,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImVtY
 Content-Type: application/json
 
 {
-    "number": ["010-1234-1234", "010-1234-1235"]
+    "hostnumber": ["010-1234-1234", "010-1234-1235"]
 }
 
 ### logout
 POST http://localhost:3000/users/logout
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImVtYWlsIjoiYXNkZjdAc3BhcnRhLmNvbSIsImlhdCI6MTY5MTU4NDE4MiwiZXhwIjoxNjkxNTg0MjQyfQ.f0PJMSK2fz15yzVXckei82RmsESM1yaTxWmlK8sud3c
 Content-Type: application/json
+
+### dafaul message sending
+Post http://localhost:3000/messages/default
+Content-Type: application/json
+
+{
+    "deviceModel": "Galaxy S22",
+    "title": "Effic is the best!",
+    "content": "test message",
+    "receiver": ["01036289823", "01099287706"],
+    "advertiseInfo": false
+}

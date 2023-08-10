@@ -38,7 +38,11 @@ export class UsersService {
       if (error instanceof NotFoundException) {
         const dummyUser = new User();
         const { accessToken } = await this.generateTokens(dummyUser);
-        return { message: 'User not found', accessToken };
+        console.log(accessToken);
+        throw new HttpException(
+          { message: 'User not found', accessToken },
+          HttpStatus.NOT_FOUND,
+        );
       }
       throw new HttpException(
         'Internal server error',
@@ -90,21 +94,19 @@ export class UsersService {
           decodedRefreshToken &&
           decodedRefreshToken.exp * 1000 > Date.now()
         ) {
-          if (decodedRefreshToken === user.refreshToken) {
-            const { accessToken, refreshToken } = await this.generateTokens(
-              user,
-            );
-            throw new HttpException(
-              { Message: 'Access token is invalid or expired', accessToken },
-              HttpStatus.FORBIDDEN,
-            );
-          } else {
-            throw new UnauthorizedException('Tokens are invalid!');
-          }
+          // if (decodedRefreshToken === user.refreshToken) {
+          const { accessToken } = await this.generateTokens(user);
+          throw new HttpException(
+            { Message: 'Access token is invalid or expired', accessToken },
+            HttpStatus.FORBIDDEN,
+          );
         } else {
           throw new UnauthorizedException('Tokens are invalid');
         }
-      }
+      } //else {
+      //   throw new UnauthorizedException('Tokens are invalid!');
+      // }
+      // }
     }
   }
 
@@ -113,7 +115,7 @@ export class UsersService {
     headerEmail: string,
     email: string,
     name: string,
-    number: string[],
+    hostnumber: string[],
     accessKey: string,
     serviceId: string,
     advertisementOpt: boolean,
@@ -125,7 +127,7 @@ export class UsersService {
     const newUser = {
       email,
       name,
-      number,
+      hostnumber,
       accessKey,
       serviceId,
       advertisementOpt,

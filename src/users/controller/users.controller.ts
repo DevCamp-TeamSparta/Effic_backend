@@ -8,8 +8,8 @@ import {
   Patch,
   Headers,
 } from '@nestjs/common';
-import { CreateUserDto } from '../dto/create-user.dto';
 import { UsersService } from '../service/users.service';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as jwt from 'jsonwebtoken';
 
@@ -27,14 +27,14 @@ export class UsersController {
     @Body() createUserDto: CreateUserDto,
     @Headers('email') headerEmail: string,
   ) {
-    const { email, name, number, accessKey, serviceId, advertisementOpt } =
+    const { email, name, hostnumber, accessKey, serviceId, advertisementOpt } =
       createUserDto;
 
     await this.usersService.createUser(
       headerEmail,
       email,
       name,
-      number,
+      hostnumber,
       accessKey,
       serviceId,
       advertisementOpt,
@@ -48,7 +48,7 @@ export class UsersController {
     return {
       email,
       name,
-      number,
+      hostnumber,
       accessKey,
       serviceId,
       advertisementOpt,

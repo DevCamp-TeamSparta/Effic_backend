@@ -13,7 +13,7 @@ export class User extends BaseEntity {
   name: string;
 
   @Column({ type: 'varchar', nullable: true })
-  number: string[];
+  hostnumber: string[];
 
   @Column({ type: 'varchar', nullable: false })
   accessKey: string;

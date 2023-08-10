@@ -14,7 +14,7 @@ export class CreateUserDto {
 
   @IsArray()
   @IsOptional()
-  number?: string[];
+  hostnumber?: string[];
 
   @IsString()
   @IsOptional()
