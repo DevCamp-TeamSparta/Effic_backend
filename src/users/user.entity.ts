@@ -1,5 +1,11 @@
-import { BaseEntity, Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-// import { Message } from '../messages/message.entity';
+import {
+  BaseEntity,
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+} from 'typeorm';
+import { Message } from '../messages/message.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -21,12 +27,18 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   serviceId: string;
 
+  @Column({ type: 'varchar', nullable: false })
+  secretKey: string;
+
   @Column({ type: 'varchar', nullable: true })
   refreshToken: string;
 
   @Column({ type: 'varchar', nullable: false })
   advertisementOpt: boolean;
 
-  // @OneToMany(() => Message,, (message) => message.user, { cascade: true })
-  // messages: Messages[];
+  @Column({ type: 'varchar', nullable: true })
+  point: number;
+
+  @OneToMany(() => Message, (message) => message.user, { cascade: true })
+  messages: Message[];
 }

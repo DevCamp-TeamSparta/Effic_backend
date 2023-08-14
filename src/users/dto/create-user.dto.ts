@@ -5,6 +5,7 @@ import {
   IsString,
   IsArray,
   IsBoolean,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -34,9 +35,17 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
+  secretKey?: string;
+
+  @IsString()
+  @IsOptional()
   accessToken?: string;
 
   @IsString()
   @IsOptional()
   refreshToken?: string;
+
+  @IsNumber()
+  @IsOptional()
+  point?: number;
 }

@@ -5,19 +5,23 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
+import { UsersRepository } from '../users.repository';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { User } from '../user.entity';
 import * as jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../../config/jwt.config';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private repo: Repository<User>) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    @InjectEntityManager() private readonly entityManager: EntityManager,
+  ) {}
 
   // 로그인
   async checkUserInfo(email: string) {
-    const user = await this.repo.findOne({ where: { email } });
+    const user = await this.usersRepository.findOneByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -29,7 +33,6 @@ export class UsersService {
 
     try {
       const user = await this.checkUserInfo(email);
-
       const { accessToken, refreshToken } = await this.generateTokens(user);
       await this.saveRefreshToken(user, refreshToken);
 
@@ -76,7 +79,7 @@ export class UsersService {
 
   async saveRefreshToken(user: User, refreshToken: string) {
     user.refreshToken = refreshToken;
-    await this.repo.save(user);
+    await this.usersRepository.saveRefreshToken(user);
   }
 
   // 엑세스토큰 확인
@@ -118,25 +121,31 @@ export class UsersService {
     hostnumber: string[],
     accessKey: string,
     serviceId: string,
+    secretKey: string,
     advertisementOpt: boolean,
+    point: number,
   ) {
     if (headerEmail !== email) {
       throw new HttpException('Email is not valid', HttpStatus.BAD_REQUEST);
     }
-    const user = await this.repo.findOne({ where: { email } });
+    const user = await this.usersRepository.findOneByEmail(email);
     const newUser = {
       email,
       name,
       hostnumber,
       accessKey,
       serviceId,
+      secretKey,
       advertisementOpt,
+      point,
     };
     if (user) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
       return;
     } else {
-      await this.repo.save(newUser);
+      const addedPoint = 300;
+      newUser.point += addedPoint;
+      await this.usersRepository.createUser(newUser);
     }
   }
 
@@ -146,7 +155,7 @@ export class UsersService {
     accessToken: string,
     updateUserDto: Partial<User>,
   ) {
-    const user = await this.repo.findOne({ where: { userId } });
+    const user = await this.usersRepository.findOneByUserId(userId);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -160,16 +169,20 @@ export class UsersService {
       throw new HttpException('Cannot change email', HttpStatus.BAD_REQUEST);
     }
 
-    return await this.repo.save(user);
+    return await this.usersRepository.updateUser(userId, updateUserDto);
   }
 
   async logout(user: User) {
     user.refreshToken = null;
-    await this.repo.save(user);
+    await this.usersRepository.logout(user);
   }
+
+  // async tokenValidation(header: Headers): Promise<User | undefined> {
+  //   return await this.usersService.finc
+  // }
 
   // 마이페이지
   async findUser(userId: number) {
-    return this.repo.findOne({ where: { userId } });
+    return this.usersRepository.findOneByUserId(userId);
   }
 }

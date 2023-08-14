@@ -3,10 +3,11 @@ POST http://localhost:3000/users/signup
 content-type: application/json
 
 {
-    "email": "asdf16@sparta.com",
-    "name": "asdf",
+    "email": "clo@sparta.com",
+    "name": "clo",
     "accessKey": "asdf",
     "serviceId": "asdf",
+    "secretKey": "asdf",
     "advertisementOpt": true
 }
 
@@ -32,14 +33,15 @@ POST http://localhost:3000/users/logout
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImVtYWlsIjoiYXNkZjdAc3BhcnRhLmNvbSIsImlhdCI6MTY5MTU4NDE4MiwiZXhwIjoxNjkxNTg0MjQyfQ.f0PJMSK2fz15yzVXckei82RmsESM1yaTxWmlK8sud3c
 Content-Type: application/json
 
-### dafaul message sending
+### dafault message sending
 Post http://localhost:3000/messages/default
 Content-Type: application/json
 
 {
     "deviceModel": "Galaxy S22",
     "title": "Effic is the best!",
-    "content": "test message",
-    "receiver": ["01036289823", "01099287706"],
-    "advertiseInfo": false
+    "content": "test message입니다.\n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요.\n https://www.google.com https://www.naver.com",
+    "receiver": ["01036289823"],
+    "advertiseInfo": false,
+    "url": ["https://www.google.com","https://www.naver.com"]
 }

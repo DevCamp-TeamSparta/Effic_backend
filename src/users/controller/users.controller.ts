@@ -7,18 +7,22 @@ import {
   Post,
   Patch,
   Headers,
+  Logger,
 } from '@nestjs/common';
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as jwt from 'jsonwebtoken';
+import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
 
 @Controller('users')
 export class UsersController {
+  private logger = new Logger('UsersController');
   constructor(private usersService: UsersService) {}
 
   @Post('/login')
-  async loginUser(@Body() createUserDto: CreateUserDto) {
+  async loginUser(@Body() createUserDto: CreateUserDto): Promise<object> {
+    this.logger.verbose('User login');
     return this.usersService.checkUserInfoWithToken(createUserDto);
   }
 
@@ -26,9 +30,18 @@ export class UsersController {
   async createUser(
     @Body() createUserDto: CreateUserDto,
     @Headers('email') headerEmail: string,
-  ) {
-    const { email, name, hostnumber, accessKey, serviceId, advertisementOpt } =
-      createUserDto;
+  ): Promise<object> {
+    this.logger.verbose('User signup');
+    const {
+      email,
+      name,
+      hostnumber,
+      accessKey,
+      serviceId,
+      secretKey,
+      advertisementOpt,
+      point,
+    } = createUserDto;
 
     await this.usersService.createUser(
       headerEmail,
@@ -37,7 +50,9 @@ export class UsersController {
       hostnumber,
       accessKey,
       serviceId,
+      secretKey,
       advertisementOpt,
+      point,
     );
 
     const user = await this.usersService.checkUserInfo(email);
@@ -53,6 +68,7 @@ export class UsersController {
       serviceId,
       advertisementOpt,
       accessToken,
+      point,
     };
   }
 
@@ -60,8 +76,9 @@ export class UsersController {
   async updateUser(
     @Param('userId') userId: string,
     @Headers('authorization') authorization: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body(new UserBodyValidationPipe()) updateUserDto: UpdateUserDto,
   ) {
+    this.logger.verbose('User update');
     await this.usersService.updateUser(
       parseInt(userId),
       authorization,
@@ -71,6 +88,7 @@ export class UsersController {
 
   @Post('/logout')
   async logout(@Headers('authorization') authorization: string) {
+    this.logger.verbose('User logout');
     const accessToken = authorization.split(' ')[1];
     const decodedAccessToken: any = jwt.decode(accessToken);
 

@@ -32,4 +32,8 @@ export class DefaultMessageDto {
   @IsDate()
   @IsOptional()
   reservetime?: Date;
+
+  @IsArray()
+  @IsOptional()
+  url?: string[];
 }
