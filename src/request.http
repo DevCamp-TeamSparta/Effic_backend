@@ -1,47 +1,55 @@
 ### Create User
-POST http://localhost:3000/users/signup
-content-type: application/json
+POST http://localhost:8000/users/signup
+Header: 
+  content-type: application/json
+  email: clo@sparta.com
 
 {
     "email": "clo@sparta.com",
     "name": "clo",
-    "accessKey": "asdf",
-    "serviceId": "asdf",
-    "secretKey": "asdf",
-    "advertisementOpt": true
+    "accessKey": "cugC5Rn2vzGEWUJhHAKw",
+    "serviceId": "ncp:sms:kr:313324923877:clo",
+    "secretKey": "z7KIKoY9QAtb1kGTlwWDBIigPfPWkLw9yALApZLv",
+    "advertisementOpt": false
 }
 
 ### login
-Post http://localhost:3000/users/login
+Post http://localhost:8000/users/login
 Content-Type: application/json
 
 {
-    "email": "asd@sparta.com"
+    "email": "clo2@sparta.com"
 }
 
 ### update User-info
-Patch http://localhost:3000/users/7
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImVtYWlsIjoiYXNkZjdAc3BhcnRhLmNvbSIsImlhdCI6MTY5MTU4MzkxNiwiZXhwIjoxNjkxNTgzOTc2fQ.ScCrkr4dwWxLRcmqBFy5Psa4PvH8WNqW89WrpQu_w5E
+Patch http://localhost:8000/users/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTIwODk2NzAsImV4cCI6MTY5MjE3NjA3MH0.X5YJGZ12Uq1rmjLCCGTmbHvEREWpECOQvhZPaBwVy8U
 Content-Type: application/json
 
 {
-    "hostnumber": ["010-1234-1234", "010-1234-1235"]
+    "hostnumber": ["010-3628-9823"]
 }
 
 ### logout
-POST http://localhost:3000/users/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsImVtYWlsIjoiYXNkZjdAc3BhcnRhLmNvbSIsImlhdCI6MTY5MTU4NDE4MiwiZXhwIjoxNjkxNTg0MjQyfQ.f0PJMSK2fz15yzVXckei82RmsESM1yaTxWmlK8sud3c
+POST http://localhost:8000/users/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTIwODk2NzAsImV4cCI6MTY5MjE3NjA3MH0.X5YJGZ12Uq1rmjLCCGTmbHvEREWpECOQvhZPaBwVy8U
 Content-Type: application/json
 
 ### dafault message sending
-Post http://localhost:3000/messages/default
+Post http://localhost:8000/messages/default
 Content-Type: application/json
 
 {
     "deviceModel": "Galaxy S22",
+    "hostnumber": "01036289823",
     "title": "Effic is the best!",
-    "content": "test message입니다.\n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요.\n https://www.google.com https://www.naver.com",
+    "content": "test message입니다. \n안녕하세요 #{name}님!\n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
     "receiver": ["01036289823"],
     "advertiseInfo": false,
+    "receiverNames": ["clo"],
     "url": ["https://www.google.com","https://www.naver.com"]
 }
+
+### dafault message result - shortio
+Get http://localhost:8000/messages/default/2
+Content-Type: application/json

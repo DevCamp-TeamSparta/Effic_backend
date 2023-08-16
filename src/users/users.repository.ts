@@ -19,20 +19,30 @@ export class UsersRepository extends Repository<User> {
   }
 
   async createUser(createUSerInfo: CreateUserDto): Promise<User> {
-    const { email, name, hostnumber, accessKey, serviceId, advertisementOpt } =
-      createUSerInfo;
+    const {
+      email,
+      name,
+      hostnumber,
+      accessKey,
+      serviceId,
+      secretKey,
+      advertisementOpt,
+    } = createUSerInfo;
+    const addedPoint = 300;
     const newUser = this.create({
       email: email,
       name: name,
       hostnumber: hostnumber,
       accessKey: accessKey,
       serviceId: serviceId,
+      secretKey: secretKey,
       advertisementOpt: advertisementOpt,
+      point: addedPoint,
     });
     return await this.save(newUser);
   }
 
-  async findOneByUserId(userId: number): Promise<User | undefined> {
+  async findOneByUserId(userId: number): Promise<User> {
     return await this.findOne({ where: { userId } });
   }
 

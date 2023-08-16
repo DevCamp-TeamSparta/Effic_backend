@@ -15,6 +15,10 @@ export class DefaultMessageDto {
 
   @IsNotEmpty()
   @IsString()
+  hostnumber: string;
+
+  @IsNotEmpty()
+  @IsString()
   title: string;
 
   @IsNotEmpty()
@@ -25,6 +29,10 @@ export class DefaultMessageDto {
   @IsNotEmpty()
   receiver: string[];
 
+  @IsArray()
+  @IsOptional()
+  receiverNames?: string[];
+
   @IsNotEmpty()
   @IsBoolean()
   advertiseInfo?: boolean;
@@ -34,6 +42,6 @@ export class DefaultMessageDto {
   reservetime?: Date;
 
   @IsArray()
-  @IsOptional()
+  @IsNotEmpty()
   url?: string[];
 }

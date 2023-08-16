@@ -66,6 +66,7 @@ export class UsersController {
       hostnumber,
       accessKey,
       serviceId,
+      secretKey,
       advertisementOpt,
       accessToken,
       point,

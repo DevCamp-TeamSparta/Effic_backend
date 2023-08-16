@@ -41,7 +41,6 @@ export class UsersService {
       if (error instanceof NotFoundException) {
         const dummyUser = new User();
         const { accessToken } = await this.generateTokens(dummyUser);
-        console.log(accessToken);
         throw new HttpException(
           { message: 'User not found', accessToken },
           HttpStatus.NOT_FOUND,
@@ -143,8 +142,6 @@ export class UsersService {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
       return;
     } else {
-      const addedPoint = 300;
-      newUser.point += addedPoint;
       await this.usersRepository.createUser(newUser);
     }
   }
@@ -176,10 +173,6 @@ export class UsersService {
     user.refreshToken = null;
     await this.usersRepository.logout(user);
   }
-
-  // async tokenValidation(header: Headers): Promise<User | undefined> {
-  //   return await this.usersService.finc
-  // }
 
   // 마이페이지
   async findUser(userId: number) {

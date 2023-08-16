@@ -13,19 +13,25 @@ import { User } from '../users/user.entity';
 @Entity()
 export class Message extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
-  message_id: number;
+  messageId: number;
 
   @Column()
-  is_sent: boolean;
+  isSent: boolean;
 
   @Column()
-  sent_type: MessageType;
-
-  @Column({ type: 'varchar', nullable: true })
-  title: string;
+  sentType: MessageType;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column({ type: 'varchar', nullable: false })
+  receiver: string[];
+
+  @Column({ type: 'varchar', nullable: true })
+  shortUrl: string[];
+
+  @Column({ type: 'varchar', nullable: false })
+  requestId: string;
 
   @ManyToOne(() => User, (user) => user.messages)
   @JoinColumn({ name: 'userId' })

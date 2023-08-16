@@ -7,4 +7,12 @@ export class MessagesRepository extends Repository<Message> {
   constructor(private datasource: DataSource) {
     super(Message, datasource.createEntityManager());
   }
+
+  async findOneByMessageId(messageId: number): Promise<Message> {
+    return await this.findOne({ where: { messageId } });
+  }
+
+  async saveShortenUrl(messageId: number, shortUrl: string[]) {
+    await this.update(messageId, { shortUrl });
+  }
 }

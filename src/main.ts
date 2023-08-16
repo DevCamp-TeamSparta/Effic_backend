@@ -11,6 +11,6 @@ async function bootstrap() {
       transform: true, // 네트워크를 통해 받는 페이로드가 DTO 클래스에 따라 지정된 개체로 자동 변환되도록 하는 옵션
     }),
   );
-  await app.listen(3000);
+  await app.listen(8000);
 }
 bootstrap();
