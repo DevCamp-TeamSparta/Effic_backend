@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
-import { Result } from './result.entity';
+import { Result } from './results.entity';
 
 @Entity()
 export class Message extends BaseEntity {

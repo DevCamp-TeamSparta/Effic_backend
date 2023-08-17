@@ -82,8 +82,9 @@ export class DefaultSchedulerService {
     const message = await this.messagesRepository.findOneByMessageId(messageId);
     const user = await this.usersRepository.findOneByEmail(email);
 
+    const now = Date.now().toString();
     const headers = {
-      'x-ncp-apigw-timestamp': Date.now().toString(),
+      'x-ncp-apigw-timestamp': now,
       'x-ncp-iam-access-key': user.accessKey,
       'x-ncp-apigw-signature-v2': await this.signature(user, message),
     };

@@ -44,9 +44,9 @@ Content-Type: application/json
     "hostnumber": "01036289823",
     "title": "Effic is the best!",
     "content": "test message입니다. #{phone} 번호 맞으시죠? \n안녕하세요 #{name}님!\n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
-    "receiver": [{"phone": "01036289823", "name": "clo"},{"phone": "01099287706", "name": "honey"}],
+    "receiverList": [{"phone": "01036289823", "name": "clo"},{"phone": "01036289823", "name": "clo22"}],
     "advertiseInfo": false,
-    "url": ["https://www.google.com","https://www.naver.com"]
+    "urlList": ["https://www.google.com","https://www.naver.com"]
 }
 
 ### dafault message result - shortio

@@ -6,7 +6,7 @@ import { Message } from './message.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { MessagesRepository } from './messages.repository';
 import { UsersService } from 'src/users/service/users.service';
-import { DefaultSchedulerService } from 'src/schedulers/defualt-message-scheduler.schedule';
+import { DefaultSchedulerService } from './service/defualt-message-scheduler.schedule';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Message])],

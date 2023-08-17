@@ -14,7 +14,6 @@ import got from 'got';
 import { shortIoConfig } from 'config/short-io.config';
 import { Message } from '../message.entity';
 import { MessageType } from '../message.enum';
-import { create } from 'domain';
 
 @Injectable()
 export class MessagesService {
@@ -32,6 +31,20 @@ export class MessagesService {
     }
   }
 
+  async replaceUrlContent(
+    urlList: string[],
+    shortenedUrls: string[],
+    content: string,
+  ) {
+    if (urlList) {
+      urlList.forEach((url, index) => {
+        content = content.replaceAll(url, shortenedUrls[index]);
+      });
+    }
+    console.log('=========> ~ content:', content);
+    return content;
+  }
+
   createMessage(content: string, info: { [key: string]: string }) {
     Object.keys(info).forEach((key) => {
       const regex = new RegExp(`#{${key}}`, 'g');
@@ -45,13 +58,27 @@ export class MessagesService {
     // 유저정보 확인
     const user = await this.usersRepository.findOneByEmail(email);
 
-    if (user.point < defaultMessageDto.receiver.length * 3) {
-      const requiredPoints = defaultMessageDto.receiver.length * 3 - user.point;
+    if (user.point < defaultMessageDto.receiverList.length * 3) {
+      const requiredPoints =
+        defaultMessageDto.receiverList.length * 3 - user.point;
       throw new HttpException(
         `need more points: ${requiredPoints}`,
         HttpStatus.FORBIDDEN,
       );
     }
+
+    const shortenedUrls: string[] = await Promise.all(
+      defaultMessageDto.urlList.map(async (url: string) => {
+        return await this.ShortenUrl(url);
+      }),
+    );
+    console.log('=========> ~ shortenedUrls:', shortenedUrls);
+
+    const newContent = await this.replaceUrlContent(
+      defaultMessageDto.urlList,
+      shortenedUrls,
+      defaultMessageDto.content,
+    );
 
     const isAdvertisement = defaultMessageDto.advertisementInfo;
 
@@ -70,10 +97,10 @@ export class MessagesService {
       from: defaultMessageDto.hostnumber,
       subject: defaultMessageDto.title,
       content: defaultMessageDto.content,
-      messages: defaultMessageDto.receiver.map((info) => ({
+      messages: defaultMessageDto.receiverList.map((info) => ({
         to: info.phone,
         content: `${contentPrefix} ${this.createMessage(
-          defaultMessageDto.content,
+          newContent,
           info,
         )} ${contentSuffix}`,
       })),
@@ -85,35 +112,42 @@ export class MessagesService {
         : {}),
     };
 
-    const headers = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'x-ncp-iam-access-key': user.accessKey,
-      'x-ncp-apigw-timestamp': Date.now().toString(),
-      'x-ncp-apigw-signature-v2': await this.signature(user),
-    };
-
-    axios
-      .post(
+    let headers;
+    try {
+      const now = Date.now().toString();
+      headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': user.accessKey,
+        'x-ncp-apigw-timestamp': now,
+        'x-ncp-apigw-signature-v2': await this.signature(user, now),
+      };
+      await axios.post(
         `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
         body,
-        { headers },
-      )
-      .then(async (response) => {
-        const message = new Message();
-        message.isSent = true;
-        message.sentType = MessageType.D;
-        message.user = user;
-        message.receiver = defaultMessageDto.receiver;
-        // message.shortUrl = await this.ShortenUrl.body.idString;
-        message.requestId = response.data.requestId;
+        {
+          headers,
+        },
+      );
+    } catch (error) {
+      console.log(headers, error.response.data);
+      throw new InternalServerErrorException();
+    }
+    // .then(async (response) => {
+    //   const message = new Message();
+    //   message.isSent = true;
+    //   message.sentType = MessageType.D;
+    //   message.user = user;
+    //   message.receiver = defaultMessageDto.receiverList;
+    //   // message.shortUrl = await this.ShortenUrl.body.idString;
+    //   message.requestId = response.data.requestId;
 
-        await this.entityManager.save(Message, message);
-        return response.data.requestId;
-      })
-      .catch(async (e) => {
-        console.log(e.response.data);
-        throw new InternalServerErrorException();
-      });
+    //   await this.entityManager.save(Message, message);
+    //   return response.data.requestId;
+    // })
+    // .catch(async (e) => {
+    //   console.log(e.response.data);
+    //   throw new InternalServerErrorException();
+    // });
     return 'send!';
   }
 
@@ -121,7 +155,6 @@ export class MessagesService {
   async ShortenUrl(url: string) {
     return got<{
       shortURL: string;
-      idString: string[];
     }>({
       method: 'POST',
       url: 'https://api.short.io/links',
@@ -136,7 +169,6 @@ export class MessagesService {
     })
       .then((response) => {
         console.log(response.body);
-        // idString = response.body.idString;
         return response.body.shortURL;
       })
       .catch((e) => {
@@ -150,17 +182,16 @@ export class MessagesService {
   //   await this.messagesRepository.saveShortenUrl(message.messageId, shortUrl);
   // }
 
-  async signature(user) {
+  async signature(user, timestamp) {
     const message = [];
     const hmac = crypto.createHmac('sha256', user.secretKey);
     const space = ' ';
     const newLine = '\n';
     const method = 'POST'; // 수정 필요
-    const timestamp = Date.now().toString();
     message.push(method);
     message.push(space);
     message.push(
-      `/sms/v2/services/${user.serviceId}/messages`, // 수정 필요.
+      `/sms/v2/services/${user.serviceId}/messages`, // 수정 필요
     );
     message.push(newLine);
     message.push(timestamp);
@@ -176,10 +207,11 @@ export class MessagesService {
     const message = await this.messagesRepository.findOneByMessageId(messageId);
     const user = await this.usersRepository.findOneByEmail(email);
 
+    const now = Date.now().toString();
     const headers = {
-      'x-ncp-apigw-timestamp': Date.now().toString(),
+      'x-ncp-apigw-timestamp': now,
       'x-ncp-iam-access-key': user.accessKey,
-      'x-ncp-apigw-signature-v2': await this.signature(user),
+      'x-ncp-apigw-signature-v2': await this.signature(user, now),
     };
 
     axios

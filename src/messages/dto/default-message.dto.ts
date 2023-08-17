@@ -27,11 +27,7 @@ export class DefaultMessageDto {
 
   @IsArray()
   @IsNotEmpty()
-  receiver: string[];
-
-  @IsArray()
-  @IsOptional()
-  name?: string[];
+  receiverList: string[];
 
   @IsNotEmpty()
   @IsBoolean()
@@ -43,5 +39,5 @@ export class DefaultMessageDto {
 
   @IsArray()
   @IsNotEmpty()
-  url?: string[];
+  urlList?: string[];
 }
