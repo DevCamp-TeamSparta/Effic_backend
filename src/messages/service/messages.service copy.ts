@@ -14,7 +14,6 @@ import got from 'got';
 import { shortIoConfig } from 'config/short-io.config';
 import { Message } from '../message.entity';
 import { MessageType } from '../message.enum';
-import { create } from 'domain';
 
 @Injectable()
 export class MessagesService {
@@ -32,11 +31,46 @@ export class MessagesService {
     }
   }
 
-  createMessage(content: string, info: { [key: string]: string }) {
-    Object.keys(info).forEach((key) => {
-      const regex = new RegExp(`#{${key}}`, 'g');
-      content = content.replace(regex, info[key]);
-    });
+  async createMessages(receivers) {
+    return Promise.all(
+      receivers.map((receiver) => this.createMessageObject(receiver)),
+    );
+  }
+
+  createMessageObject(receiver) {
+    return { to: receiver };
+  }
+
+  async replaceUrlContent(
+    content: string,
+    urls: string[],
+    receiverNames: string[],
+    shortenedUrls: string[],
+  ) {
+    if (urls) {
+      urls.forEach((url, index) => {
+        content = content.replaceAll(url, shortenedUrls[index]);
+      });
+    }
+
+    let replaceContent = content;
+    const newCotent = [];
+    if (content.includes('#{name}')) {
+      receiverNames.forEach((name) => {
+        replaceContent = content.replace(/#{name}/g, name);
+        newCotent.push(replaceContent);
+      });
+    }
+    return newCotent;
+  }
+
+  async replaceMessage(content) {
+    return Promise.all(
+      content.map((content) => this.replaceMessageObject(content)),
+    );
+  }
+
+  replaceMessageObject(content) {
     return content;
   }
 
@@ -53,6 +87,12 @@ export class MessagesService {
       );
     }
 
+    const shortenedUrls: string[] = await Promise.all(
+      defaultMessageDto.url.map(async (url: string) => {
+        return await this.ShortenUrl(url);
+      }),
+    );
+
     const isAdvertisement = defaultMessageDto.advertisementInfo;
 
     let contentPrefix = '';
@@ -63,20 +103,23 @@ export class MessagesService {
       contentSuffix = '\n무료수신거부 08012341234';
     }
 
+    const newContent = await this.replaceUrlContent(
+      defaultMessageDto.content,
+      defaultMessageDto.url,
+      defaultMessageDto.receiverNames,
+      shortenedUrls,
+    );
+    console.log('=========> ~ newContent:', newContent);
+
     const body = {
       type: 'MMS',
       contentType: await this.getCotentType(defaultMessageDto),
       countryCode: '82',
       from: defaultMessageDto.hostnumber,
       subject: defaultMessageDto.title,
-      content: defaultMessageDto.content,
-      messages: defaultMessageDto.receiver.map((info) => ({
-        to: info.phone,
-        content: `${contentPrefix} ${this.createMessage(
-          defaultMessageDto.content,
-          info,
-        )} ${contentSuffix}`,
-      })),
+      content:
+        contentPrefix + (await this.replaceMessage(newContent)) + contentSuffix,
+      messages: await this.createMessages(defaultMessageDto.receiver),
       ...(defaultMessageDto.reservetime
         ? {
             reservetime: defaultMessageDto.reservetime,
@@ -160,7 +203,7 @@ export class MessagesService {
     message.push(method);
     message.push(space);
     message.push(
-      `/sms/v2/services/${user.serviceId}/messages`, // 수정 필요.
+      `/sms/v2/services/${user.serviceId}/messages`, // 수정 필요
     );
     message.push(newLine);
     message.push(timestamp);

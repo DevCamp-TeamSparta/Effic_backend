@@ -32,4 +32,12 @@ export class MessagesController {
   async defaultMessageResult(@Param('messageId') messageId: number) {
     return await this.messagesService.shortUrlResult(messageId);
   }
+
+  @Get('/default/ncp/:messageId')
+  async defaultMessageNcpResult(
+    @Param('messageId') messageId: number,
+    @Headers('email') headerEmail: string,
+  ) {
+    return await this.messagesService.ncpResult(messageId, headerEmail);
+  }
 }

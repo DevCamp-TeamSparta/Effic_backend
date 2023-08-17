@@ -4,11 +4,13 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
+  OneToMany,
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
+import { Result } from './result.entity';
 
 @Entity()
 export class Message extends BaseEntity {
@@ -36,4 +38,7 @@ export class Message extends BaseEntity {
   @ManyToOne(() => User, (user) => user.messages)
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @OneToMany(() => Result, (result) => result.message, { cascade: true })
+  result: Result[];
 }

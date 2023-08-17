@@ -43,13 +43,19 @@ Content-Type: application/json
     "deviceModel": "Galaxy S22",
     "hostnumber": "01036289823",
     "title": "Effic is the best!",
-    "content": "test message입니다. \n안녕하세요 #{name}님!\n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
-    "receiver": ["01036289823"],
+    "content": "test message입니다. #{phone} 번호 맞으시죠? \n안녕하세요 #{name}님!\n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
+    "receiver": [{"phone": "01036289823", "name": "clo"},{"phone": "01099287706", "name": "honey"}],
     "advertiseInfo": false,
-    "receiverNames": ["clo"],
     "url": ["https://www.google.com","https://www.naver.com"]
 }
 
 ### dafault message result - shortio
 Get http://localhost:8000/messages/default/2
 Content-Type: application/json
+
+
+### dafault message result - ncp
+Get http://localhost:8000/messages/default/ncp/8
+Header: 
+  content-type: application/json
+  email: clo@sparta.com

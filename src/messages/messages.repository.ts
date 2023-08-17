@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Message } from './message.entity';
 import { Repository, DataSource } from 'typeorm';
+import { DefaultResultDto } from './dto/default-result.dto';
 
 @Injectable()
 export class MessagesRepository extends Repository<Message> {
@@ -12,7 +13,21 @@ export class MessagesRepository extends Repository<Message> {
     return await this.findOne({ where: { messageId } });
   }
 
-  async saveShortenUrl(messageId: number, shortUrl: string[]) {
-    await this.update(messageId, { shortUrl });
+  async findOlderThanTwentyFourHours(): Promise<Message[]> {
+    const twentyFourHoursAgo = new Date();
+    twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
+
+    return this.createQueryBuilder('message')
+      .where('message.createdAt < :twentyFourHoursAgo', { twentyFourHoursAgo })
+      .getMany();
+  }
+
+  async findOlderThanThreeDays(): Promise<Message[]> {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+    return this.createQueryBuilder('message')
+      .where('message.createdAt < :threeDaysAgo', { threeDaysAgo })
+      .getMany();
   }
 }
