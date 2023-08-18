@@ -41,7 +41,6 @@ export class MessagesService {
         content = content.replaceAll(url, shortenedUrls[index]);
       });
     }
-    console.log('=========> ~ content:', content);
     return content;
   }
 
@@ -67,12 +66,15 @@ export class MessagesService {
       );
     }
 
-    const shortenedUrls: string[] = await Promise.all(
-      defaultMessageDto.urlList.map(async (url: string) => {
-        return await this.ShortenUrl(url);
-      }),
-    );
-    console.log('=========> ~ shortenedUrls:', shortenedUrls);
+    const shortenedUrls: string[] = [];
+    const idStrings: string[] = [];
+
+    for (const url of defaultMessageDto.urlList) {
+      const response = await this.ShortenUrl(url);
+      shortenedUrls.push(response.shortURL);
+      idStrings.push(response.idString);
+    }
+    console.log('=========> ~ idStrings:', idStrings);
 
     const newContent = await this.replaceUrlContent(
       defaultMessageDto.urlList,
@@ -121,40 +123,36 @@ export class MessagesService {
         'x-ncp-apigw-timestamp': now,
         'x-ncp-apigw-signature-v2': await this.signature(user, now),
       };
-      await axios.post(
+      const response = await axios.post(
         `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
         body,
         {
           headers,
         },
       );
+
+      const message = new Message();
+      message.isSent = true;
+      message.sentType = MessageType.D;
+      message.user = user;
+      message.receiver = defaultMessageDto.receiverList;
+      message.shortUrl = idStrings;
+      message.requestId = response.data.requestId;
+
+      await this.entityManager.save(Message, message);
+
+      return message.messageId;
     } catch (error) {
       console.log(headers, error.response.data);
       throw new InternalServerErrorException();
     }
-    // .then(async (response) => {
-    //   const message = new Message();
-    //   message.isSent = true;
-    //   message.sentType = MessageType.D;
-    //   message.user = user;
-    //   message.receiver = defaultMessageDto.receiverList;
-    //   // message.shortUrl = await this.ShortenUrl.body.idString;
-    //   message.requestId = response.data.requestId;
-
-    //   await this.entityManager.save(Message, message);
-    //   return response.data.requestId;
-    // })
-    // .catch(async (e) => {
-    //   console.log(e.response.data);
-    //   throw new InternalServerErrorException();
-    // });
-    return 'send!';
   }
 
   // 단축 URL 생성
   async ShortenUrl(url: string) {
     return got<{
       shortURL: string;
+      idString: string;
     }>({
       method: 'POST',
       url: 'https://api.short.io/links',
@@ -169,18 +167,13 @@ export class MessagesService {
     })
       .then((response) => {
         console.log(response.body);
-        return response.body.shortURL;
+        return response.body;
       })
       .catch((e) => {
         console.log(e.response.body);
         throw new InternalServerErrorException();
       });
   }
-
-  // async saveShortenUrl(messageId, shortUrl: string[]) {
-  //   const message = await this.messagesRepository.findOneByMessageId(messageId);
-  //   await this.messagesRepository.saveShortenUrl(message.messageId, shortUrl);
-  // }
 
   async signature(user, timestamp) {
     const message = [];

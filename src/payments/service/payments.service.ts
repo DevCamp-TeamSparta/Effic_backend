@@ -11,7 +11,6 @@ import { Payment } from '../payments.entity';
 import axios from 'axios';
 import { iamConfig } from 'config/iam.config';
 import { v4 } from 'uuid';
-import { CancelPaymentDto } from '../dto/cancel-payment.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -103,6 +102,11 @@ export class PaymentsService {
     refundMoney: number,
   ) {
     try {
+      const user = await this.usersRepository.findOneByEmail(email);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
       const getToken = await axios({
         url: 'https://api.iamport.kr/users/getToken',
         method: 'post',
@@ -131,6 +135,7 @@ export class PaymentsService {
         throw new Error('취소 가능한 금액이 없습니다.');
       }
 
+      // 결제 취소
       const getCancelData = await axios({
         url: 'https://api.iamport.kr/payments/cancel',
         method: 'post',
@@ -147,6 +152,7 @@ export class PaymentsService {
       });
       const { response } = getCancelData.data;
       console.log(response);
+      user.money -= refundMoney;
     } catch (error) {
       console.log(error);
       throw error;
