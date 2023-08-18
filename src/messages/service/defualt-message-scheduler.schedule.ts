@@ -86,7 +86,7 @@ export class DefaultSchedulerService {
     const headers = {
       'x-ncp-apigw-timestamp': now,
       'x-ncp-iam-access-key': user.accessKey,
-      'x-ncp-apigw-signature-v2': await this.signature(user, message),
+      'x-ncp-apigw-signature-v2': await this.signature(user, message, now),
     };
 
     axios
@@ -116,13 +116,12 @@ export class DefaultSchedulerService {
       });
   }
 
-  async signature(user, messages) {
+  async signature(user, messages, timestamp) {
     const message = [];
     const hmac = crypto.createHmac('sha256', user.secretKey);
     const space = ' ';
     const newLine = '\n';
     const method = 'GET';
-    const timestamp = Date.now().toString();
     message.push(method);
     message.push(space);
     message.push(
