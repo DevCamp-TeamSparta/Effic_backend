@@ -6,6 +6,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
+import { Payment } from '../payments/payments.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -36,9 +37,15 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   advertisementOpt: boolean;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'int', nullable: true })
   point: number;
+
+  @Column({ type: 'int', nullable: true })
+  money: number;
 
   @OneToMany(() => Message, (message) => message.user, { cascade: true })
   messages: Message[];
+
+  @OneToMany(() => Payment, (payment) => payment.user, { cascade: true })
+  payments: Payment[];
 }

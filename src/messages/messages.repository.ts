@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Message } from './message.entity';
 import { Repository, DataSource } from 'typeorm';
-import { DefaultResultDto } from './dto/default-result.dto';
 
 @Injectable()
 export class MessagesRepository extends Repository<Message> {
