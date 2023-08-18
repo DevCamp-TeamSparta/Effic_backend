@@ -1,43 +1,20 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Get,
-  Logger,
-  Headers,
-  Param,
-} from '@nestjs/common';
+import { Body, Controller, Post, Logger, Headers } from '@nestjs/common';
 import { MessagesService } from '../service/messages.service';
-import { UsersService } from '../../users/service/users.service';
 import { DefaultMessageDto } from '../dto/default-message.dto';
+import { DefaultMessageValidationPipe } from '../pipe/defualt-body-validation-pipe';
 
 @Controller('messages')
 export class MessagesController {
   private logger = new Logger('MessagesController');
-  constructor(
-    private messagesService: MessagesService,
-    private usersService: UsersService,
-  ) {}
+  constructor(private messagesService: MessagesService) {}
 
   @Post('/default')
   async defaultMessage(
-    @Body() defaultMessageDto: DefaultMessageDto,
+    @Body(new DefaultMessageValidationPipe())
+    defaultMessageDto: DefaultMessageDto,
     @Headers('email') headerEmail: string,
   ) {
-    this.logger.verbose('Default message');
+    this.logger.verbose('Default message sending');
     await this.messagesService.defaultMessage(headerEmail, defaultMessageDto);
-  }
-
-  @Get('/default/:messageId')
-  async defaultMessageResult(@Param('messageId') messageId: number) {
-    return await this.messagesService.shortUrlResult(messageId);
-  }
-
-  @Get('/default/ncp/:messageId')
-  async defaultMessageNcpResult(
-    @Param('messageId') messageId: number,
-    @Headers('email') headerEmail: string,
-  ) {
-    return await this.messagesService.ncpResult(messageId, headerEmail);
   }
 }

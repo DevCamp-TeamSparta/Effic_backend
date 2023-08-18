@@ -57,9 +57,14 @@ export class MessagesService {
     // 유저정보 확인
     const user = await this.usersRepository.findOneByEmail(email);
 
-    if (user.point < defaultMessageDto.receiverList.length * 3) {
-      const requiredPoints =
-        defaultMessageDto.receiverList.length * 3 - user.point;
+    const receiverPhones = defaultMessageDto.receiverList.map(
+      (info) => info.phone,
+    );
+
+    const totalMoney = user.money + user.point;
+
+    if (totalMoney < receiverPhones.length * 3) {
+      const requiredPoints = receiverPhones.length * 3 - totalMoney;
       throw new HttpException(
         `need more points: ${requiredPoints}`,
         HttpStatus.FORBIDDEN,
@@ -74,7 +79,6 @@ export class MessagesService {
       shortenedUrls.push(response.shortURL);
       idStrings.push(response.idString);
     }
-    console.log('=========> ~ idStrings:', idStrings);
 
     const newContent = await this.replaceUrlContent(
       defaultMessageDto.urlList,
@@ -131,15 +135,29 @@ export class MessagesService {
         },
       );
 
+      // 유저 금액 차감
+      const deductionMoney = receiverPhones.length * 3;
+      if (user.point >= deductionMoney) {
+        user.point -= deductionMoney;
+      } else {
+        user.money -= deductionMoney - user.point;
+        user.point = 0;
+      }
+
       const message = new Message();
       message.isSent = true;
       message.sentType = MessageType.D;
       message.user = user;
-      message.receiver = defaultMessageDto.receiverList;
+      message.receiverList = receiverPhones;
       message.shortUrl = idStrings;
       message.requestId = response.data.requestId;
 
-      await this.entityManager.save(Message, message);
+      await this.entityManager.transaction(
+        async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(user);
+          await transactionalEntityManager.save(message);
+        },
+      );
 
       return message.messageId;
     } catch (error) {
@@ -180,12 +198,10 @@ export class MessagesService {
     const hmac = crypto.createHmac('sha256', user.secretKey);
     const space = ' ';
     const newLine = '\n';
-    const method = 'POST'; // 수정 필요
+    const method = 'POST';
     message.push(method);
     message.push(space);
-    message.push(
-      `/sms/v2/services/${user.serviceId}/messages`, // 수정 필요
-    );
+    message.push(`/sms/v2/services/${user.serviceId}/messages`);
     message.push(newLine);
     message.push(timestamp);
     message.push(newLine);

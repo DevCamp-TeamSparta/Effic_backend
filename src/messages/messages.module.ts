@@ -5,7 +5,6 @@ import { MessagesService } from './service/messages.service';
 import { Message } from './message.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import { MessagesRepository } from './messages.repository';
-import { UsersService } from 'src/users/service/users.service';
 import { DefaultSchedulerService } from './service/defualt-message-scheduler.schedule';
 
 @Module({
@@ -15,7 +14,6 @@ import { DefaultSchedulerService } from './service/defualt-message-scheduler.sch
     MessagesService,
     MessagesRepository,
     UsersRepository,
-    UsersService,
     DefaultSchedulerService,
   ],
   exports: [MessagesService, MessagesRepository, DefaultSchedulerService],

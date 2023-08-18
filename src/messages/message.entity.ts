@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
-import { Result } from './results.entity';
+import { Result } from '../results/result.entity';
 
 @Entity()
 export class Message extends BaseEntity {
@@ -27,7 +27,7 @@ export class Message extends BaseEntity {
   createdAt: Date;
 
   @Column({ type: 'varchar', nullable: false })
-  receiver: string[];
+  receiverList: string[];
 
   @Column({ type: 'varchar', nullable: true })
   shortUrl: string[];

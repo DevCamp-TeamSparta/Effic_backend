@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Message } from './message.entity';
+import { Message } from '../messages/message.entity';
 
 @Entity()
 export class Result extends BaseEntity {
