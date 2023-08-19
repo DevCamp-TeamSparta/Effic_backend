@@ -72,10 +72,11 @@ export class MessagesService {
     }
 
     const shortenedUrls: string[] = [];
-    const idStrings: string[] = [];
+    const idStrings = [];
 
     for (const url of defaultMessageDto.urlList) {
       const response = await this.ShortenUrl(url);
+      console.log(response.idString);
       shortenedUrls.push(response.shortURL);
       idStrings.push(response.idString);
     }
@@ -161,7 +162,6 @@ export class MessagesService {
 
       return message.messageId;
     } catch (error) {
-      console.log(headers, error.response.data);
       throw new InternalServerErrorException();
     }
   }
@@ -209,75 +209,5 @@ export class MessagesService {
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
-  }
-
-  // 기본메세지 ncp 결과
-  async ncpResult(messageId: number, email: string) {
-    const message = await this.messagesRepository.findOneByMessageId(messageId);
-    const user = await this.usersRepository.findOneByEmail(email);
-
-    const now = Date.now().toString();
-    const headers = {
-      'x-ncp-apigw-timestamp': now,
-      'x-ncp-iam-access-key': user.accessKey,
-      'x-ncp-apigw-signature-v2': await this.signature(user, now),
-    };
-
-    axios
-      .get(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${message.requestId}`,
-        { headers },
-      )
-      .then((response) => {
-        console.log(response.data);
-        let success = 0;
-        let fail = 0;
-        let reserved = 0;
-        for (let i = 0; i < response.data.itemCount; i++) {
-          if (response.data.messages[i].statusName === 'success') {
-            success++;
-          } else if (response.data.messages[i].statusName === 'fail') {
-            fail++;
-          } else if (response.data.messages[i].statusName === 'reserved') {
-            reserved++;
-          }
-        }
-        console.log(success, reserved, fail);
-        return { success, reserved, fail };
-      })
-      .catch((e) => {
-        console.log(e.response.data);
-        throw new InternalServerErrorException();
-      });
-  }
-
-  // 단축 url 결과
-  async shortUrlResult(messageId: number) {
-    const message = await this.messagesRepository.findOneByMessageId(messageId);
-
-    try {
-      const response = await axios.get(
-        `https://api-v2.short.io/statistics/link/${message.shortUrl}`,
-        {
-          params: {
-            period: 'week',
-            tzOffset: '0',
-          },
-          headers: {
-            accept: '*/*',
-            authorization: shortIoConfig.secretKey,
-          },
-        },
-      );
-
-      const totalClicks = response.data.totalClicks;
-      const humanClicks = response.data.humanClicks;
-      console.log(response.data);
-
-      return { totalClicks, humanClicks };
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
-    }
   }
 }

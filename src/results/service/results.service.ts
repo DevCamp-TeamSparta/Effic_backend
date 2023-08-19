@@ -7,7 +7,6 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { MessagesRepository } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { EntityManager } from 'typeorm';
-import { ResultsRepository } from '../results.repository';
 import axios from 'axios';
 import * as crypto from 'crypto';
 import { shortIoConfig } from 'config/short-io.config';
@@ -17,29 +16,8 @@ export class ResultsService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly messagesRepository: MessagesRepository,
-    private readonly resultsRepository: ResultsRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
-
-  async signature(user, messages, timestamp) {
-    const message = [];
-    const hmac = crypto.createHmac('sha256', user.secretKey);
-    const space = ' ';
-    const newLine = '\n';
-    const method = 'GET';
-    message.push(method);
-    message.push(space);
-    message.push(
-      `/sms/v2/services/${user.serviceId}/messages?${messages.requestId}`,
-    );
-    message.push(newLine);
-    message.push(timestamp);
-    message.push(newLine);
-    message.push(user.accessKey);
-
-    const signature = hmac.update(message.join('')).digest('base64');
-    return signature.toString();
-  }
 
   // 기본메세지 ncp 결과
   async ncpResult(messageId: number, email: string) {
@@ -64,9 +42,11 @@ export class ResultsService {
       )
       .then((response) => {
         console.log(response.data);
+
         let success = 0;
         let fail = 0;
         let reserved = 0;
+
         for (let i = 0; i < response.data.itemCount; i++) {
           if (response.data.messages[i].statusName === 'success') {
             success++;
@@ -87,6 +67,21 @@ export class ResultsService {
   // 단축 url 결과
   async shortUrlResult(messageId: number) {
     const message = await this.messagesRepository.findOneByMessageId(messageId);
+    if (!message) {
+      throw new BadRequestException('messageId is wrong');
+    }
+
+    const shortUrlArray = [message.shortUrl.slice(1, -1)];
+    console.log('=========> ~ shortUrlArray:', shortUrlArray);
+    for (const shortUrl of shortUrlArray) {
+      console.log('=========> ~ shortUrl:', shortUrl);
+    }
+    // const shortUrlObject = message.shortUrl;
+    // for (const idString of Object.values(shortUrlObject)) {
+    //   console.log('=========> ~ shortUrlObject:', shortUrlObject);
+    //   console.log('=========> ~ idString:', idString);
+    // }
+    // console.log(result);
 
     try {
       const response = await axios.get(
@@ -111,5 +106,25 @@ export class ResultsService {
       console.log(error);
       throw new InternalServerErrorException();
     }
+  }
+
+  async signature(user, messageId, timestamp) {
+    const message = [];
+    const hmac = crypto.createHmac('sha256', user.secretKey);
+    const space = ' ';
+    const newLine = '\n';
+    const method = 'GET';
+    message.push(method);
+    message.push(space);
+    message.push(
+      `/sms/v2/services/${user.serviceId}/messages?requestId=${messageId.requestId}`,
+    );
+    message.push(newLine);
+    message.push(timestamp);
+    message.push(newLine);
+    message.push(user.accessKey);
+
+    const signature = hmac.update(message.join('')).digest('base64');
+    return signature.toString();
   }
 }

@@ -11,22 +11,4 @@ export class MessagesRepository extends Repository<Message> {
   async findOneByMessageId(messageId: number): Promise<Message> {
     return await this.findOne({ where: { messageId } });
   }
-
-  async findOlderThanTwentyFourHours(): Promise<Message[]> {
-    const twentyFourHoursAgo = new Date();
-    twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
-
-    return this.createQueryBuilder('message')
-      .where('message.createdAt < :twentyFourHoursAgo', { twentyFourHoursAgo })
-      .getMany();
-  }
-
-  async findOlderThanThreeDays(): Promise<Message[]> {
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
-    return this.createQueryBuilder('message')
-      .where('message.createdAt < :threeDaysAgo', { threeDaysAgo })
-      .getMany();
-  }
 }

@@ -50,15 +50,15 @@ Content-Type: application/json
 }
 
 ### dafault message result - shortio
-Get http://localhost:8000/results/default/2
+Get http://localhost:8000/results/default/1
 Content-Type: application/json
 
 
 ### dafault message result - ncp
-Get http://localhost:8000/results/default/ncp/35
+Get http://localhost:8000/results/default/ncp/1
 Header: 
   content-type: application/json
-  email: clo@sparta.coms
+  email: clo@sparta.com
 
 ### create payment
 Post http://localhost:8000/payments

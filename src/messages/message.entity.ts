@@ -30,7 +30,7 @@ export class Message extends BaseEntity {
   receiverList: string[];
 
   @Column({ type: 'varchar', nullable: true })
-  shortUrl: string[];
+  shortUrl: Array<string>;
 
   @Column({ type: 'varchar', nullable: false })
   requestId: string;
@@ -40,5 +40,5 @@ export class Message extends BaseEntity {
   user: User;
 
   @OneToMany(() => Result, (result) => result.message, { cascade: true })
-  result: Result[];
+  results: Result[];
 }

@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
+import { User } from '../users/user.entity';
 
 @Entity()
 export class Result extends BaseEntity {
@@ -19,7 +20,20 @@ export class Result extends BaseEntity {
   @Column()
   humanClicks: number;
 
-  @ManyToOne(() => Message, (message) => message.user)
+  @Column()
+  success: number;
+
+  @Column()
+  reserved: number;
+
+  @Column()
+  fail: number;
+
+  @ManyToOne(() => Message, (message) => message.results)
   @JoinColumn({ name: 'messageId' })
   message: Message;
+
+  @ManyToOne(() => User, (user) => user.results)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }

@@ -6,6 +6,8 @@ export class ResultsController {
   private logger = new Logger('ResultsController');
   constructor(private resultsService: ResultsService) {}
 
+  //   @Get('/default')
+
   @Get('/default/:messageId')
   async defaultMessageResult(@Param('messageId') messageId: number) {
     this.logger.verbose('Default message result');

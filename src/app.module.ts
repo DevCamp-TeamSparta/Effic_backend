@@ -7,10 +7,12 @@ import { MessageModule } from './messages/messages.module';
 import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ResultsModule } from './results/results.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(CongfigValidator),
+    ScheduleModule.forRoot(),
     MessageModule,
     UsersModule,
     PaymentsModule,
