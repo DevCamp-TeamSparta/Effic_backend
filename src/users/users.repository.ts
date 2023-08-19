@@ -28,11 +28,15 @@ export class UsersRepository extends Repository<User> {
       secretKey,
       advertisementOpt,
     } = createUSerInfo;
+
+    const extractedHostnumbers = hostnumber.map((hostnumber) =>
+      hostnumber.replace(/\D/g, ''),
+    );
     const addedPoint = 300;
     const newUser = this.create({
       email: email,
       name: name,
-      hostnumber: hostnumber,
+      hostnumber: extractedHostnumbers,
       accessKey: accessKey,
       serviceId: serviceId,
       secretKey: secretKey,
