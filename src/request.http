@@ -50,7 +50,7 @@ Content-Type: application/json
 }
 
 ### dafault message result - shortio
-Get http://localhost:8000/results/default/1
+Get http://localhost:8000/results/default/3
 Content-Type: application/json
 
 
@@ -69,3 +69,7 @@ Header:
 {
     "money": 1000
 }
+
+### result - messageId
+Get http://localhost:8000/results/2
+Content-Type: application/json

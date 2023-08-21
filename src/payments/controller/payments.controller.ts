@@ -41,20 +41,20 @@ export class PaymentsController {
     return payment;
   }
 
-  @Post('/cancel')
-  async cancelPayment(
-    @Body() cancelPaymentDto: CancelPaymentDto,
-    @Headers('email') headerEmail: string,
-  ) {
-    this.logger.verbose('Payment cancel');
-    const { imp_uid, merchant_uid, refundMoney } = cancelPaymentDto;
-    const payment = await this.paymentsService.cancelPayment(
-      headerEmail,
-      imp_uid,
-      merchant_uid,
-      refundMoney,
-    );
+  // @Post('/cancel')
+  // async cancelPayment(
+  //   @Body() cancelPaymentDto: CancelPaymentDto,
+  //   @Headers('email') headerEmail: string,
+  // ) {
+  //   this.logger.verbose('Payment cancel');
+  //   const { imp_uid, merchant_uid, refundMoney } = cancelPaymentDto;
+  //   const payment = await this.paymentsService.cancelPayment(
+  //     headerEmail,
+  //     imp_uid,
+  //     merchant_uid,
+  //     refundMoney,
+  //   );
 
-    return payment;
-  }
+  //   return payment;
+  // }
 }

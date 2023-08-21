@@ -23,17 +23,20 @@ export class Message extends BaseEntity {
   @Column()
   sentType: MessageType;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createdAt: Date;
 
   @Column({ type: 'varchar', nullable: false })
   receiverList: string[];
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
   shortUrl: Array<string>;
 
   @Column({ type: 'varchar', nullable: false })
   requestId: string;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
 
   @ManyToOne(() => User, (user) => user.messages)
   @JoinColumn({ name: 'userId' })

@@ -31,6 +31,10 @@ export class PaymentsService {
       throw new UnauthorizedException('Minimum payment amount is 1000');
     }
 
+    if (money > 5000000) {
+      throw new UnauthorizedException('Maximum payment amount is 100000');
+    }
+
     const merchant_uid = () => {
       const tokens = v4().split('-');
       return tokens[2] + tokens[1] + tokens[0] + tokens[3] + tokens[4];
@@ -79,15 +83,15 @@ export class PaymentsService {
       );
       amountToBePaid = order.chargemoney;
       // 결제 검증
-      const { amount, status } = paymentData;
-      if (amount === amountToBePaid) {
-        user.money += amountToBePaid;
-      } else {
-        throw {
-          status: 'forgery',
-          message: '결제금액 불일치. 위조된 결제시도',
-        };
-      }
+      // const { amount, status } = paymentData;
+      // if (amount === amountToBePaid) {
+      //   user.money += amountToBePaid;
+      // } else {
+      //   throw {
+      //     status: 'forgery',
+      //     message: '결제금액 불일치. 위조된 결제시도',
+      //   };
+      // }
     } catch (error) {
       this.cancelPayment(email, imp_uid, merchant_uid, amountToBePaid);
       throw error;
@@ -119,7 +123,7 @@ export class PaymentsService {
       console.log(getToken.data);
 
       const { access_token } = getToken.data.response;
-      console.log(access_token);
+      console.log(access_token, imp_uid);
 
       // imp_uid로 포트원 서버에서 결제 정보 조회
       const getPaymentData = await axios({
@@ -144,7 +148,7 @@ export class PaymentsService {
           Authorization: access_token, // 포트원 서버로부터 발급받은 엑세스 토큰
         },
         data: {
-          //   reason, // 가맹점 클라이언트로부터 받은 환불사유
+          // reason, // 가맹점 클라이언트로부터 받은 환불사유
           imp_uid, // imp_uid를 환불 `unique key`로 입력
           amount: refundMoney, // 가맹점 클라이언트로부터 받은 환불금액
           checksum: cancelableAmount, // [권장] 환불 가능 금액 입력
