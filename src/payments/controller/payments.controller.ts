@@ -3,7 +3,6 @@ import { PaymentsService } from '../service/payments.service';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { Payment } from '../payments.entity';
 import { CompletePaymentDto } from '../dto/complete-payment.dto';
-import { CancelPaymentDto } from '../dto/cancel-payment.dto';
 
 @Controller('payments')
 export class PaymentsController {

@@ -7,16 +7,24 @@ import {
   IsString,
 } from 'class-validator';
 
-export class DefaultMessageDto {
+export class AbTestMessageDto {
+  @IsNotEmpty()
+  @IsArray()
+  messageInfoList: string[];
+
+  @IsOptional()
+  @IsString()
+  type: string;
+
   @IsNotEmpty()
   @IsString()
   hostnumber: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   title: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   content: string;
 
@@ -24,15 +32,19 @@ export class DefaultMessageDto {
   @IsNotEmpty()
   receiverList: string[];
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
   advertiseInfo?: boolean;
+
+  @IsNotEmpty()
+  @IsString()
+  urlForResult: string;
 
   @IsDate()
   @IsOptional()
   reservetime?: Date;
 
   @IsArray()
-  @IsNotEmpty()
+  @IsOptional()
   urlList?: string[];
 }

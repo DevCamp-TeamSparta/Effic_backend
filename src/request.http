@@ -40,7 +40,6 @@ Post http://localhost:8000/messages/default
 Content-Type: application/json
 
 {
-    "deviceModel": "Galaxy S22",
     "hostnumber": "01036289823",
     "title": "Effic is the best!",
     "content": "test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
@@ -73,3 +72,15 @@ Header:
 ### result - messageId
 Get http://localhost:8000/results/2
 Content-Type: application/json
+
+
+### abTest message sending
+Post http://localhost:8000/messages/abtest
+Content-Type: application/json
+
+{
+    "message_info_list": [{"type": "A", "title": "Effic is the best!-A", "content": "A test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.naver.com"]},{"type": "B", "title": "Effic is the best!-B", "content": "B test message입니다. \n메세지를 받은 #{name}님! \n현재 #{name}님의 등급은#{grade}입니다. \n더 많은 물품을 보시고 싶으시면 아래의 url을 눌러주세요. \nhttps://www.google.com https://www.daum.net", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.daum.net"]}],
+    "urlForResult": "https://www.naver.com",
+    "hostnumber": "01036289823",
+    "receiverList": [{"phone": "01036289823", "name": "clo", "grade": "A"},{"phone": "01036289823", "name": "clo2", "grade": "B"},{"phone": "01036289823", "name": "clo3", "grade": "A"},{"phone": "01036289823", "name": "clo4", "grade": "C"},{"phone": "01036289823", "name": "clo5", "grade": "B"},{"phone": "01036289823", "name": "clo6", "grade": "D"}]
+}

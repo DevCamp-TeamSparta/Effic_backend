@@ -32,7 +32,7 @@ export class Message extends BaseEntity {
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   shortUrl: Array<string>;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   requestId: string;
 
   @Column({ type: 'int', nullable: false })

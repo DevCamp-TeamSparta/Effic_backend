@@ -7,7 +7,6 @@ import {
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersRepository } from '../../users/users.repository';
-import { MessagesRepository } from '../messages.repository';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
@@ -19,7 +18,6 @@ import { MessageType } from '../message.enum';
 export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly messagesRepository: MessagesRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -76,7 +74,6 @@ export class MessagesService {
 
     for (const url of defaultMessageDto.urlList) {
       const response = await this.ShortenUrl(url);
-      console.log(response.idString);
       shortenedUrls.push(response.shortURL);
       idStrings.push(response.idString);
     }
@@ -180,6 +177,7 @@ export class MessagesService {
       json: {
         originalURL: url,
         domain: 'au9k.short.gy',
+        allowDuplicates: true,
       },
       responseType: 'json',
     })
@@ -209,5 +207,255 @@ export class MessagesService {
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
+  }
+
+  // AB테스트 메세지 보내기
+  async abTestMessage(email, abTestMessageDto) {
+    // 유저정보 확인
+    const user = await this.usersRepository.findOneByEmail(email);
+
+    const receiverPhones = abTestMessageDto.receiverList.map(
+      (info) => info.phone,
+    );
+
+    // 유저 금액 확인 (보낼 수 있는지)
+    const totalMoney = user.money + user.point;
+
+    if (totalMoney < receiverPhones.length * 3) {
+      const requiredPoints = receiverPhones.length * 3 - totalMoney;
+      throw new HttpException(
+        `need more points: ${requiredPoints}`,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    let shortenedUrls: string[] = [];
+    let idStrings = [];
+
+    const isAdvertisement = abTestMessageDto.advertisementInfo;
+
+    let contentPrefix = '';
+    let contentSuffix = '';
+
+    if (isAdvertisement) {
+      contentPrefix = '(광고)';
+      contentSuffix = '\n무료수신거부 08012341234';
+    }
+
+    // 리시버를 3개로 나누기
+    let testReceiverNumber = 0;
+    if (Math.ceil(receiverPhones.length / 2) % 2 == 1) {
+      testReceiverNumber = Math.ceil(receiverPhones.length / 2) + 1;
+    } else {
+      testReceiverNumber = Math.ceil(receiverPhones.length / 2);
+    }
+
+    const aTestReceiver = abTestMessageDto.receiverList.slice(
+      0,
+      testReceiverNumber / 2,
+    );
+    const bTestReceiver = abTestMessageDto.receiverList.slice(
+      testReceiverNumber / 2,
+      testReceiverNumber,
+    );
+    const abResultReceiver =
+      abTestMessageDto.receiverList.slice(testReceiverNumber);
+
+    // A, B 메세지 보내기
+    for (let i = 0; i < 3; i++) {
+      if (i < 1) {
+        //A 메세지 보내기 + 저장
+        for (const url of abTestMessageDto.messageInfoList[0].urlList) {
+          const response = await this.ShortenUrl(url);
+          shortenedUrls.push(response.shortURL);
+          idStrings.push(response.idString);
+        }
+
+        const newContent = await this.replaceUrlContent(
+          abTestMessageDto.messageInfoList[0].urlList,
+          shortenedUrls,
+          abTestMessageDto.messageInfoList[0].content,
+        );
+
+        const body = {
+          type: 'MMS',
+          contentType: await this.getCotentType(abTestMessageDto),
+          countryCode: '82',
+          from: abTestMessageDto.hostnumber,
+          subject: abTestMessageDto.messageInfoList[0].title,
+          content: abTestMessageDto.messageInfoList[0].content,
+          messages: aTestReceiver.map((info) => ({
+            to: info.phone,
+            content: `${contentPrefix} ${this.createMessage(
+              newContent,
+              info,
+            )} ${contentSuffix}`,
+          })),
+          ...(abTestMessageDto.reservetime
+            ? {
+                reservetime: abTestMessageDto.reservetime,
+                reserveTimeZone: 'Asia/Seoul',
+              }
+            : {}),
+        };
+
+        const now = Date.now().toString();
+        const headers = {
+          'Content-Type': 'application/json; charset=utf-8',
+          'x-ncp-iam-access-key': user.accessKey,
+          'x-ncp-apigw-timestamp': now,
+          'x-ncp-apigw-signature-v2': await this.signature(user, now),
+        };
+        const response = await axios.post(
+          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+          body,
+          {
+            headers,
+          },
+        );
+
+        const message = new Message();
+        message.isSent = true;
+        message.sentType = MessageType.A;
+        message.user = user;
+        message.receiverList = receiverPhones.slice(0, aTestReceiver.length);
+        message.shortUrl = idStrings;
+        message.requestId = response.data.requestId;
+
+        await this.entityManager.save(message);
+      } else if (i < 2) {
+        //B 메세지 보내기 + 저장
+        shortenedUrls = [];
+        idStrings = [];
+        for (const url of abTestMessageDto.messageInfoList[1].urlList) {
+          const response = await this.ShortenUrl(url);
+          shortenedUrls.push(response.shortURL);
+          idStrings.push(response.idString);
+        }
+
+        const newContent = await this.replaceUrlContent(
+          abTestMessageDto.messageInfoList[1].urlList,
+          shortenedUrls,
+          abTestMessageDto.messageInfoList[1].content,
+        );
+
+        const body = {
+          type: 'MMS',
+          contentType: await this.getCotentType(abTestMessageDto),
+          countryCode: '82',
+          from: abTestMessageDto.hostnumber,
+          subject: abTestMessageDto.messageInfoList[1].title,
+          content: abTestMessageDto.messageInfoList[1].content,
+          messages: bTestReceiver.map((info) => ({
+            to: info.phone,
+            content: `${contentPrefix} ${this.createMessage(
+              newContent,
+              info,
+            )} ${contentSuffix}`,
+          })),
+          ...(abTestMessageDto.reservetime
+            ? {
+                reservetime: abTestMessageDto.reservetime,
+                reserveTimeZone: 'Asia/Seoul',
+              }
+            : {}),
+        };
+
+        const now = Date.now().toString();
+        const headers = {
+          'Content-Type': 'application/json; charset=utf-8',
+          'x-ncp-iam-access-key': user.accessKey,
+          'x-ncp-apigw-timestamp': now,
+          'x-ncp-apigw-signature-v2': await this.signature(user, now),
+        };
+        const response = await axios.post(
+          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+          body,
+          {
+            headers,
+          },
+        );
+
+        const message = new Message();
+        message.isSent = true;
+        message.sentType = MessageType.B;
+        message.user = user;
+        message.receiverList = receiverPhones.slice(
+          aTestReceiver.length,
+          testReceiverNumber,
+        );
+        message.shortUrl = idStrings;
+        message.requestId = response.data.requestId;
+
+        await this.entityManager.save(message);
+      } else {
+        const message = new Message();
+        message.isSent = false;
+        message.sentType = MessageType.N;
+        message.user = user;
+        message.receiverList = receiverPhones.slice(testReceiverNumber);
+        message.shortUrl = null;
+        message.requestId = null;
+
+        await this.entityManager.save(message);
+      }
+    }
+
+    // 2시간 뒤에 결과 확인해서 좋은 것으로 보내기 - 메세지 예약
+    // db에서 false인 메세지 찾아서 보내고 삭제
+
+    // const body = {
+    //   type: 'MMS',
+    //   contentType: await this.getCotentType(abTestMessageDto),
+    //   countryCode: '82',
+    //   from: abTestMessageDto.hostnumber,
+    //   subject: abTestMessageDto.title,
+    //   content: abTestMessageDto.content,
+    //   messages: abTestMessageDto.receiverList.map((info) => ({
+    //     to: info.phone,
+    //     content: `${contentPrefix} ${this.createMessage(
+    //       newContent,
+    //       info,
+    //     )} ${contentSuffix}`,
+    //   })),
+    //   ...(abTestMessageDto.reservetime
+    //     ? {
+    //         reservetime: abTestMessageDto.reservetime,
+    //         reserveTimeZone: 'Asia/Seoul',
+    //       }
+    //     : {}),
+    // };
+
+    // let headers;
+    // try {
+    //   const now = Date.now().toString();
+    //   headers = {
+    //     'Content-Type': 'application/json; charset=utf-8',
+    //     'x-ncp-iam-access-key': user.accessKey,
+    //     'x-ncp-apigw-timestamp': now,
+    //     'x-ncp-apigw-signature-v2': await this.signature(user, now),
+    //   };
+    //   const response = await axios.post(
+    //     `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+    //     body,
+    //     {
+    //       headers,
+    //     },
+    //   );
+
+    // 유저 금액 차감
+    const deductionMoney = receiverPhones.length * 3;
+    if (user.point >= deductionMoney) {
+      user.point -= deductionMoney;
+    } else {
+      user.money -= deductionMoney - user.point;
+      user.point = 0;
+    }
+
+    await this.entityManager.save(user);
+  }
+  catch(error) {
+    console.log(error);
+    throw new error();
   }
 }
