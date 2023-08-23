@@ -287,6 +287,9 @@ export class MessagesService {
     }
   }
 
+  // hostnumbercheck 메세지
+  // async hostNumberCheckMessage(checkHostNumberDto) {}
+
   // AB테스트 메세지 보내기
   async abTestMessage(email, abTestMessageDto) {
     // 유저정보 확인

@@ -6,6 +6,7 @@ import { AbTestMessageDto } from '../dto/abTest-message.dto';
 import { abTestMessageValidationPipe } from '../pipe/abTest-body-validation-pipe';
 import { TestMessageValidationPipe } from '../pipe/test-body-validation';
 import { TestMessageDto } from '../dto/test-message.dto';
+import { CheckHostNumberDto } from '../dto/check-number.dto';
 import * as jwt from 'jsonwebtoken';
 
 @Controller('messages')
@@ -59,5 +60,14 @@ export class MessagesController {
     const email = decodedAccessToken.email;
 
     await this.messagesService.testMessage(email, testMessageDto);
+  }
+
+  @Post('/checkhostnumber')
+  async checkHostNumber(@Body() checkHostNumberDto: CheckHostNumberDto) {
+    this.logger.verbose('Check host number');
+
+    // const { hostnumber } = checkHostNumberDto;
+
+    // return await this.messagesService.checkHostNumber(hostnumber);
   }
 }
