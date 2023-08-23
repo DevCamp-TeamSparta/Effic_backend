@@ -21,14 +21,14 @@ export class abTestMessageValidationPipe implements PipeTransform {
 
     const receiverPhones = value.receiverList.map((info) => info.phone);
 
-    // const uniqueReceiverPhones = new Set(receiverPhones);
-    // if (uniqueReceiverPhones.size !== receiverPhones.length) {
-    //   throw new BadRequestException('Duplicate phone numbers found');
-    // }
+    const uniqueReceiverPhones = new Set(receiverPhones);
+    if (uniqueReceiverPhones.size !== receiverPhones.length) {
+      throw new BadRequestException('Duplicate phone numbers found');
+    }
 
-    // if (receiverPhones.length < 10) {
-    //   throw new BadRequestException('receivers are must more than 9');
-    // }
+    if (receiverPhones.length < 10) {
+      throw new BadRequestException('receivers are must more than 9');
+    }
 
     const receivernumberRegex = /^(\d{11})$/;
     for (const phone of receiverPhones) {
