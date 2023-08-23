@@ -2,10 +2,10 @@
 POST http://localhost:8000/users/signup
 Header: 
   content-type: application/json
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzNAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MDMxNCwiZXhwIjoxNjkyODU2NzE0fQ.nOq5Z9RIVcV9ilDilnyC1cic01gWK_MRIyUPqUbIChg
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzZAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MTYyMywiZXhwIjoxNjkyODU4MDIzfQ.Rtbf1oxTNZCQnwl-z2I1rsGbtIV1AyQRI7yvAbKqFSg
 
 {
-    "email": "clo3@sparta.com",
+    "email": "clo7@sparta.com",
     "name": "clo2222",
     "accessKey": "cugC5Rn2vzGEWUJhHAKw",
     "serviceId": "ncp:sms:kr:313324923877:clo",
@@ -19,16 +19,16 @@ Post http://localhost:8000/users/login
 Content-Type: application/json
 
 {
-    "email": "clo3@sparta.com"
+    "email": "clo6@sparta.com"
 }
 
 ### update User-info
 Patch http://localhost:8000/users/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTIwODk2NzAsImV4cCI6MTY5MjE3NjA3MH0.X5YJGZ12Uq1rmjLCCGTmbHvEREWpECOQvhZPaBwVy8U
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzRAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MDkxNCwiZXhwIjoxNjkyODU3MzE0fQ.jMwFRtCGu0dE6wpZ0R5y-KD0R4bb5gwciZqeUCcmND4
 Content-Type: application/json
 
 {
-    "hostnumber": ["010-3628-9823"]
+    "hostnumber": ["010-3628-9823"],
 }
 
 ### logout
@@ -45,6 +45,20 @@ Content-Type: application/json
     "title": "Effic is the best!",
     "content": "test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
     "receiverList": [{"phone": "01036289823", "name": "clo"},{"phone": "01099287706", "name": "woo"}],
+    "advertiseInfo": false,
+    "urlList": ["https://www.google.com","https://www.naver.com"]
+}
+
+### test message sending
+Post http://localhost:8000/messages/test
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTIwODk2NzAsImV4cCI6MTY5MjE3NjA3MH0.X5YJGZ12Uq1rmjLCCGTmbHvEREWpECOQvhZPaBwVy8U
+Content-Type: application/json
+
+{
+    "hostnumber": "01036289823",
+    "title": "Effic is the best!",
+    "content": "test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
+    "receiverList": [{"phone": "01036289823", "name": "clo"}],
     "advertiseInfo": false,
     "urlList": ["https://www.google.com","https://www.naver.com"]
 }

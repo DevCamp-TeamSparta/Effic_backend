@@ -4,6 +4,9 @@ import { DefaultMessageDto } from '../dto/default-message.dto';
 import { DefaultMessageValidationPipe } from '../pipe/defualt-body-validation-pipe';
 import { AbTestMessageDto } from '../dto/abTest-message.dto';
 import { abTestMessageValidationPipe } from '../pipe/abTest-body-validation-pipe';
+import { TestMessageValidationPipe } from '../pipe/test-body-validation';
+import { TestMessageDto } from '../dto/test-message.dto';
+import * as jwt from 'jsonwebtoken';
 
 @Controller('messages')
 export class MessagesController {
@@ -14,19 +17,47 @@ export class MessagesController {
   async defaultMessage(
     @Body(new DefaultMessageValidationPipe())
     defaultMessageDto: DefaultMessageDto,
-    @Headers('email') headerEmail: string,
+    @Headers('authorization') authorization: string,
   ) {
     this.logger.verbose('Default message sending');
-    await this.messagesService.defaultMessage(headerEmail, defaultMessageDto);
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    await this.messagesService.defaultMessage(email, defaultMessageDto);
   }
 
   @Post('/abtest')
   async abTestMessage(
     @Body(new abTestMessageValidationPipe())
     abTestMessageDto: AbTestMessageDto,
-    @Headers('email') headerEmail: string,
+    @Headers('authorization') authorization: string,
   ) {
     this.logger.verbose('AB test message sending');
-    await this.messagesService.abTestMessage(headerEmail, abTestMessageDto);
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    await this.messagesService.abTestMessage(email, abTestMessageDto);
+  }
+
+  @Post('/test')
+  async testMessage(
+    @Body(new TestMessageValidationPipe())
+    testMessageDto: TestMessageDto,
+    @Headers('authorization') authorization: string,
+  ) {
+    this.logger.verbose('Test message sending');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    await this.messagesService.testMessage(email, testMessageDto);
   }
 }

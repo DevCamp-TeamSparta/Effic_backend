@@ -213,6 +213,80 @@ export class MessagesService {
     return signature.toString();
   }
 
+  // 테스트 메세지 보내기
+  async testMessage(email, testMessageDto) {
+    // 유저정보 확인
+    const user = await this.usersRepository.findOneByEmail(email);
+
+    const shortenedUrls: string[] = [];
+    const idStrings = [];
+
+    for (const url of testMessageDto.urlList) {
+      const response = await this.ShortenUrl(url);
+      shortenedUrls.push(response.shortURL);
+      idStrings.push(response.idString);
+    }
+
+    const newContent = await this.replaceUrlContent(
+      testMessageDto.urlList,
+      shortenedUrls,
+      testMessageDto.content,
+    );
+
+    const isAdvertisement = testMessageDto.advertisementInfo;
+
+    let contentPrefix = '';
+    let contentSuffix = '';
+
+    if (isAdvertisement) {
+      contentPrefix = '(광고)';
+      contentSuffix = '\n무료수신거부 08012341234';
+    }
+
+    const body = {
+      type: 'MMS',
+      contentType: await this.getCotentType(testMessageDto),
+      countryCode: '82',
+      from: testMessageDto.hostnumber,
+      subject: testMessageDto.title,
+      content: testMessageDto.content,
+      messages: testMessageDto.receiverList.map((info) => ({
+        to: info.phone,
+        content: `${contentPrefix} ${this.createMessage(
+          newContent,
+          info,
+        )} ${contentSuffix}`,
+      })),
+      ...(testMessageDto.reservetime
+        ? {
+            reservetime: testMessageDto.reservetime,
+            reserveTimeZone: 'Asia/Seoul',
+          }
+        : {}),
+    };
+
+    let headers;
+    try {
+      const now = Date.now().toString();
+      headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': user.accessKey,
+        'x-ncp-apigw-timestamp': now,
+        'x-ncp-apigw-signature-v2': await this.signature(user, now),
+      };
+      const response = await axios.post(
+        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+        body,
+        {
+          headers,
+        },
+      );
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error.response.data);
+    }
+  }
+
   // AB테스트 메세지 보내기
   async abTestMessage(email, abTestMessageDto) {
     // 유저정보 확인

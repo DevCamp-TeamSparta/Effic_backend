@@ -270,7 +270,7 @@ export class ResultsService {
           const message =
             await this.messagesContentRepository.findOneByMessageId(aMessageId);
 
-          //   aMessage.isSent = true;
+          // aMessage.isSent = true;
           // await this.messagesRepository.save(aMessage);
           // console.log(`Message ${aMessageId} is sent.`);
         } else {
