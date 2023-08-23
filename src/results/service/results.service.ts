@@ -114,7 +114,6 @@ export class ResultsService {
     if (!message) {
       throw new BadRequestException('messageId is wrong');
     }
-    console.log('===========> ~ message.urlForResult:', message.urlForResult);
 
     const statisticsArray = [];
 
@@ -268,7 +267,7 @@ export class ResultsService {
 
         // a 메세지의 click이 많을 경우, message-content table의 messageId를 검색해서 a 메세지를 전송
         if (aHumanClick > bHumanClick) {
-          const aMessage =
+          const message =
             await this.messagesContentRepository.findOneByMessageId(aMessageId);
 
           //   aMessage.isSent = true;

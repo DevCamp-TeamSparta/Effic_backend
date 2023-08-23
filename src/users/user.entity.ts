@@ -20,8 +20,8 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  hostnumber: string[];
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  hostnumber: Array<string>;
 
   @Column({ type: 'varchar', nullable: false })
   accessKey: string;
