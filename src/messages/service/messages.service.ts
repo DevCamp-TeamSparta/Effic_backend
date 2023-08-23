@@ -14,6 +14,7 @@ import got from 'got';
 import { shortIoConfig } from 'config/short-io.config';
 import { Message } from '../message.entity';
 import { MessageType } from '../message.enum';
+import { MessageContent } from '../message.entity';
 
 @Injectable()
 export class MessagesService {
@@ -332,6 +333,17 @@ export class MessagesService {
         message.requestId = response.data.requestId;
 
         await this.entityManager.save(message);
+
+        const messageContent = new MessageContent();
+        messageContent.messageId = message.messageId;
+        messageContent.content = abTestMessageDto.messageInfoList[0];
+        messageContent.receiverList = abTestMessageDto.receiverList.slice(
+          0,
+          aTestReceiver.length,
+        );
+        messageContent.sentType = MessageType.A;
+
+        await this.entityManager.save(messageContent);
       } else if (i < 2) {
         //B 메세지 보내기 + 저장
         shortenedUrls = [];
@@ -403,6 +415,17 @@ export class MessagesService {
         message.requestId = response.data.requestId;
 
         await this.entityManager.save(message);
+
+        const messageContent = new MessageContent();
+        messageContent.messageId = message.messageId;
+        messageContent.content = abTestMessageDto.messageInfoList[1];
+        messageContent.receiverList = abTestMessageDto.receiverList.slice(
+          aTestReceiver.length,
+          testReceiverNumber,
+        );
+        messageContent.sentType = MessageType.B;
+
+        await this.entityManager.save(messageContent);
       } else {
         const message = new Message();
         message.isSent = false;

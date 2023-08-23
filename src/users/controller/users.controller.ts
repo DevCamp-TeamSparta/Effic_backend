@@ -29,7 +29,7 @@ export class UsersController {
   @Post('/signup')
   async createUser(
     @Body() createUserDto: CreateUserDto,
-    @Headers('token') headerEmail: string,
+    @Headers('token') token: string,
   ): Promise<object> {
     this.logger.verbose('User signup');
     const {
@@ -44,7 +44,7 @@ export class UsersController {
     } = createUserDto;
 
     await this.usersService.createUser(
-      headerEmail,
+      token,
       email,
       name,
       hostnumber,
@@ -102,9 +102,17 @@ export class UsersController {
   }
 
   // 마이페이지.
-  @Get('/:userId')
-  async findUser(@Param('userId') userId: string) {
-    const user = await this.usersService.findUser(parseInt(userId));
+  @Get('/me')
+  async findUser(@Headers('authorization') authorization: string) {
+    this.logger.verbose('User info');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
     if (!user) {
       throw new NotFoundException('User not found!');
     }

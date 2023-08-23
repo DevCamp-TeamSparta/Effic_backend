@@ -8,6 +8,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { MessagesRepository } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { ResultsRepository } from '../results.repository';
+import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { Result } from '../result.entity';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
@@ -22,6 +23,7 @@ export class ResultsService {
     private readonly usersRepository: UsersRepository,
     private readonly messagesRepository: MessagesRepository,
     private readonly resultsRepository: ResultsRepository,
+    private readonly messagesContentRepository: MessagesContentRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -112,6 +114,7 @@ export class ResultsService {
     if (!message) {
       throw new BadRequestException('messageId is wrong');
     }
+    console.log('===========> ~ message.urlForResult:', message.urlForResult);
 
     const statisticsArray = [];
 
@@ -136,7 +139,7 @@ export class ResultsService {
       statisticsArray.push({ totalClicks, humanClicks });
     } catch (error) {
       console.log(error);
-      throw new InternalServerErrorException();
+      throw new error();
     }
     return statisticsArray;
   }
@@ -246,7 +249,7 @@ export class ResultsService {
   }
 
   // A/B 테스트 결과 polling
-  // @Cron('*/10 * * * *')
+  @Cron('*/5 * * * *')
   async handleAbTestCron() {
     this.logger.log('abtest polling');
     const messages = await this.messagesRepository.findNotSend();
@@ -254,24 +257,24 @@ export class ResultsService {
 
     for (const message of messages) {
       try {
-        // message 의 messageId를 반환
         const aMessageId = message.messageId - 2;
         const bMessageId = message.messageId - 1;
 
-        // 그 messageId의 urlForResult 를 이용해서 shortUrlResult 반환
         const aShortUrlResult = await this.shortUrlAbTestResult(aMessageId);
         const bShortUrlResult = await this.shortUrlAbTestResult(bMessageId);
 
-        // a,b 중 humanclick이 더 큰 값을 가진 메세지의 messageId를 반환
         const aHumanClick = aShortUrlResult[0].humanClicks;
         const bHumanClick = bShortUrlResult[0].humanClicks;
+
+        // a 메세지의 click이 많을 경우, message-content table의 messageId를 검색해서 a 메세지를 전송
         if (aHumanClick > bHumanClick) {
-          const aMessage = await this.messagesRepository.findOneByMessageId(
-            aMessageId,
-          );
-          aMessage.isSent = true;
-          await this.messagesRepository.save(aMessage);
-          console.log(`Message ${aMessageId} is sent.`);
+          const aMessage =
+            await this.messagesContentRepository.findOneByMessageId(aMessageId);
+
+          //   aMessage.isSent = true;
+          // await this.messagesRepository.save(aMessage);
+          // console.log(`Message ${aMessageId} is sent.`);
+        } else {
         }
 
         // 더 큰 값을 가진 메세지를 2시간 뒤에 전송하도록 return

@@ -40,3 +40,14 @@ export class MessagesRepository extends Repository<Message> {
       .getMany();
   }
 }
+
+@Injectable()
+export class MessagesContentRepository extends Repository<Message> {
+  constructor(private datasource: DataSource) {
+    super(Message, datasource.createEntityManager());
+  }
+
+  async findOneByMessageId(messageId: number): Promise<Message> {
+    return await this.findOne({ where: { messageId } });
+  }
+}

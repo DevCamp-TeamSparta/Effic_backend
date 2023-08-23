@@ -7,6 +7,7 @@ import {
   OneToMany,
   CreateDateColumn,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
@@ -47,4 +48,26 @@ export class Message extends BaseEntity {
 
   @OneToMany(() => Result, (result) => result.message, { cascade: true })
   results: Result[];
+}
+
+@Entity()
+export class MessageContent {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  contentId: number;
+
+  @Column({ type: 'int', nullable: false })
+  messageId: number;
+
+  @Column()
+  sentType: MessageType;
+
+  @Column()
+  content: string;
+
+  @Column({ array: true, nullable: false, type: 'text', default: [] })
+  receiverList: Array<string>;
+
+  @OneToOne(() => Message)
+  @JoinColumn({ name: 'messageId' })
+  message: Message;
 }

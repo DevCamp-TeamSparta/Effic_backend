@@ -5,7 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Result } from './result.entity';
 import { ResultsRepository } from './results.repository';
 import { UsersRepository } from 'src/users/users.repository';
-import { MessagesRepository } from 'src/messages/messages.repository';
+import {
+  MessagesContentRepository,
+  MessagesRepository,
+} from 'src/messages/messages.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Result])],
@@ -15,6 +18,7 @@ import { MessagesRepository } from 'src/messages/messages.repository';
     ResultsRepository,
     UsersRepository,
     MessagesRepository,
+    MessagesContentRepository,
   ],
   exports: [ResultsService, ResultsRepository],
 })
