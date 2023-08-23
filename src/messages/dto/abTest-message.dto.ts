@@ -12,21 +12,9 @@ export class AbTestMessageDto {
   @IsArray()
   messageInfoList: string[];
 
-  @IsOptional()
-  @IsString()
-  type: string;
-
   @IsNotEmpty()
   @IsString()
   hostnumber: string;
-
-  @IsOptional()
-  @IsString()
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  content: string;
 
   @IsArray()
   @IsNotEmpty()

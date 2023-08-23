@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
@@ -33,6 +34,9 @@ export class Message extends BaseEntity {
   shortUrl: Array<string>;
 
   @Column({ type: 'varchar', nullable: true })
+  urlForResult: string;
+
+  @Column({ type: 'varchar', nullable: true })
   requestId: string;
 
   @Column({ type: 'int', nullable: false })
@@ -44,4 +48,6 @@ export class Message extends BaseEntity {
 
   @OneToMany(() => Result, (result) => result.message, { cascade: true })
   results: Result[];
+
+  // @OneToOne(() => MessageContent, (result) => result.message)
 }

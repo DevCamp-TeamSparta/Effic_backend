@@ -106,6 +106,41 @@ export class ResultsService {
     return statisticsArray;
   }
 
+  // 단축 url A/B 비교 결과
+  async shortUrlAbTestResult(messageId: number) {
+    const message = await this.messagesRepository.findOneByMessageId(messageId);
+    if (!message) {
+      throw new BadRequestException('messageId is wrong');
+    }
+
+    const statisticsArray = [];
+
+    try {
+      const response = await axios.get(
+        `https://api-v2.short.io/statistics/link/${message.urlForResult}`,
+        {
+          params: {
+            period: 'week',
+            tzOffset: '0',
+          },
+          headers: {
+            accept: '*/*',
+            authorization: shortIoConfig.secretKey,
+          },
+        },
+      );
+
+      const totalClicks = response.data.totalClicks;
+      const humanClicks = response.data.humanClicks;
+
+      statisticsArray.push({ totalClicks, humanClicks });
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+    return statisticsArray;
+  }
+
   async signature(user, messageId, timestamp) {
     const message = [];
     const hmac = crypto.createHmac('sha256', user.secretKey);
@@ -139,11 +174,11 @@ export class ResultsService {
     return result;
   }
 
+  // ncp 발송 여부 결과
   @Cron('0 */1 * * *')
   async handleNcpCron() {
     this.logger.log('ncp polling');
     const messages = await this.messagesRepository.findThreeDaysBeforeSend();
-    this.logger.log(messages);
 
     for (const message of messages) {
       const user = await this.usersRepository.findOneByUserId(message.userId);
@@ -171,6 +206,7 @@ export class ResultsService {
     }
   }
 
+  // url 클릭 결과
   @Cron('0 */1 * * *')
   // @Cron(CronExpression.EVERY_10_MINUTES)
   async handleUrlCron() {
@@ -203,6 +239,45 @@ export class ResultsService {
       } catch (error) {
         console.error(
           `Failed to fetch short url results for message ${message.messageId}.`,
+          error,
+        );
+      }
+    }
+  }
+
+  // A/B 테스트 결과 polling
+  // @Cron('*/10 * * * *')
+  async handleAbTestCron() {
+    this.logger.log('abtest polling');
+    const messages = await this.messagesRepository.findNotSend();
+    this.logger.log(messages);
+
+    for (const message of messages) {
+      try {
+        // message 의 messageId를 반환
+        const aMessageId = message.messageId - 2;
+        const bMessageId = message.messageId - 1;
+
+        // 그 messageId의 urlForResult 를 이용해서 shortUrlResult 반환
+        const aShortUrlResult = await this.shortUrlAbTestResult(aMessageId);
+        const bShortUrlResult = await this.shortUrlAbTestResult(bMessageId);
+
+        // a,b 중 humanclick이 더 큰 값을 가진 메세지의 messageId를 반환
+        const aHumanClick = aShortUrlResult[0].humanClicks;
+        const bHumanClick = bShortUrlResult[0].humanClicks;
+        if (aHumanClick > bHumanClick) {
+          const aMessage = await this.messagesRepository.findOneByMessageId(
+            aMessageId,
+          );
+          aMessage.isSent = true;
+          await this.messagesRepository.save(aMessage);
+          console.log(`Message ${aMessageId} is sent.`);
+        }
+
+        // 더 큰 값을 가진 메세지를 2시간 뒤에 전송하도록 return
+      } catch (error) {
+        console.error(
+          `Failed to fetch ab test results for message ${message.messageId}.`,
           error,
         );
       }

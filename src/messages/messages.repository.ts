@@ -29,4 +29,14 @@ export class MessagesRepository extends Repository<Message> {
       .where('message.createdAt > :twentyFourHoursAgo', { twentyFourHoursAgo })
       .getMany();
   }
+
+  async findNotSend(): Promise<Message[]> {
+    const twoHoursAgo = new Date();
+    twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);
+
+    return this.createQueryBuilder('message')
+      .where('message.createdAt < :twoHoursAgo', { twoHoursAgo })
+      .andWhere('message.isSent = :status', { status: false })
+      .getMany();
+  }
 }

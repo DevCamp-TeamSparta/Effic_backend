@@ -15,6 +15,7 @@ export class DefaultMessageValidationPipe implements PipeTransform {
     }
 
     const receiverPhones = value.receiverList.map((info) => info.phone);
+
     const uniqueReceiverPhones = new Set(receiverPhones);
     if (uniqueReceiverPhones.size !== receiverPhones.length) {
       throw new BadRequestException('Duplicate phone numbers found');
@@ -25,6 +26,11 @@ export class DefaultMessageValidationPipe implements PipeTransform {
       if (!receivernumberRegex.test(phone)) {
         throw new BadRequestException('receiver phone number is not valid');
       }
+    }
+
+    const uniqueUrl = new Set(value.urlList);
+    if (uniqueUrl.size !== value.urlList.length) {
+      throw new BadRequestException('Duplicate urls found');
     }
 
     return value;

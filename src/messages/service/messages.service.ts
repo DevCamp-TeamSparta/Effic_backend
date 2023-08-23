@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   HttpException,
   HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -148,6 +149,7 @@ export class MessagesService {
       message.user = user;
       message.receiverList = receiverPhones;
       message.shortUrl = idStrings;
+      message.urlForResult = null;
       message.requestId = response.data.requestId;
 
       await this.entityManager.transaction(
@@ -159,7 +161,8 @@ export class MessagesService {
 
       return message.messageId;
     } catch (error) {
-      throw new InternalServerErrorException();
+      console.log(error);
+      throw new BadRequestException(error.response.data);
     }
   }
 
@@ -314,12 +317,18 @@ export class MessagesService {
           },
         );
 
+        const urlForResult = abTestMessageDto.urlForResult;
+        const idStringIndex =
+          abTestMessageDto.messageInfoList[0].urlList.indexOf(urlForResult);
+        const idStringForResult = idStrings[idStringIndex];
+
         const message = new Message();
         message.isSent = true;
         message.sentType = MessageType.A;
         message.user = user;
         message.receiverList = receiverPhones.slice(0, aTestReceiver.length);
         message.shortUrl = idStrings;
+        message.urlForResult = idStringForResult;
         message.requestId = response.data.requestId;
 
         await this.entityManager.save(message);
@@ -376,6 +385,11 @@ export class MessagesService {
           },
         );
 
+        const urlForResult = abTestMessageDto.urlForResult;
+        const idStringIndex =
+          abTestMessageDto.messageInfoList[1].urlList.indexOf(urlForResult);
+        const idStringForResult = idStrings[idStringIndex];
+
         const message = new Message();
         message.isSent = true;
         message.sentType = MessageType.B;
@@ -385,6 +399,7 @@ export class MessagesService {
           testReceiverNumber,
         );
         message.shortUrl = idStrings;
+        message.urlForResult = idStringForResult;
         message.requestId = response.data.requestId;
 
         await this.entityManager.save(message);
@@ -395,6 +410,7 @@ export class MessagesService {
         message.user = user;
         message.receiverList = receiverPhones.slice(testReceiverNumber);
         message.shortUrl = null;
+        message.urlForResult = null;
         message.requestId = null;
 
         await this.entityManager.save(message);
@@ -403,45 +419,6 @@ export class MessagesService {
 
     // 2시간 뒤에 결과 확인해서 좋은 것으로 보내기 - 메세지 예약
     // db에서 false인 메세지 찾아서 보내고 삭제
-
-    // const body = {
-    //   type: 'MMS',
-    //   contentType: await this.getCotentType(abTestMessageDto),
-    //   countryCode: '82',
-    //   from: abTestMessageDto.hostnumber,
-    //   subject: abTestMessageDto.title,
-    //   content: abTestMessageDto.content,
-    //   messages: abTestMessageDto.receiverList.map((info) => ({
-    //     to: info.phone,
-    //     content: `${contentPrefix} ${this.createMessage(
-    //       newContent,
-    //       info,
-    //     )} ${contentSuffix}`,
-    //   })),
-    //   ...(abTestMessageDto.reservetime
-    //     ? {
-    //         reservetime: abTestMessageDto.reservetime,
-    //         reserveTimeZone: 'Asia/Seoul',
-    //       }
-    //     : {}),
-    // };
-
-    // let headers;
-    // try {
-    //   const now = Date.now().toString();
-    //   headers = {
-    //     'Content-Type': 'application/json; charset=utf-8',
-    //     'x-ncp-iam-access-key': user.accessKey,
-    //     'x-ncp-apigw-timestamp': now,
-    //     'x-ncp-apigw-signature-v2': await this.signature(user, now),
-    //   };
-    //   const response = await axios.post(
-    //     `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-    //     body,
-    //     {
-    //       headers,
-    //     },
-    //   );
 
     // 유저 금액 차감
     const deductionMoney = receiverPhones.length * 3;
