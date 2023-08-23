@@ -49,11 +49,13 @@ Content-Type: application/json
 }
 
 ### dafault message result - shortio
+### test용입니다 실제로 사용되지 않습니다.
 Get http://localhost:8000/results/default/3
 Content-Type: application/json
 
 
-### dafault message result - ncp
+### dafault message result - ncp 
+### test용입니다 실제로 사용되지 않습니다.
 Get http://localhost:8000/results/default/ncp/42
 Header: 
   content-type: application/json
