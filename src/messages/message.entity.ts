@@ -5,14 +5,12 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   CreateDateColumn,
   JoinColumn,
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
 import { Result } from '../results/result.entity';
-import { MessageContent } from './message-content.entity';
 
 @Entity()
 export class Message extends BaseEntity {

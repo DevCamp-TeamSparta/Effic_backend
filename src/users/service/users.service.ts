@@ -92,12 +92,17 @@ export class UsersService {
       if (decodedAccessToken && decodedAccessToken.exp * 1000 > Date.now()) {
         return;
       } else {
+        if (!user) {
+          throw new HttpException(
+            { Message: 'Access token is invalid or expired', accessToken },
+            HttpStatus.FORBIDDEN,
+          );
+        }
         const decodedRefreshToken: any = jwt.decode(user.refreshToken);
         if (
           decodedRefreshToken &&
           decodedRefreshToken.exp * 1000 > Date.now()
         ) {
-          // if (decodedRefreshToken === user.refreshToken) {
           const { accessToken } = await this.generateTokens(user);
           throw new HttpException(
             { Message: 'Access token is invalid or expired', accessToken },
@@ -106,10 +111,7 @@ export class UsersService {
         } else {
           throw new UnauthorizedException('Tokens are invalid');
         }
-      } //else {
-      //   throw new UnauthorizedException('Tokens are invalid!');
-      // }
-      // }
+      }
     }
   }
 
@@ -125,6 +127,7 @@ export class UsersService {
     advertisementOpt: boolean,
     point: number,
   ) {
+    this.checkAccessToken(null, token);
     const payload = jwt.decode(token);
     if (typeof payload === 'string') {
       throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
