@@ -32,6 +32,7 @@ export class UsersRepository extends Repository<User> {
     const extractedHostnumbers = hostnumber.map((hostnumber) =>
       hostnumber.replace(/\D/g, ''),
     );
+
     const addedPoint = 3000;
     const newUser = this.create({
       email: email,

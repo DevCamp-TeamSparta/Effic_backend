@@ -2,14 +2,15 @@
 POST http://localhost:8000/users/signup
 Header: 
   content-type: application/json
-  email: clo@sparta.com
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzNAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MDMxNCwiZXhwIjoxNjkyODU2NzE0fQ.nOq5Z9RIVcV9ilDilnyC1cic01gWK_MRIyUPqUbIChg
 
 {
-    "email": "clo@sparta.com",
-    "name": "clo",
+    "email": "clo3@sparta.com",
+    "name": "clo2222",
     "accessKey": "cugC5Rn2vzGEWUJhHAKw",
     "serviceId": "ncp:sms:kr:313324923877:clo",
     "secretKey": "z7KIKoY9QAtb1kGTlwWDBIigPfPWkLw9yALApZLv",
+    "hostnumber": ["010-3628-9823"],
     "advertisementOpt": false
 }
 
@@ -18,7 +19,7 @@ Post http://localhost:8000/users/login
 Content-Type: application/json
 
 {
-    "email": "clo2@sparta.com"
+    "email": "clo3@sparta.com"
 }
 
 ### update User-info

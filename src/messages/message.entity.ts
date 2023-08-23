@@ -12,6 +12,7 @@ import {
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
 import { Result } from '../results/result.entity';
+import { MessageContent } from './message-content.entity';
 
 @Entity()
 export class Message extends BaseEntity {
@@ -48,6 +49,4 @@ export class Message extends BaseEntity {
 
   @OneToMany(() => Result, (result) => result.message, { cascade: true })
   results: Result[];
-
-  // @OneToOne(() => MessageContent, (result) => result.message)
 }

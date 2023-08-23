@@ -40,6 +40,7 @@ export class UsersService {
     } catch (error) {
       if (error instanceof NotFoundException) {
         const dummyUser = new User();
+        dummyUser.email = email;
         const { accessToken } = await this.generateTokens(dummyUser);
         throw new HttpException(
           { message: 'User not found', accessToken },
@@ -114,7 +115,7 @@ export class UsersService {
 
   // 회원가입
   async createUser(
-    headerEmail: string,
+    token: string,
     email: string,
     name: string,
     hostnumber: string[],
@@ -124,6 +125,11 @@ export class UsersService {
     advertisementOpt: boolean,
     point: number,
   ) {
+    const payload = jwt.decode(token);
+    if (typeof payload === 'string') {
+      throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
+    }
+    const headerEmail = payload.email;
     if (headerEmail !== email) {
       throw new HttpException('Email is not valid', HttpStatus.BAD_REQUEST);
     }

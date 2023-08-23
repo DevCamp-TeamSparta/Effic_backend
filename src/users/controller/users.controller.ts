@@ -29,7 +29,7 @@ export class UsersController {
   @Post('/signup')
   async createUser(
     @Body() createUserDto: CreateUserDto,
-    @Headers('email') headerEmail: string,
+    @Headers('token') headerEmail: string,
   ): Promise<object> {
     this.logger.verbose('User signup');
     const {
