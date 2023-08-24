@@ -197,7 +197,6 @@ export class ResultsService {
     });
     return results;
   }
-
   // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
   async messageResult(messageId: number) {
     // 클릭했을 때 결과를 하나 만듦

@@ -176,7 +176,6 @@ export class MessagesService {
           result.id = group.id;
         },
       );
-
       return {
         messageId: message.messageId,
         messageGroupId: result.id,
