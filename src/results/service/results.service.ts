@@ -99,8 +99,6 @@ export class ResultsService {
         const totalClicks = response.data.totalClicks;
         const humanClicks = response.data.humanClicks;
 
-        console.log(response.data);
-
         statisticsArray.push({ totalClicks, humanClicks, shortUrl });
       } catch (error) {
         console.log(error);
@@ -169,10 +167,10 @@ export class ResultsService {
   async getLinkInfo(shortUrl: string) {
     try {
       axios
-        .get(`https://api.short.io/${shortUrl}/expand`, {
+        .get(`https://api.short.io/links/expand`, {
           params: {
             domain: 'au9k.short.gy',
-            path: 'first-blog-post',
+            path: shortUrl,
           },
           headers: {
             accept: 'application/json',
@@ -185,8 +183,6 @@ export class ResultsService {
         .catch(function (response) {
           console.log(response);
         });
-
-      // return response.data;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException();
@@ -200,9 +196,12 @@ export class ResultsService {
       throw new BadRequestException('messageId is wrong');
     }
 
-    const result = await this.resultsRepository.findAllByMessageId(messageId);
+    // const result =
+    const pollingResult = await this.resultsRepository.findAllByMessageId(
+      messageId,
+    );
 
-    return result;
+    return pollingResult;
   }
 
   // ncp 발송 여부 결과

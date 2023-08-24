@@ -259,7 +259,7 @@ export class MessagesService {
       })),
       ...(testMessageDto.reservetime
         ? {
-            reservetime: testMessageDto.reservetime,
+            reserveTime: testMessageDto.reservetime,
             reserveTimeZone: 'Asia/Seoul',
           }
         : {}),
