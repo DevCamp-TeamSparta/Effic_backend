@@ -6,13 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import {
+  MessageGroupRepo,
   MessagesRepository,
   UrlInfosRepository,
 } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { ResultsRepository } from '../results.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
-import { Result, NcpResult, UrlResult } from '../result.entity';
+import { NcpResult, UrlResult } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
 import { EntityManager } from 'typeorm';
@@ -27,6 +28,7 @@ export class ResultsService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly messagesRepository: MessagesRepository,
+    private readonly messageGroupRepo: MessageGroupRepo,
     private readonly resultsRepository: ResultsRepository,
     private readonly messagesContentRepository: MessagesContentRepository,
     private readonly urlResultsRepository: UrlResultsRepository,
@@ -170,15 +172,37 @@ export class ResultsService {
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
   }
+  async messageGroupResult(messageGroupId: number, email: string) {
+    const result =
+      this.messageGroupRepo.findOneByMessageGroupId(messageGroupId);
+    if (!result) {
+      throw new BadRequestException('messageGroupId is wrong');
+    }
+
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('email is wrong');
+    }
+
+    const messages = await this.messagesRepository.findAllByMessageGroupId(
+      messageGroupId,
+    );
+    if (!messages) {
+      throw new BadRequestException('messageGroupId is wrong');
+    }
+
+    const results = messages.map((message) => {
+      console.log('!group 동작', message);
+      return this.messageResult(message.messageId);
+    });
+    return results;
+  }
 
   // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
   async messageResult(messageId: number) {
-    const urlMessage = await this.urlResultsRepository.findAllByMessageId(
-      messageId,
-    );
-    if (!urlMessage) {
-      throw new BadRequestException('messageId is wrong');
-    }
+    // if (!urlMessage) {
+    //   throw new BadRequestException('messageId is wrong');
+    // }
 
     const ncpMessage = await this.ncpResultsRepository.findAllByMessageId(
       messageId,
@@ -187,32 +211,62 @@ export class ResultsService {
       throw new BadRequestException('messageId is wrong');
     }
 
-    const messageResult = [];
-    for (const url of urlMessage) {
-      const urlInfo = await this.urlInfosRepository.findOneByIdString(
-        url.idString,
+    const messageResults = [];
+
+    for (const ncp of ncpMessage) {
+      const urlMessage = await this.urlResultsRepository.findAllByResultId(
+        ncp.ncpResultId,
       );
-
       const result = {
-        idString: url.idString,
-        humanclicks: url.humanclicks,
-        totalclicks: url.totalclicks,
+        message: messageId,
+        user: ncp.user,
+        urls: [],
+        success: ncp.success,
+        reserved: ncp.reserved,
+        fail: ncp.fail,
       };
-      messageResult.push(result);
+      for (const url of urlMessage) {
+        if (ncp.messageId === url.messageId) {
+          const urlInfo = await this.urlInfosRepository.findOneByIdString(
+            url.idString,
+          );
+
+          result.urls.push({
+            shortUrl: urlInfo.shortenUrl,
+            originalUrl: urlInfo.originalUrl,
+            humanclicks: url.humanclicks,
+            totalclicks: url.totalclicks,
+          });
+        }
+      }
+
+      messageResults.push(result);
     }
+    return messageResults;
 
-    const ncpResult = {
-      success: ncpMessage[0].success,
-      reserved: ncpMessage[0].reserved,
-      fail: ncpMessage[0].fail,
-    };
+    // for (const url of urlMessage) {
+    //   const urlInfo = await this.urlInfosRepository.findOneByIdString(
+    //     url.idString,
+    //   );
 
-    const result = {
-      messageResult,
-      ncpResult,
-    };
+    //   const result = {
+    //     idString: url.idString,
+    //     humanclicks: url.humanclicks,
+    //     totalclicks: url.totalclicks,
+    //   };
+    //   messageResult.push(result);
+    // }
 
-    return result;
+    // const ncpResult = {
+    //   success: ncpMessage[0].success,
+    //   reserved: ncpMessage[0].reserved,
+    //   fail: ncpMessage[0].fail,
+    // };
+
+    // const result = {
+    //   messageResult,
+    //   ncpResult,
+    // };
   }
 
   // ncp와 단축 url 결과를 합친 polling
@@ -236,9 +290,38 @@ export class ResultsService {
           user: user,
         });
 
-        await this.entityManager.save(resultEntity);
+        const resultId = (await this.entityManager.save(resultEntity))
+          .ncpResultId;
 
         console.log(`NCP results for message ${message.messageId} saved.`);
+
+        if (message.createdAt < new Date(Date.now() - 24 * 60 * 60 * 1000)) {
+          try {
+            const shortUrlResult = await this.shortUrlResult(message.messageId);
+
+            for (const result of shortUrlResult) {
+              const resultEntity = this.entityManager.create(UrlResult, {
+                message: message,
+                user: user,
+                humanclicks: result.humanClicks,
+                totalclicks: result.totalClicks,
+                idString: result.idString,
+                ncpResultId: resultId,
+              });
+
+              await this.entityManager.save(resultEntity);
+            }
+
+            console.log(
+              `Short url results for message ${message.messageId} saved.`,
+            );
+          } catch (error) {
+            console.error(
+              `Failed to fetch short url results for message ${message.messageId}.`,
+              error,
+            );
+          }
+        }
       } catch (error) {
         console.error(
           `Failed to fetch NCP results for message ${message.messageId}.`,

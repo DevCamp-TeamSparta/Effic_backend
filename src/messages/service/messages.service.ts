@@ -16,13 +16,23 @@ import { Message } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { UrlInfo } from '../message.entity';
+import { MessageGroupRepo } from '../messages.repository';
 
 @Injectable()
 export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly messageGroupRepo: MessageGroupRepo,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
+
+  async getGroupList(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    const messageGroupList = await this.messageGroupRepo.findAllByUserId(
+      user.userId,
+    );
+    return messageGroupList;
+  }
 
   async getCotentType(defaultMessageDto): Promise<string> {
     if (defaultMessageDto.advertiseInfo === true) {
@@ -154,14 +164,23 @@ export class MessagesService {
       message.urlForResult = null;
       message.requestId = response.data.requestId;
 
+      const result: any = {};
       await this.entityManager.transaction(
         async (transactionalEntityManager) => {
           await transactionalEntityManager.save(user);
+          const group = await this.messageGroupRepo.createMessageGroup(
+            user.userId,
+          );
+          message.messageGroupId = group.id;
           await transactionalEntityManager.save(message);
+          result.id = group.id;
         },
       );
 
-      return message.messageId;
+      return {
+        messageId: message.messageId,
+        messageGroupId: result.id,
+      };
     } catch (error) {
       console.log(error);
       throw new BadRequestException(error.response);
@@ -412,6 +431,7 @@ export class MessagesService {
     const abResultReceiver =
       abTestMessageDto.receiverList.slice(testReceiverNumber);
 
+    const result = await this.messageGroupRepo.createMessageGroup(user.userId);
     // A, B 메세지 보내기
     for (let i = 0; i < 3; i++) {
       if (i < 1) {
@@ -478,7 +498,7 @@ export class MessagesService {
         message.idString = idStrings;
         message.urlForResult = idStringForResult;
         message.requestId = response.data.requestId;
-
+        message.messageGroupId = result.id;
         await this.entityManager.save(message);
 
         const messageContent = new MessageContent();
@@ -560,7 +580,7 @@ export class MessagesService {
         message.idString = idStrings;
         message.urlForResult = idStringForResult;
         message.requestId = response.data.requestId;
-
+        message.messageGroupId = result.id;
         await this.entityManager.save(message);
 
         const messageContent = new MessageContent();
@@ -582,7 +602,7 @@ export class MessagesService {
         message.idString = null;
         message.urlForResult = null;
         message.requestId = null;
-
+        message.messageGroupId = result.id;
         await this.entityManager.save(message);
       }
     }
@@ -600,6 +620,10 @@ export class MessagesService {
     }
 
     await this.entityManager.save(user);
+    return {
+      messageId: '',
+      messageGroupId: result.id,
+    };
   }
   catch(error) {
     console.log(error);

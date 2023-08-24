@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Logger, Headers } from '@nestjs/common';
+import { Body, Controller, Post, Logger, Headers, Get } from '@nestjs/common';
 import { MessagesService } from '../service/messages.service';
 import { DefaultMessageDto } from '../dto/default-message.dto';
 import { DefaultMessageValidationPipe } from '../pipe/defualt-body-validation-pipe';
@@ -48,12 +48,15 @@ export class MessagesController {
 
     const email = decodedAccessToken.email;
 
-    const messageId = await this.messagesService.abTestMessage(
+    const result = await this.messagesService.abTestMessage(
       email,
       abTestMessageDto,
     );
 
-    return { messageId };
+    return {
+      messageId: result.messageId,
+      messageGroupId: result.messageGroupId,
+    };
   }
 
   @Post('/test')
@@ -86,5 +89,16 @@ export class MessagesController {
     );
 
     return { message };
+  }
+
+  @Get('/group')
+  async getGroupList(@Headers('authorization') authorization: string) {
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+    const groupList = await this.messagesService.getGroupList(email);
+
+    return { groupList };
   }
 }

@@ -48,6 +48,25 @@ export class Message extends BaseEntity {
 
   @OneToMany(() => Result, (result) => result.message, { cascade: true })
   results: Result[];
+
+  @Column({ type: 'int', nullable: true })
+  messageGroupId: number;
+
+  // @ManyToOne(() => MessageGroup, (group) => group.messages)
+  // @JoinColumn({ name: 'messageGroupId' })
+  // messageGroup: MessageGroup;
+}
+
+@Entity()
+export class MessageGroup extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  id: number;
+
+  @OneToMany(() => Message, 'messageGroupId')
+  messages: Message[];
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
 }
 
 @Entity()
@@ -70,6 +89,9 @@ export class MessageContent extends BaseEntity {
   @OneToOne(() => Message)
   @JoinColumn({ name: 'messageId' })
   message: Message;
+
+  @Column({ type: 'int', nullable: true })
+  messageGroupId: number;
 }
 
 @Entity()

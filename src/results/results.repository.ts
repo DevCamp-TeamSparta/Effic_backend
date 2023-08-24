@@ -22,6 +22,10 @@ export class UrlResultsRepository extends Repository<UrlResult> {
   async findAllByMessageId(messageId: number): Promise<UrlResult[]> {
     return await this.find({ where: { messageId } });
   }
+
+  async findAllByResultId(ncpResultId: number): Promise<UrlResult[]> {
+    return await this.find({ where: { ncpResultId } });
+  }
 }
 
 @Injectable()
