@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import {
+  MessageGroupRepo,
   MessagesRepository,
   UrlInfosRepository,
 } from 'src/messages/messages.repository';
@@ -27,6 +28,7 @@ export class ResultsService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly messagesRepository: MessagesRepository,
+    private readonly messageGroupRepo: MessageGroupRepo,
     private readonly resultsRepository: ResultsRepository,
     private readonly messagesContentRepository: MessagesContentRepository,
     private readonly urlResultsRepository: UrlResultsRepository,
@@ -170,7 +172,31 @@ export class ResultsService {
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
   }
+  async messageGroupResult(messageGroupId: number, email: string) {
+    const result =
+      this.messageGroupRepo.findOneByMessageGroupId(messageGroupId);
+    if (!result) {
+      throw new BadRequestException('messageGroupId is wrong');
+    }
 
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('email is wrong');
+    }
+
+    const messages = await this.messagesRepository.findAllByMessageGroupId(
+      messageGroupId,
+    );
+    if (!messages) {
+      throw new BadRequestException('messageGroupId is wrong');
+    }
+
+    const results = messages.map((message) => {
+      console.log('!group 동작', message);
+      return this.messageResult(message.messageId);
+    });
+    return results;
+  }
   // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
   async messageResult(messageId: number) {
     const urlMessage = await this.urlResultsRepository.findAllByMessageId(
@@ -216,8 +242,8 @@ export class ResultsService {
   }
 
   // ncp와 단축 url 결과를 합친 polling
-  @Cron('*/1 * * * *')
-  // @Cron('0 */1 * * *')
+  // @Cron('*/1 * * * *')
+  @Cron('0 */1 * * *')
   async handleNcpCron() {
     this.logger.log('ncp polling');
     const ncpmessages = await this.messagesRepository.findThreeDaysBeforeSend();

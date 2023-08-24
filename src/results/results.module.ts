@@ -10,6 +10,7 @@ import {
 } from './results.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import {
+  MessageGroupRepo,
   MessagesContentRepository,
   MessagesRepository,
   UrlInfosRepository,
@@ -26,6 +27,7 @@ import {
     UrlResultsRepository,
     MessagesRepository,
     MessagesContentRepository,
+    MessageGroupRepo,
     UrlInfosRepository,
   ],
   exports: [
