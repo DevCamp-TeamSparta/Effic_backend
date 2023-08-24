@@ -1,11 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { Message, MessageContent, UrlInfo } from './message.entity';
+import {
+  Message,
+  MessageContent,
+  MessageGroup,
+  UrlInfo,
+} from './message.entity';
 import { Repository, DataSource } from 'typeorm';
 
 @Injectable()
 export class MessagesRepository extends Repository<Message> {
   constructor(private datasource: DataSource) {
     super(Message, datasource.createEntityManager());
+  }
+  async findAllByMessageGroupId(messageGroupId: number) {
+    return await this.find({ where: { messageGroupId } });
   }
 
   async findOneByMessageId(messageId: number): Promise<Message> {
@@ -60,5 +68,25 @@ export class UrlInfosRepository extends Repository<UrlInfo> {
 
   async findOneByIdString(idString: string): Promise<UrlInfo> {
     return await this.findOne({ where: { idString } });
+  }
+}
+
+@Injectable()
+export class MessageGroupRepo extends Repository<MessageGroup> {
+  constructor(private datasource: DataSource) {
+    super(MessageGroup, datasource.createEntityManager());
+  }
+
+  async findOneByMessageGroupId(messageGroupId: number) {
+    return await this.findOne({ where: { id: messageGroupId } });
+  }
+  async findAllByUserId(userId: number): Promise<MessageGroup[]> {
+    return await this.find({ where: { userId } });
+  }
+
+  async createMessageGroup(userId: number): Promise<MessageGroup> {
+    const messageGroup = new MessageGroup();
+    messageGroup.userId = userId;
+    return await this.save(messageGroup);
   }
 }
