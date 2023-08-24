@@ -200,10 +200,38 @@ export class ResultsService {
 
   // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
   async messageResult(messageId: number) {
-    // if (!urlMessage) {
-    //   throw new BadRequestException('messageId is wrong');
-    // }
+    // 클릭했을 때 결과를 하나 만듦
+    const message = await this.messagesRepository.findOneByMessageId(messageId);
+    const user = await this.usersRepository.findOneByUserId(message.userId);
+    const newNcpResult = await this.ncpResult(messageId, user.email);
 
+    const resultEntity = this.entityManager.create(NcpResult, {
+      message: message,
+      success: newNcpResult.success,
+      reserved: newNcpResult.reserved,
+      fail: newNcpResult.fail,
+      createdAt: new Date(),
+      user: user,
+    });
+
+    const resultId = (await this.entityManager.save(resultEntity)).ncpResultId;
+
+    const newUrlResult = await this.shortUrlResult(messageId);
+
+    for (const result of newUrlResult) {
+      const resultEntity2 = this.entityManager.create(UrlResult, {
+        message: message,
+        user: user,
+        humanclicks: result.humanClicks,
+        totalclicks: result.totalClicks,
+        idString: result.idString,
+        ncpResultId: resultId,
+      });
+
+      await this.entityManager.save(resultEntity2);
+    }
+
+    // polling 결과들
     const ncpMessage = await this.ncpResultsRepository.findAllByMessageId(
       messageId,
     );
@@ -217,13 +245,15 @@ export class ResultsService {
       const urlMessage = await this.urlResultsRepository.findAllByResultId(
         ncp.ncpResultId,
       );
+
       const result = {
         message: messageId,
-        user: ncp.user,
+        user: ncp.userId,
         urls: [],
         success: ncp.success,
         reserved: ncp.reserved,
         fail: ncp.fail,
+        createdAt: ncp.createdAt,
       };
       for (const url of urlMessage) {
         if (ncp.messageId === url.messageId) {
@@ -243,35 +273,10 @@ export class ResultsService {
       messageResults.push(result);
     }
     return messageResults;
-
-    // for (const url of urlMessage) {
-    //   const urlInfo = await this.urlInfosRepository.findOneByIdString(
-    //     url.idString,
-    //   );
-
-    //   const result = {
-    //     idString: url.idString,
-    //     humanclicks: url.humanclicks,
-    //     totalclicks: url.totalclicks,
-    //   };
-    //   messageResult.push(result);
-    // }
-
-    // const ncpResult = {
-    //   success: ncpMessage[0].success,
-    //   reserved: ncpMessage[0].reserved,
-    //   fail: ncpMessage[0].fail,
-    // };
-
-    // const result = {
-    //   messageResult,
-    //   ncpResult,
-    // };
   }
 
   // ncp와 단축 url 결과를 합친 polling
-  @Cron('*/1 * * * *')
-  // @Cron('0 */1 * * *')
+  @Cron('0 */1 * * *')
   async handleNcpCron() {
     this.logger.log('ncp polling');
     const ncpmessages = await this.messagesRepository.findThreeDaysBeforeSend();
@@ -287,6 +292,7 @@ export class ResultsService {
           success: ncpResult.success,
           reserved: ncpResult.reserved,
           fail: ncpResult.fail,
+          createdAt: new Date(),
           user: user,
         });
 
@@ -295,7 +301,7 @@ export class ResultsService {
 
         console.log(`NCP results for message ${message.messageId} saved.`);
 
-        if (message.createdAt < new Date(Date.now() - 24 * 60 * 60 * 1000)) {
+        if (message.createdAt > new Date(Date.now() - 24 * 60 * 60 * 1000)) {
           try {
             const shortUrlResult = await this.shortUrlResult(message.messageId);
 

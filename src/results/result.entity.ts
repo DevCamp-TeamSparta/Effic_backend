@@ -69,6 +69,9 @@ export class NcpResult extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   fail: number;
 
+  @Column({ type: 'timestamp', nullable: false })
+  createdAt: Date;
+
   @ManyToOne(() => Message, (message) => message.results)
   @JoinColumn({ name: 'messageId' })
   message: Message;
