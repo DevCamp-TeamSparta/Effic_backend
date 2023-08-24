@@ -99,6 +99,8 @@ export class ResultsService {
         const totalClicks = response.data.totalClicks;
         const humanClicks = response.data.humanClicks;
 
+        console.log(response.data);
+
         statisticsArray.push({ totalClicks, humanClicks, shortUrl });
       } catch (error) {
         console.log(error);
@@ -163,16 +165,43 @@ export class ResultsService {
     return signature.toString();
   }
 
-  // 메세지별 결과 (유저정보 + polling 결과)
+  // get link info
+  async getLinkInfo(shortUrl: string) {
+    try {
+      axios
+        .get(`https://api.short.io/${shortUrl}/expand`, {
+          params: {
+            domain: 'au9k.short.gy',
+            path: 'first-blog-post',
+          },
+          headers: {
+            accept: 'application/json',
+            authorization: shortIoConfig.secretKey,
+          },
+        })
+        .then(function (response) {
+          console.log(response.data);
+        })
+        .catch(function (response) {
+          console.log(response);
+        });
+
+      // return response.data;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException();
+    }
+  }
+
+  // 메세지별 결과 (polling 결과)
   async messageResult(messageId: number): Promise<Result[]> {
     const message = await this.resultsRepository.findAllByMessageId(messageId);
     if (!message) {
       throw new BadRequestException('messageId is wrong');
     }
 
-    const user = await this.usersRepository.findOneByUserId(message[0].userId);
     const result = await this.resultsRepository.findAllByMessageId(messageId);
-    result[0].user = user;
+
     return result;
   }
 
@@ -226,6 +255,7 @@ export class ResultsService {
         for (const result of shortUrlResult) {
           const resultEntity = this.entityManager.create(Result, {
             message: message,
+            // urls: {}
             totalClicks: result.totalClicks,
             humanClicks: result.humanClicks,
             user: user,

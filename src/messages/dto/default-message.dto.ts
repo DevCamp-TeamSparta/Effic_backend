@@ -28,9 +28,9 @@ export class DefaultMessageDto {
   @IsBoolean()
   advertiseInfo?: boolean;
 
-  @IsDate()
+  @IsString()
   @IsOptional()
-  reservetime?: Date;
+  reservetime?: string;
 
   @IsArray()
   @IsNotEmpty()

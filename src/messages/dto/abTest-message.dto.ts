@@ -28,9 +28,9 @@ export class AbTestMessageDto {
   @IsString()
   urlForResult: string;
 
-  @IsDate()
+  @IsString()
   @IsOptional()
-  reservetime?: Date;
+  reservetime?: string;
 
   @IsArray()
   @IsOptional()
