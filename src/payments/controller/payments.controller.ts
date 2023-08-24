@@ -3,6 +3,7 @@ import { PaymentsService } from '../service/payments.service';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { Payment } from '../payments.entity';
 import { CompletePaymentDto } from '../dto/complete-payment.dto';
+import * as jwt from 'jsonwebtoken';
 
 @Controller('payments')
 export class PaymentsController {
@@ -12,14 +13,17 @@ export class PaymentsController {
   @Post()
   async createPayment(
     @Body() createPaymentDto: CreatePaymentDto,
-    @Headers('email') headerEmail: string,
+    @Headers('authorization') authorization: string,
   ): Promise<Payment> {
     this.logger.verbose('Payment create');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
     const { money } = createPaymentDto;
-    const payment = await this.paymentsService.createPayment(
-      headerEmail,
-      money,
-    );
+    const payment = await this.paymentsService.createPayment(email, money);
 
     return payment;
   }
@@ -27,12 +31,18 @@ export class PaymentsController {
   @Post('/complete')
   async completePayment(
     @Body() completePaymentDto: CompletePaymentDto,
-    @Headers('email') headerEmail: string,
+    @Headers('authorization') authorization: string,
   ) {
     this.logger.verbose('Payment complete');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
     const { imp_uid, merchant_uid } = completePaymentDto;
     const payment = await this.paymentsService.completePayment(
-      headerEmail,
+      email,
       imp_uid,
       merchant_uid,
     );

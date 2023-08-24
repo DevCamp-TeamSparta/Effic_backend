@@ -84,6 +84,8 @@ export class PaymentsService {
       );
       amountToBePaid = order.chargemoney;
       user.money += amountToBePaid;
+
+      return 'success';
       // 결제 검증
       // const { amount, status } = paymentData;
       // if (amount === amountToBePaid) {
