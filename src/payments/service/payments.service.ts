@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  HttpException,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
@@ -82,6 +83,7 @@ export class PaymentsService {
         merchant_uid,
       );
       amountToBePaid = order.chargemoney;
+      user.money += amountToBePaid;
       // 결제 검증
       // const { amount, status } = paymentData;
       // if (amount === amountToBePaid) {
@@ -94,7 +96,7 @@ export class PaymentsService {
       // }
     } catch (error) {
       this.cancelPayment(email, imp_uid, merchant_uid, amountToBePaid);
-      throw error;
+      throw new HttpException(error.response.data, error.response.status);
     }
   }
 

@@ -2,12 +2,17 @@ import { Module } from '@nestjs/common';
 import { ResultsController } from './controller/results.controller';
 import { ResultsService } from './service/results.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Result } from './result.entity';
-import { ResultsRepository } from './results.repository';
+import { NcpResult, Result } from './result.entity';
+import {
+  NcpResultsRepository,
+  ResultsRepository,
+  UrlResultsRepository,
+} from './results.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import {
   MessagesContentRepository,
   MessagesRepository,
+  UrlInfosRepository,
 } from 'src/messages/messages.repository';
 
 @Module({
@@ -17,9 +22,17 @@ import {
     ResultsService,
     ResultsRepository,
     UsersRepository,
+    NcpResultsRepository,
+    UrlResultsRepository,
     MessagesRepository,
     MessagesContentRepository,
+    UrlInfosRepository,
   ],
-  exports: [ResultsService, ResultsRepository],
+  exports: [
+    ResultsService,
+    ResultsRepository,
+    NcpResultsRepository,
+    UrlResultsRepository,
+  ],
 })
 export class ResultsModule {}

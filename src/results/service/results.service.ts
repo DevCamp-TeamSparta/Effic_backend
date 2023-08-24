@@ -5,11 +5,16 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { MessagesRepository } from 'src/messages/messages.repository';
+import {
+  MessagesRepository,
+  UrlInfosRepository,
+} from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { ResultsRepository } from '../results.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
-import { Result } from '../result.entity';
+import { Result, NcpResult, UrlResult } from '../result.entity';
+import { UrlResultsRepository } from '../results.repository';
+import { NcpResultsRepository } from '../results.repository';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
@@ -24,6 +29,9 @@ export class ResultsService {
     private readonly messagesRepository: MessagesRepository,
     private readonly resultsRepository: ResultsRepository,
     private readonly messagesContentRepository: MessagesContentRepository,
+    private readonly urlResultsRepository: UrlResultsRepository,
+    private readonly ncpResultsRepository: NcpResultsRepository,
+    private readonly urlInfosRepository: UrlInfosRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -80,10 +88,10 @@ export class ResultsService {
 
     const statisticsArray = [];
 
-    for (const shortUrl of message.shortUrl) {
+    for (const idString of message.idString) {
       try {
         const response = await axios.get(
-          `https://api-v2.short.io/statistics/link/${shortUrl}`,
+          `https://api-v2.short.io/statistics/link/${idString}`,
           {
             params: {
               period: 'week',
@@ -99,7 +107,7 @@ export class ResultsService {
         const totalClicks = response.data.totalClicks;
         const humanClicks = response.data.humanClicks;
 
-        statisticsArray.push({ totalClicks, humanClicks, shortUrl });
+        statisticsArray.push({ totalClicks, humanClicks, idString });
       } catch (error) {
         console.log(error);
         throw new InternalServerErrorException();
@@ -163,60 +171,64 @@ export class ResultsService {
     return signature.toString();
   }
 
-  // get link info
-  async getLinkInfo(shortUrl: string) {
-    try {
-      axios
-        .get(`https://api.short.io/links/expand`, {
-          params: {
-            domain: 'au9k.short.gy',
-            path: shortUrl,
-          },
-          headers: {
-            accept: 'application/json',
-            authorization: shortIoConfig.secretKey,
-          },
-        })
-        .then(function (response) {
-          console.log(response.data);
-        })
-        .catch(function (response) {
-          console.log(response);
-        });
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException();
-    }
-  }
-
-  // 메세지별 결과 (polling 결과)
-  async messageResult(messageId: number): Promise<Result[]> {
-    const message = await this.resultsRepository.findAllByMessageId(messageId);
-    if (!message) {
+  // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
+  async messageResult(messageId: number) {
+    const urlMessage = await this.urlResultsRepository.findAllByMessageId(
+      messageId,
+    );
+    if (!urlMessage) {
       throw new BadRequestException('messageId is wrong');
     }
 
-    // const result =
-    const pollingResult = await this.resultsRepository.findAllByMessageId(
+    const ncpMessage = await this.ncpResultsRepository.findAllByMessageId(
       messageId,
     );
+    if (!ncpMessage) {
+      throw new BadRequestException('messageId is wrong');
+    }
 
-    return pollingResult;
+    const messageResult = [];
+    for (const url of urlMessage) {
+      const urlInfo = await this.urlInfosRepository.findOneByIdString(
+        url.idString,
+      );
+
+      const result = {
+        idString: url.idString,
+        humanclicks: url.humanclicks,
+        totalclicks: url.totalclicks,
+      };
+      messageResult.push(result);
+    }
+
+    const ncpResult = {
+      success: ncpMessage[0].success,
+      reserved: ncpMessage[0].reserved,
+      fail: ncpMessage[0].fail,
+    };
+
+    const result = {
+      messageResult,
+      ncpResult,
+    };
+
+    return result;
   }
 
-  // ncp 발송 여부 결과
-  @Cron('0 */1 * * *')
+  // ncp와 단축 url 결과를 합친 polling
+  @Cron('*/1 * * * *')
+  // @Cron('0 */1 * * *')
   async handleNcpCron() {
     this.logger.log('ncp polling');
-    const messages = await this.messagesRepository.findThreeDaysBeforeSend();
+    const ncpmessages = await this.messagesRepository.findThreeDaysBeforeSend();
 
-    for (const message of messages) {
+    for (const message of ncpmessages) {
       const user = await this.usersRepository.findOneByUserId(message.userId);
 
       try {
         const ncpResult = await this.ncpResult(message.messageId, user.email);
 
-        const resultEntity = this.entityManager.create(Result, {
+        const resultEntity = this.entityManager.create(NcpResult, {
           message: message,
           success: ncpResult.success,
           reserved: ncpResult.reserved,
@@ -234,31 +246,23 @@ export class ResultsService {
         );
       }
     }
-  }
 
-  // url 클릭 결과
-  @Cron('0 */1 * * *')
-  // @Cron(CronExpression.EVERY_10_MINUTES)
-  async handleUrlCron() {
-    this.logger.log('url polling');
-    const messages =
+    const urlmessages =
       await this.messagesRepository.findTwentyFourHoursBeforeSend();
-    this.logger.log(messages);
 
-    for (const message of messages) {
+    for (const message of urlmessages) {
       const user = await this.usersRepository.findOneByUserId(message.userId);
 
       try {
         const shortUrlResult = await this.shortUrlResult(message.messageId);
 
         for (const result of shortUrlResult) {
-          const resultEntity = this.entityManager.create(Result, {
+          const resultEntity = this.entityManager.create(UrlResult, {
             message: message,
-            // urls: {}
-            totalClicks: result.totalClicks,
-            humanClicks: result.humanClicks,
             user: user,
-            shortUrl: result.shortUrl,
+            humanclicks: result.humanClicks,
+            totalclicks: result.totalClicks,
+            idString: result.idString,
           });
 
           await this.entityManager.save(resultEntity);

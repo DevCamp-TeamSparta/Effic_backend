@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Message } from './message.entity';
+import { Message, MessageContent, UrlInfo } from './message.entity';
 import { Repository, DataSource } from 'typeorm';
 
 @Injectable()
@@ -42,12 +42,23 @@ export class MessagesRepository extends Repository<Message> {
 }
 
 @Injectable()
-export class MessagesContentRepository extends Repository<Message> {
+export class MessagesContentRepository extends Repository<MessageContent> {
   constructor(private datasource: DataSource) {
-    super(Message, datasource.createEntityManager());
+    super(MessageContent, datasource.createEntityManager());
   }
 
-  async findOneByMessageId(messageId: number): Promise<Message> {
+  async findOneByMessageId(messageId: number): Promise<MessageContent> {
     return await this.findOne({ where: { messageId } });
+  }
+}
+
+@Injectable()
+export class UrlInfosRepository extends Repository<UrlInfo> {
+  constructor(private datasource: DataSource) {
+    super(UrlInfo, datasource.createEntityManager());
+  }
+
+  async findOneByIdString(idString: string): Promise<UrlInfo> {
+    return await this.findOne({ where: { idString } });
   }
 }

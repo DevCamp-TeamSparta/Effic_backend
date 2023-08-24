@@ -15,6 +15,7 @@ import { shortIoConfig } from 'config/short-io.config';
 import { Message } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
+import { UrlInfo } from '../message.entity';
 
 @Injectable()
 export class MessagesService {
@@ -112,7 +113,7 @@ export class MessagesService {
       })),
       ...(defaultMessageDto.reservetime
         ? {
-            reservetime: defaultMessageDto.reservetime,
+            reserveTime: defaultMessageDto.reservetime,
             reserveTimeZone: 'Asia/Seoul',
           }
         : {}),
@@ -149,7 +150,7 @@ export class MessagesService {
       message.sentType = MessageType.D;
       message.user = user;
       message.receiverList = receiverPhones;
-      message.shortUrl = idStrings;
+      message.idString = idStrings;
       message.urlForResult = null;
       message.requestId = response.data.requestId;
 
@@ -163,7 +164,7 @@ export class MessagesService {
       return message.messageId;
     } catch (error) {
       console.log(error);
-      throw new BadRequestException(error.response.data);
+      throw new BadRequestException(error.response);
     }
   }
 
@@ -172,6 +173,7 @@ export class MessagesService {
     return got<{
       shortURL: string;
       idString: string;
+      originalURL: string;
     }>({
       method: 'POST',
       url: 'https://api.short.io/links',
@@ -187,6 +189,14 @@ export class MessagesService {
     })
       .then((response) => {
         console.log(response.body);
+
+        const urlInfo = new UrlInfo();
+        urlInfo.originalUrl = response.body.originalURL;
+        urlInfo.shortenUrl = response.body.shortURL;
+        urlInfo.idString = response.body.idString;
+
+        this.entityManager.save(urlInfo);
+
         return response.body;
       })
       .catch((e) => {
@@ -434,7 +444,7 @@ export class MessagesService {
           })),
           ...(abTestMessageDto.reservetime
             ? {
-                reservetime: abTestMessageDto.reservetime,
+                reserveTime: abTestMessageDto.reservetime,
                 reserveTimeZone: 'Asia/Seoul',
               }
             : {}),
@@ -465,7 +475,7 @@ export class MessagesService {
         message.sentType = MessageType.A;
         message.user = user;
         message.receiverList = receiverPhones.slice(0, aTestReceiver.length);
-        message.shortUrl = idStrings;
+        message.idString = idStrings;
         message.urlForResult = idStringForResult;
         message.requestId = response.data.requestId;
 
@@ -513,7 +523,7 @@ export class MessagesService {
           })),
           ...(abTestMessageDto.reservetime
             ? {
-                reservetime: abTestMessageDto.reservetime,
+                reserveTime: abTestMessageDto.reservetime,
                 reserveTimeZone: 'Asia/Seoul',
               }
             : {}),
@@ -547,7 +557,7 @@ export class MessagesService {
           aTestReceiver.length,
           testReceiverNumber,
         );
-        message.shortUrl = idStrings;
+        message.idString = idStrings;
         message.urlForResult = idStringForResult;
         message.requestId = response.data.requestId;
 
@@ -569,7 +579,7 @@ export class MessagesService {
         message.sentType = MessageType.N;
         message.user = user;
         message.receiverList = receiverPhones.slice(testReceiverNumber);
-        message.shortUrl = null;
+        message.idString = null;
         message.urlForResult = null;
         message.requestId = null;
 

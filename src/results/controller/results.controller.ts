@@ -27,10 +27,10 @@ export class ResultsController {
     return await this.resultsService.ncpResult(messageId, headerEmail);
   }
 
-  @Get('/getUrlInfo')
-  async getUrlInfo() {
-    this.logger.verbose('Get url info');
-    const shorturl = 'kY0LNX';
-    return await this.resultsService.getLinkInfo(shorturl);
-  }
+  // @Get('/getUrlInfo')
+  // async getUrlInfo() {
+  //   this.logger.verbose('Get url info');
+  //   const shorturl = 'kY0LNX';
+  //   return await this.resultsService.getLinkInfo(shorturl);
+  // }
 }

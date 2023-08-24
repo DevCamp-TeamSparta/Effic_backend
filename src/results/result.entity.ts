@@ -4,6 +4,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
@@ -15,11 +16,8 @@ export class Result extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   ResultId: number;
 
-  @Column({ type: 'int', nullable: true })
-  totalClicks: number;
-
-  @Column({ type: 'int', nullable: true })
-  humanClicks: number;
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  urls: Array<string>;
 
   @Column({ type: 'int', nullable: true })
   success: number;
@@ -50,3 +48,103 @@ export class Result extends BaseEntity {
   @JoinColumn({ name: 'userId' })
   user: User;
 }
+
+@Entity()
+export class NcpResult extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  ncpResultId: number;
+
+  @Column({ type: 'int', nullable: true })
+  messageId: number;
+
+  @Column({ type: 'int', nullable: true })
+  userId: number;
+
+  @Column({ type: 'int', nullable: true })
+  success: number;
+
+  @Column({ type: 'int', nullable: true })
+  reserved: number;
+
+  @Column({ type: 'int', nullable: true })
+  fail: number;
+
+  @ManyToOne(() => Message, (message) => message.results)
+  @JoinColumn({ name: 'messageId' })
+  message: Message;
+
+  @ManyToOne(() => User, (user) => user.results)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+}
+
+@Entity()
+export class UrlResult extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  urlResultId: number;
+
+  @Column({ type: 'int', nullable: true })
+  humanclicks: number;
+
+  @Column({ type: 'int', nullable: true })
+  totalclicks: number;
+
+  @Column({ type: 'varchar', nullable: true })
+  idString: string;
+
+  @Column({ type: 'int', nullable: true })
+  messageId: number;
+
+  @Column({ type: 'int', nullable: true })
+  userId: number;
+
+  @ManyToOne(() => Message, (message) => message.results)
+  @JoinColumn({ name: 'messageId' })
+  message: Message;
+
+  @ManyToOne(() => User, (user) => user.results)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+}
+
+// @Entity()
+// export class ResultV2 extends BaseEntity {
+//   @PrimaryGeneratedColumn({ type: 'int' })
+//   ResultId: number;
+
+//   // @Column({ array: true, nullable: true, type: 'text', default: [] })
+//   // urls: Array<UrlResult>;
+
+//   @OneToMany(() => UrlResult, (urlResult) => urlResult.result)
+//   @JoinColumn({ name: 'ResultId' })
+//   urls: Array<UrlResult>;
+
+//   @Column({ type: 'varchar', nullable: true })
+//   shortUrl: string;
+
+//   @Column({ type: 'int', nullable: true })
+//   success: number;
+
+//   @Column({ type: 'int', nullable: true })
+//   reserved: number;
+
+//   @Column({ type: 'int', nullable: true })
+//   fail: number;
+
+//   @CreateDateColumn({ type: 'timestamp' })
+//   createdAt: Date;
+
+//   @Column({ type: 'int', nullable: true })
+//   messageId: number;
+
+//   @Column({ type: 'int', nullable: true })
+//   userId: number;
+
+//   @ManyToOne(() => Message, (message) => message.results)
+//   @JoinColumn({ name: 'messageId' })
+//   message: Message;
+
+//   @ManyToOne(() => User, (user) => user.results)
+//   @JoinColumn({ name: 'userId' })
+//   user: User;
+// }

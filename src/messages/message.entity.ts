@@ -31,7 +31,7 @@ export class Message extends BaseEntity {
   receiverList: string[];
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
-  shortUrl: Array<string>;
+  idString: Array<string>;
 
   @Column({ type: 'varchar', nullable: true })
   urlForResult: string;
@@ -51,7 +51,7 @@ export class Message extends BaseEntity {
 }
 
 @Entity()
-export class MessageContent {
+export class MessageContent extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   contentId: number;
 
@@ -70,4 +70,19 @@ export class MessageContent {
   @OneToOne(() => Message)
   @JoinColumn({ name: 'messageId' })
   message: Message;
+}
+
+@Entity()
+export class UrlInfo extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  urlInfoId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  originalUrl: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  shortenUrl: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  idString: string;
 }
