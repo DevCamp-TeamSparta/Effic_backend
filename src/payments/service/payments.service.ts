@@ -85,6 +85,8 @@ export class PaymentsService {
       amountToBePaid = order.chargemoney;
       user.money += amountToBePaid;
 
+      await this.entityManager.save(user);
+
       return 'success';
       // 결제 검증
       // const { amount, status } = paymentData;
