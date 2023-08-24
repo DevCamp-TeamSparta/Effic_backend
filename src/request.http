@@ -105,7 +105,7 @@ Header:
 }
 
 ### result - messageId
-Get http://localhost:8000/results/42
+Get http://localhost:8000/results/40
 Content-Type: application/json
 
 

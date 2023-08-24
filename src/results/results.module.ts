@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ResultsController } from './controller/results.controller';
 import { ResultsService } from './service/results.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { NcpResult, Result } from './result.entity';
+import { Result } from './result.entity';
 import {
   NcpResultsRepository,
   ResultsRepository,

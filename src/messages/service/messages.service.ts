@@ -22,8 +22,8 @@ import { MessageGroupRepo } from '../messages.repository';
 export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    @InjectEntityManager() private readonly entityManager: EntityManager,
     private readonly messageGroupRepo: MessageGroupRepo,
+    @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
   async getGroupList(email: string) {
@@ -33,6 +33,7 @@ export class MessagesService {
     );
     return messageGroupList;
   }
+
   async getCotentType(defaultMessageDto): Promise<string> {
     if (defaultMessageDto.advertiseInfo === true) {
       return 'AD';

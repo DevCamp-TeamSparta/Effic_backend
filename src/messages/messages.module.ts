@@ -12,7 +12,9 @@ import {
 } from './messages.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Message, MessageGroup])],
+  imports: [
+    TypeOrmModule.forFeature([Message, MessageGroup, MessageGroupRepo]),
+  ],
   controllers: [MessagesController],
   providers: [
     MessagesService,

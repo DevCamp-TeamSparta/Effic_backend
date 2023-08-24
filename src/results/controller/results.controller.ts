@@ -53,11 +53,4 @@ export class ResultsController {
     this.logger.verbose('Default message ncp result');
     return await this.resultsService.ncpResult(messageId, headerEmail);
   }
-
-  // @Get('/getUrlInfo')
-  // async getUrlInfo() {
-  //   this.logger.verbose('Get url info');
-  //   const shorturl = 'kY0LNX';
-  //   return await this.resultsService.getLinkInfo(shorturl);
-  // }
 }
