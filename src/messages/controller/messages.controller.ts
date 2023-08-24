@@ -27,7 +27,12 @@ export class MessagesController {
 
     const email = decodedAccessToken.email;
 
-    await this.messagesService.defaultMessage(email, defaultMessageDto);
+    const messageId = await this.messagesService.defaultMessage(
+      email,
+      defaultMessageDto,
+    );
+
+    return { messageId };
   }
 
   @Post('/abtest')
@@ -43,7 +48,12 @@ export class MessagesController {
 
     const email = decodedAccessToken.email;
 
-    await this.messagesService.abTestMessage(email, abTestMessageDto);
+    const messageId = await this.messagesService.abTestMessage(
+      email,
+      abTestMessageDto,
+    );
+
+    return { messageId };
   }
 
   @Post('/test')
@@ -59,15 +69,22 @@ export class MessagesController {
 
     const email = decodedAccessToken.email;
 
-    await this.messagesService.testMessage(email, testMessageDto);
+    const message = await this.messagesService.testMessage(
+      email,
+      testMessageDto,
+    );
+
+    return { message };
   }
 
   @Post('/checkhostnumber')
   async checkHostNumber(@Body() checkHostNumberDto: CheckHostNumberDto) {
     this.logger.verbose('Check host number');
 
-    // const { hostnumber } = checkHostNumberDto;
+    const message = await this.messagesService.hostNumberCheckMessage(
+      checkHostNumberDto,
+    );
 
-    // return await this.messagesService.checkHostNumber(hostnumber);
+    return { message };
   }
 }

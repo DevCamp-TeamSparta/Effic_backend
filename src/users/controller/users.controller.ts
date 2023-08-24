@@ -101,7 +101,7 @@ export class UsersController {
     }
   }
 
-  // 마이페이지.
+  // 마이페이지
   @Get('/me')
   async findUser(@Headers('authorization') authorization: string) {
     this.logger.verbose('User info');

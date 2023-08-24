@@ -281,6 +281,7 @@ export class MessagesService {
           headers,
         },
       );
+      return 'success';
     } catch (error) {
       console.log(error);
       throw new BadRequestException(error.response.data);
@@ -288,7 +289,66 @@ export class MessagesService {
   }
 
   // hostnumbercheck 메세지
-  // async hostNumberCheckMessage(checkHostNumberDto) {}
+  async hostNumberCheckMessage(checkHostNumberDto) {
+    const body = {
+      type: 'MMS',
+      contentType: await this.getCotentType(checkHostNumberDto),
+      countryCode: '82',
+      from: checkHostNumberDto.hostnumber,
+      subject: '번호확인 문자',
+      content: '번호확인 문자',
+      messages: [
+        {
+          to: '01712341234',
+          content: '번호확인 문자',
+        },
+      ],
+    };
+
+    let headers;
+    try {
+      const now = Date.now().toString();
+      headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': checkHostNumberDto.accessKey,
+        'x-ncp-apigw-timestamp': now,
+        'x-ncp-apigw-signature-v2': await this.makesignature(
+          checkHostNumberDto,
+          now,
+        ),
+      };
+      const response = await axios.post(
+        `https://sens.apigw.ntruss.com/sms/v2/services/${checkHostNumberDto.serviceId}/messages`,
+        body,
+        {
+          headers,
+        },
+      );
+
+      return 'success';
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error.response.data);
+    }
+  }
+
+  async makesignature(checkHostNumberDto, timestamp) {
+    const message = [];
+    const hmac = crypto.createHmac('sha256', checkHostNumberDto.secretKey);
+    const space = ' ';
+    const newLine = '\n';
+    const method = 'POST';
+    message.push(method);
+    message.push(space);
+    message.push(`/sms/v2/services/${checkHostNumberDto.serviceId}/messages`);
+    message.push(newLine);
+    message.push(timestamp);
+    message.push(newLine);
+    message.push(checkHostNumberDto.accessKey);
+
+    const signature = hmac.update(message.join('')).digest('base64');
+    return signature.toString();
+  }
 
   // AB테스트 메세지 보내기
   async abTestMessage(email, abTestMessageDto) {

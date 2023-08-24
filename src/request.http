@@ -38,16 +38,16 @@ Content-Type: application/json
 
 ### dafault message sending
 Post http://localhost:8000/messages/default
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzRAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MDkxNCwiZXhwIjoxNjkyODU3MzE0fQ.jMwFRtCGu0dE6wpZ0R5y-KD0R4bb5gwciZqeUCcmND4
 Content-Type: application/json
 
 {
     "hostnumber": "01036289823",
     "title": "Effic is the best!",
     "content": "test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com",
-    "receiverList": [{"phone": "01036289823", "name": "clo"},{"phone": "01099287706", "name": "woo"}],
+    "receiverList": [{"phone": "01036289823", "name": "clo"}],
     "advertiseInfo": false,
-    "urlList": ["https://www.google.com","https://www.naver.com"],
-    "reservetime":
+    "urlList": ["https://www.google.com","https://www.naver.com"]
 }
 
 ### test message sending
@@ -62,6 +62,17 @@ Content-Type: application/json
     "receiverList": [{"phone": "01036289823", "name": "clo"}],
     "advertiseInfo": false,
     "urlList": ["https://www.google.com","https://www.naver.com"]
+}
+
+### hostnumber check
+Post http://localhost:8000/messages/checkhostnumber
+Content-Type: application/json
+
+{
+    "hostnumber": "01036289823",
+    "accessKey":,
+    "secretKey":,
+    "serviceId":
 }
 
 ### dafault message result - shortio
