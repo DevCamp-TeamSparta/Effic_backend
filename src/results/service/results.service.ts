@@ -18,9 +18,11 @@ import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
+import got from 'got';
 import { shortIoConfig } from 'config/short-io.config';
 import { Cron } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
+import { UrlInfo } from 'src/messages/message.entity';
 
 @Injectable()
 export class ResultsService {
@@ -409,6 +411,14 @@ export class ResultsService {
     }
   }
 
+  async getCotentType(defaultMessageDto): Promise<string> {
+    if (defaultMessageDto.advertiseInfo === true) {
+      return 'AD';
+    } else {
+      return 'COMM';
+    }
+  }
+
   async sendAbTestWinnerMessage(messageId: number) {
     const messageContent =
       await this.messagesContentRepository.findOneByMessageId(messageId);
@@ -416,5 +426,122 @@ export class ResultsService {
     const message = await this.messagesRepository.findOneByMessageId(messageId);
 
     const user = await this.usersRepository.findOneByUserId(message.userId);
+
+    const shortenedUrls: string[] = [];
+    const idStrings = [];
+
+    // for (const url of messageContent.content.urlList) {
+    //   const response = await this.ShortenUrl(url);
+    //   shortenedUrls.push(response.shortURL);
+    //   idStrings.push(response.idString);
+    // }
+
+    // const newContent = await this.replaceUrlContent(
+    //   messageContent.content.urlList,
+    //   shortenedUrls,
+    //   messageContent.content.content,
+    // );
+
+    const isAdvertisement = messageContent.content.advertiseInfo;
+
+    let contentPrefix = '';
+    let contentSuffix = '';
+
+    if (isAdvertisement) {
+      contentPrefix = '(광고)';
+      contentSuffix = '\n무료수신거부 08012341234';
+    }
+
+    //   const body = {
+    //     type: 'LMS',
+    //     contentType: await this.getCotentType(messageContent.content),
+    //     countryCode: '82',
+    //     from: user.hostnumber,
+    //     subject: testMessageDto.title,
+    //     content: testMessageDto.content,
+    //     messages: testMessageDto.receiverList.map((info) => ({
+    //       to: info.phone,
+    //       content: `${contentPrefix} ${this.createMessage(
+    //         newContent,
+    //         info,
+    //       )} ${contentSuffix}`,
+    //     })),
+    //     ...(testMessageDto.reservetime
+    //       ? {
+    //           reserveTime: testMessageDto.reservetime,
+    //           reserveTimeZone: 'Asia/Seoul',
+    //         }
+    //       : {}),
+    //   };
+
+    //   let headers;
+    //   try {
+    //     const now = Date.now().toString();
+    //     headers = {
+    //       'Content-Type': 'application/json; charset=utf-8',
+    //       'x-ncp-iam-access-key': user.accessKey,
+    //       'x-ncp-apigw-timestamp': now,
+    //       'x-ncp-apigw-signature-v2': await this.signature(user, now),
+    //     };
+    //     const response = await axios.post(
+    //       `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+    //       body,
+    //       {
+    //         headers,
+    //       },
+    //     );
+    //     return 'success';
+    //   } catch (error) {
+    //     console.log(error);
+    //     throw new BadRequestException(error.response.data);
+    //   }
+    // }
+
+    // async replaceUrlContent(
+    //   urlList: string[],
+    //   shortenedUrls: string[],
+    //   content: string,
+    // ) {
+    //   if (urlList) {
+    //     urlList.forEach((url, index) => {
+    //       content = content.replaceAll(url, shortenedUrls[index]);
+    //     });
+    //   }
+    //   return content;
+    // }
+
+    // async ShortenUrl(url: string) {
+    //   return got<{
+    //     shortURL: string;
+    //     idString: string;
+    //     originalURL: string;
+    //   }>({
+    //     method: 'POST',
+    //     url: 'https://api.short.io/links',
+    //     headers: {
+    //       authorization: shortIoConfig.secretKey,
+    //     },
+    //     json: {
+    //       originalURL: url,
+    //       domain: 'au9k.short.gy',
+    //       allowDuplicates: true,
+    //     },
+    //     responseType: 'json',
+    //   })
+    //     .then((response) => {
+    //       const urlInfo = new UrlInfo();
+    //       urlInfo.originalUrl = response.body.originalURL;
+    //       urlInfo.shortenUrl = response.body.shortURL;
+    //       urlInfo.idString = response.body.idString;
+
+    //       this.entityManager.save(urlInfo);
+
+    //       return response.body;
+    //     })
+    //     .catch((e) => {
+    //       console.error(e.response.body);
+    //       throw new InternalServerErrorException();
+    //     });
+    // }
   }
 }

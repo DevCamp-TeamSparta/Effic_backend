@@ -87,8 +87,18 @@ export class MessageContent extends BaseEntity {
   @Column()
   sentType: MessageType;
 
-  @Column({ array: true, nullable: false, type: 'text', default: [] })
-  content: Array<string>;
+  @Column({ type: 'json', nullable: false, default: '[]' })
+  content: {
+    type: string;
+    title: string;
+    content: string;
+    advertiseInfo: boolean;
+    urlList: string[];
+    reservetime?: Date;
+  };
+
+  @Column({ type: 'varchar', nullable: false })
+  hostnumber: string;
 
   @Column({ array: true, nullable: false, type: 'text', default: [] })
   receiverList: Array<string>;

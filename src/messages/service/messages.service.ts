@@ -507,6 +507,7 @@ export class MessagesService {
           aTestReceiver.length,
         );
         messageContent.sentType = MessageType.A;
+        messageContent.hostnumber = abTestMessageDto.hostnumber;
 
         await this.entityManager.save(messageContent);
       } else if (i < 2) {
@@ -589,6 +590,7 @@ export class MessagesService {
           testReceiverNumber,
         );
         messageContent.sentType = MessageType.B;
+        messageContent.hostnumber = abTestMessageDto.hostnumber;
 
         await this.entityManager.save(messageContent);
       } else {
