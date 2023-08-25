@@ -14,6 +14,7 @@ import { UsersRepository } from 'src/users/users.repository';
 import { NcpResult, UrlResult } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
+import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
@@ -31,6 +32,7 @@ export class ResultsService {
     private readonly urlResultsRepository: UrlResultsRepository,
     private readonly ncpResultsRepository: NcpResultsRepository,
     private readonly urlInfosRepository: UrlInfosRepository,
+    private readonly messagesContentRepository: MessagesContentRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -391,6 +393,7 @@ export class ResultsService {
         const bHumanClick = bShortUrlResult[0].humanClicks;
 
         if (aHumanClick >= bHumanClick) {
+          await this.sendAbTestWinnerMessage(aMessageId);
           // const result = aMessageId;
           // return result;
         } else {
@@ -406,5 +409,12 @@ export class ResultsService {
     }
   }
 
-  async abTestWinnerMessageSend(messageId: number) {}
+  async sendAbTestWinnerMessage(messageId: number) {
+    const messageContent =
+      await this.messagesContentRepository.findOneByMessageId(messageId);
+
+    const message = await this.messagesRepository.findOneByMessageId(messageId);
+
+    const user = await this.usersRepository.findOneByUserId(message.userId);
+  }
 }

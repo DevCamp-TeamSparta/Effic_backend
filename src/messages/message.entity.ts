@@ -87,8 +87,8 @@ export class MessageContent extends BaseEntity {
   @Column()
   sentType: MessageType;
 
-  @Column()
-  content: string;
+  @Column({ array: true, nullable: false, type: 'text', default: [] })
+  content: Array<string>;
 
   @Column({ array: true, nullable: false, type: 'text', default: [] })
   receiverList: Array<string>;

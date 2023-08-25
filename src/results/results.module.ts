@@ -12,6 +12,7 @@ import {
   MessageGroupRepo,
   MessagesRepository,
   UrlInfosRepository,
+  MessagesContentRepository,
 } from 'src/messages/messages.repository';
 
 @Module({
@@ -25,6 +26,7 @@ import {
     MessagesRepository,
     MessageGroupRepo,
     UrlInfosRepository,
+    MessagesContentRepository,
   ],
   exports: [ResultsService, NcpResultsRepository, UrlResultsRepository],
 })
