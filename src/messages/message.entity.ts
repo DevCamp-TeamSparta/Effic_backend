@@ -94,14 +94,17 @@ export class MessageContent extends BaseEntity {
     content: string;
     advertiseInfo: boolean;
     urlList: string[];
-    reservetime?: Date;
+    reserveTime?: Date;
   };
 
   @Column({ type: 'varchar', nullable: false })
   hostnumber: string;
 
-  @Column({ array: true, nullable: false, type: 'text', default: [] })
-  receiverList: Array<string>;
+  @Column('json', { default: [] })
+  receiverList: Record<string, any>;
+
+  @Column('json', { default: [] })
+  remainReceiverList: Record<string, any>;
 
   @OneToOne(() => Message)
   @JoinColumn({ name: 'messageId' })

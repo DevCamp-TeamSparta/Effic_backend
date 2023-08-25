@@ -381,7 +381,6 @@ export class ResultsService {
   async handleAbTestCron() {
     this.logger.log('abtest polling');
     const messages = await this.messagesRepository.findNotSend();
-    this.logger.log(messages);
 
     for (const message of messages) {
       try {
@@ -395,12 +394,34 @@ export class ResultsService {
         const bHumanClick = bShortUrlResult[0].humanClicks;
 
         if (aHumanClick >= bHumanClick) {
-          await this.sendAbTestWinnerMessage(aMessageId);
-          // const result = aMessageId;
-          // return result;
+          // aMessageId값을 이용해서 message 테이블에 접근
+          const message = await this.messagesRepository.findOneByMessageId(
+            aMessageId,
+          );
+          const index = message.idString.indexOf(message.urlForResult);
+
+          const response = await this.sendAbTestWinnerMessage(aMessageId);
+          message.isSent = true;
+          message.sentType = MessageType.A;
+          message.createdAt = new Date();
+          message.requestId = response.res;
+          message.idString = response.idStrings;
+          message.urlForResult = response.shortenedUrls[index];
+          await this.messagesRepository.save(message);
         } else {
-          // const result = bMessageId;
-          // return result;
+          const message = await this.messagesRepository.findOneByMessageId(
+            bMessageId,
+          );
+          const index = message.idString.indexOf(message.urlForResult);
+
+          const response = await this.sendAbTestWinnerMessage(bMessageId);
+          message.isSent = true;
+          message.sentType = MessageType.B;
+          message.createdAt = new Date();
+          message.requestId = response.res;
+          message.idString = response.idStrings;
+          message.urlForResult = response.shortenedUrls[index];
+          await this.messagesRepository.save(message);
         }
       } catch (error) {
         console.error(
@@ -419,6 +440,14 @@ export class ResultsService {
     }
   }
 
+  createMessage(content: string, info: { [key: string]: string }) {
+    Object.keys(info).forEach((key) => {
+      const regex = new RegExp(`#{${key}}`, 'g');
+      content = content.replace(regex, info[key]);
+    });
+    return content;
+  }
+
   async sendAbTestWinnerMessage(messageId: number) {
     const messageContent =
       await this.messagesContentRepository.findOneByMessageId(messageId);
@@ -430,17 +459,17 @@ export class ResultsService {
     const shortenedUrls: string[] = [];
     const idStrings = [];
 
-    // for (const url of messageContent.content.urlList) {
-    //   const response = await this.ShortenUrl(url);
-    //   shortenedUrls.push(response.shortURL);
-    //   idStrings.push(response.idString);
-    // }
+    for (const url of messageContent.content.urlList) {
+      const response = await this.ShortenUrl(url);
+      shortenedUrls.push(response.shortURL);
+      idStrings.push(response.idString);
+    }
 
-    // const newContent = await this.replaceUrlContent(
-    //   messageContent.content.urlList,
-    //   shortenedUrls,
-    //   messageContent.content.content,
-    // );
+    const newContent = await this.replaceUrlContent(
+      messageContent.content.urlList,
+      shortenedUrls,
+      messageContent.content.content,
+    );
 
     const isAdvertisement = messageContent.content.advertiseInfo;
 
@@ -452,96 +481,114 @@ export class ResultsService {
       contentSuffix = '\n무료수신거부 08012341234';
     }
 
-    //   const body = {
-    //     type: 'LMS',
-    //     contentType: await this.getCotentType(messageContent.content),
-    //     countryCode: '82',
-    //     from: user.hostnumber,
-    //     subject: testMessageDto.title,
-    //     content: testMessageDto.content,
-    //     messages: testMessageDto.receiverList.map((info) => ({
-    //       to: info.phone,
-    //       content: `${contentPrefix} ${this.createMessage(
-    //         newContent,
-    //         info,
-    //       )} ${contentSuffix}`,
-    //     })),
-    //     ...(testMessageDto.reservetime
-    //       ? {
-    //           reserveTime: testMessageDto.reservetime,
-    //           reserveTimeZone: 'Asia/Seoul',
-    //         }
-    //       : {}),
-    //   };
+    const body = {
+      type: 'LMS',
+      contentType: await this.getCotentType(messageContent.content),
+      countryCode: '82',
+      from: messageContent.hostnumber,
+      subject: messageContent.content.title,
+      content: messageContent.content.content,
+      messages: messageContent.remainReceiverList.map((info) => ({
+        to: info.phone,
+        content: `${contentPrefix} ${this.createMessage(
+          newContent,
+          info,
+        )} ${contentSuffix}`,
+      })),
+      ...(messageContent.content.reserveTime
+        ? {
+            reserveTime: messageContent.content.reserveTime,
+            reserveTimeZone: 'Asia/Seoul',
+          }
+        : {}),
+    };
 
-    //   let headers;
-    //   try {
-    //     const now = Date.now().toString();
-    //     headers = {
-    //       'Content-Type': 'application/json; charset=utf-8',
-    //       'x-ncp-iam-access-key': user.accessKey,
-    //       'x-ncp-apigw-timestamp': now,
-    //       'x-ncp-apigw-signature-v2': await this.signature(user, now),
-    //     };
-    //     const response = await axios.post(
-    //       `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-    //       body,
-    //       {
-    //         headers,
-    //       },
-    //     );
-    //     return 'success';
-    //   } catch (error) {
-    //     console.log(error);
-    //     throw new BadRequestException(error.response.data);
-    //   }
-    // }
+    let headers;
+    try {
+      const now = Date.now().toString();
+      headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': user.accessKey,
+        'x-ncp-apigw-timestamp': now,
+        'x-ncp-apigw-signature-v2': await this.makeSignature(user, now),
+      };
+      const response = await axios.post(
+        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+        body,
+        {
+          headers,
+        },
+      );
+      this.logger.log(response.data, idStrings, shortenedUrls);
+      return { res: response.data.requestId, idStrings, shortenedUrls };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error.response.data);
+    }
+  }
 
-    // async replaceUrlContent(
-    //   urlList: string[],
-    //   shortenedUrls: string[],
-    //   content: string,
-    // ) {
-    //   if (urlList) {
-    //     urlList.forEach((url, index) => {
-    //       content = content.replaceAll(url, shortenedUrls[index]);
-    //     });
-    //   }
-    //   return content;
-    // }
+  async replaceUrlContent(
+    urlList: string[],
+    shortenedUrls: string[],
+    content: string,
+  ) {
+    if (urlList) {
+      urlList.forEach((url, index) => {
+        content = content.replaceAll(url, shortenedUrls[index]);
+      });
+    }
+    return content;
+  }
 
-    // async ShortenUrl(url: string) {
-    //   return got<{
-    //     shortURL: string;
-    //     idString: string;
-    //     originalURL: string;
-    //   }>({
-    //     method: 'POST',
-    //     url: 'https://api.short.io/links',
-    //     headers: {
-    //       authorization: shortIoConfig.secretKey,
-    //     },
-    //     json: {
-    //       originalURL: url,
-    //       domain: 'au9k.short.gy',
-    //       allowDuplicates: true,
-    //     },
-    //     responseType: 'json',
-    //   })
-    //     .then((response) => {
-    //       const urlInfo = new UrlInfo();
-    //       urlInfo.originalUrl = response.body.originalURL;
-    //       urlInfo.shortenUrl = response.body.shortURL;
-    //       urlInfo.idString = response.body.idString;
+  async ShortenUrl(url: string) {
+    return got<{
+      shortURL: string;
+      idString: string;
+      originalURL: string;
+    }>({
+      method: 'POST',
+      url: 'https://api.short.io/links',
+      headers: {
+        authorization: shortIoConfig.secretKey,
+      },
+      json: {
+        originalURL: url,
+        domain: 'au9k.short.gy',
+        allowDuplicates: true,
+      },
+      responseType: 'json',
+    })
+      .then((response) => {
+        const urlInfo = new UrlInfo();
+        urlInfo.originalUrl = response.body.originalURL;
+        urlInfo.shortenUrl = response.body.shortURL;
+        urlInfo.idString = response.body.idString;
 
-    //       this.entityManager.save(urlInfo);
+        this.entityManager.save(urlInfo);
 
-    //       return response.body;
-    //     })
-    //     .catch((e) => {
-    //       console.error(e.response.body);
-    //       throw new InternalServerErrorException();
-    //     });
-    // }
+        return response.body;
+      })
+      .catch((e) => {
+        console.error(e.response.body);
+        throw new InternalServerErrorException();
+      });
+  }
+
+  async makeSignature(user, timestamp) {
+    const message = [];
+    const hmac = crypto.createHmac('sha256', user.secretKey);
+    const space = ' ';
+    const newLine = '\n';
+    const method = 'POST';
+    message.push(method);
+    message.push(space);
+    message.push(`/sms/v2/services/${user.serviceId}/messages`);
+    message.push(newLine);
+    message.push(timestamp);
+    message.push(newLine);
+    message.push(user.accessKey);
+
+    const signature = hmac.update(message.join('')).digest('base64');
+    return signature.toString();
   }
 }
