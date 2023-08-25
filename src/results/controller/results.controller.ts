@@ -15,6 +15,24 @@ export class ResultsController {
   private logger = new Logger('ResultsController');
   constructor(private resultsService: ResultsService) {}
 
+  @Get('/group')
+  async getAllMessageGroupResult(
+    @Headers('Authorization') authorization: string,
+  ) {
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    this.logger.verbose('Message group result');
+    const result = await this.resultsService.allMessageGroupResult(
+      decodedAccessToken.email,
+    );
+    return {
+      result,
+    };
+  }
+
   @Get('/:messageId')
   async messageResult(@Param('messageId') messageId: number) {
     this.logger.verbose('Message result');
