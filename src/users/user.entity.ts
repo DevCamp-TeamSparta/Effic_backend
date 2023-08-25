@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
-import { Result } from '../results/result.entity';
+import { NcpResult, UrlResult } from '../results/result.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -50,6 +50,13 @@ export class User extends BaseEntity {
   @OneToMany(() => Payment, (payment) => payment.user, { cascade: true })
   payments: Payment[];
 
-  @OneToMany(() => Result, (result) => result.user, { cascade: true })
-  results: Result[];
+  @OneToMany(() => NcpResult, (ncpResult) => ncpResult.message, {
+    cascade: true,
+  })
+  ncpResults: NcpResult[];
+
+  @OneToMany(() => UrlResult, (urlResult) => urlResult.message, {
+    cascade: true,
+  })
+  urlResults: UrlResult[];
 }

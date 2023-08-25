@@ -11,8 +11,6 @@ import {
   UrlInfosRepository,
 } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
-import { ResultsRepository } from '../results.repository';
-import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { NcpResult, UrlResult } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
@@ -29,8 +27,6 @@ export class ResultsService {
     private readonly usersRepository: UsersRepository,
     private readonly messagesRepository: MessagesRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
-    private readonly resultsRepository: ResultsRepository,
-    private readonly messagesContentRepository: MessagesContentRepository,
     private readonly urlResultsRepository: UrlResultsRepository,
     private readonly ncpResultsRepository: NcpResultsRepository,
     private readonly urlInfosRepository: UrlInfosRepository,
@@ -334,38 +330,6 @@ export class ResultsService {
         );
       }
     }
-
-    const urlmessages =
-      await this.messagesRepository.findTwentyFourHoursBeforeSend();
-
-    for (const message of urlmessages) {
-      const user = await this.usersRepository.findOneByUserId(message.userId);
-
-      try {
-        const shortUrlResult = await this.shortUrlResult(message.messageId);
-
-        for (const result of shortUrlResult) {
-          const resultEntity = this.entityManager.create(UrlResult, {
-            message: message,
-            user: user,
-            humanclicks: result.humanClicks,
-            totalclicks: result.totalClicks,
-            idString: result.idString,
-          });
-
-          await this.entityManager.save(resultEntity);
-        }
-
-        console.log(
-          `Short url results for message ${message.messageId} saved.`,
-        );
-      } catch (error) {
-        console.error(
-          `Failed to fetch short url results for message ${message.messageId}.`,
-          error,
-        );
-      }
-    }
   }
 
   // A/B 테스트 결과 polling
@@ -386,18 +350,13 @@ export class ResultsService {
         const aHumanClick = aShortUrlResult[0].humanClicks;
         const bHumanClick = bShortUrlResult[0].humanClicks;
 
-        // a 메세지의 click이 많을 경우, message-content table의 messageId를 검색해서 a 메세지를 전송
-        if (aHumanClick > bHumanClick) {
-          const message =
-            await this.messagesContentRepository.findOneByMessageId(aMessageId);
-
-          // aMessage.isSent = true;
-          // await this.messagesRepository.save(aMessage);
-          // console.log(`Message ${aMessageId} is sent.`);
+        if (aHumanClick >= bHumanClick) {
+          // const result = aMessageId;
+          // return result;
         } else {
+          // const result = bMessageId;
+          // return result;
         }
-
-        // 더 큰 값을 가진 메세지를 2시간 뒤에 전송하도록 return
       } catch (error) {
         console.error(
           `Failed to fetch ab test results for message ${message.messageId}.`,
@@ -406,4 +365,6 @@ export class ResultsService {
       }
     }
   }
+
+  async abTestWinnerMessageSend(messageId: number) {}
 }

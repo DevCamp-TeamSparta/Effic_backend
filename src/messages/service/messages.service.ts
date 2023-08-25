@@ -8,6 +8,7 @@ import {
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersRepository } from '../../users/users.repository';
+import { ResultsService } from '../../results/service/results.service';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
@@ -23,6 +24,7 @@ export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
+    private readonly resultsService: ResultsService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -108,7 +110,7 @@ export class MessagesService {
     }
 
     const body = {
-      type: 'MMS',
+      type: 'LMS',
       contentType: await this.getCotentType(defaultMessageDto),
       countryCode: '82',
       from: defaultMessageDto.hostnumber,
@@ -272,7 +274,7 @@ export class MessagesService {
     }
 
     const body = {
-      type: 'MMS',
+      type: 'LMS',
       contentType: await this.getCotentType(testMessageDto),
       countryCode: '82',
       from: testMessageDto.hostnumber,
@@ -319,7 +321,7 @@ export class MessagesService {
   // hostnumbercheck 메세지
   async hostNumberCheckMessage(checkHostNumberDto) {
     const body = {
-      type: 'MMS',
+      type: 'LMS',
       contentType: await this.getCotentType(checkHostNumberDto),
       countryCode: '82',
       from: checkHostNumberDto.hostnumber,
@@ -448,7 +450,7 @@ export class MessagesService {
         );
 
         const body = {
-          type: 'MMS',
+          type: 'LMS',
           contentType: await this.getCotentType(abTestMessageDto),
           countryCode: '82',
           from: abTestMessageDto.hostnumber,
@@ -527,7 +529,7 @@ export class MessagesService {
         );
 
         const body = {
-          type: 'MMS',
+          type: 'LMS',
           contentType: await this.getCotentType(abTestMessageDto),
           countryCode: '82',
           from: abTestMessageDto.hostnumber,
@@ -606,7 +608,8 @@ export class MessagesService {
       }
     }
 
-    // 2시간 뒤에 결과 확인해서 좋은 것으로 보내기 - 메세지 예약
+    // 2시간 뒤에 결과 확인해서 좋은 것으로 보내기
+
     // db에서 false인 메세지 찾아서 보내고 삭제
 
     // 유저 금액 차감

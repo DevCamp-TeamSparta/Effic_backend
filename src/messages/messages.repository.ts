@@ -29,15 +29,6 @@ export class MessagesRepository extends Repository<Message> {
       .getMany();
   }
 
-  async findTwentyFourHoursBeforeSend(): Promise<Message[]> {
-    const twentyFourHoursAgo = new Date();
-    twentyFourHoursAgo.setDate(twentyFourHoursAgo.getDate() - 1);
-
-    return this.createQueryBuilder('message')
-      .where('message.createdAt > :twentyFourHoursAgo', { twentyFourHoursAgo })
-      .getMany();
-  }
-
   async findNotSend(): Promise<Message[]> {
     const twoHoursAgo = new Date();
     twoHoursAgo.setHours(twoHoursAgo.getHours() - 2);

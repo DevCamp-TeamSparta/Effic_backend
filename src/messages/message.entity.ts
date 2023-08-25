@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
-import { Result } from '../results/result.entity';
+import { NcpResult, UrlResult } from 'src/results/result.entity';
 
 @Entity()
 export class Message extends BaseEntity {
@@ -46,8 +46,15 @@ export class Message extends BaseEntity {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => Result, (result) => result.message, { cascade: true })
-  results: Result[];
+  @OneToMany(() => NcpResult, (ncpResult) => ncpResult.message, {
+    cascade: true,
+  })
+  ncpResults: NcpResult[];
+
+  @OneToMany(() => UrlResult, (urlResult) => urlResult.message, {
+    cascade: true,
+  })
+  urlResults: UrlResult[];
 
   @Column({ type: 'int', nullable: true })
   messageGroupId: number;

@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { Result, UrlResult, NcpResult } from './result.entity';
+import { UrlResult, NcpResult } from './result.entity';
 import { Repository, DataSource } from 'typeorm';
 
-@Injectable()
-export class ResultsRepository extends Repository<Result> {
-  constructor(private datasource: DataSource) {
-    super(Result, datasource.createEntityManager());
-  }
+// @Injectable()
+// export class ResultsRepository extends Repository<Result> {
+//   constructor(private datasource: DataSource) {
+//     super(Result, datasource.createEntityManager());
+//   }
 
-  async findAllByMessageId(messageId: number): Promise<Result[]> {
-    return await this.find({ where: { messageId } });
-  }
-}
+//   async findAllByMessageId(messageId: number): Promise<Result[]> {
+//     return await this.find({ where: { messageId } });
+//   }
+// }
 
 @Injectable()
 export class UrlResultsRepository extends Repository<UrlResult> {

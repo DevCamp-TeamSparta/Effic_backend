@@ -10,6 +10,9 @@ import {
   UrlInfosRepository,
   MessageGroupRepo,
 } from './messages.repository';
+import { ResultsService } from 'src/results/service/results.service';
+import { UrlResultsRepository } from 'src/results/results.repository';
+import { NcpResultsRepository } from 'src/results/results.repository';
 
 @Module({
   imports: [
@@ -19,8 +22,11 @@ import {
   providers: [
     MessagesService,
     MessagesRepository,
+    ResultsService,
     UsersRepository,
     UrlInfosRepository,
+    UrlResultsRepository,
+    NcpResultsRepository,
     MessagesContentRepository,
     MessageGroupRepo,
   ],

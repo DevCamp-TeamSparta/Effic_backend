@@ -4,50 +4,11 @@ import {
   Column,
   PrimaryGeneratedColumn,
   ManyToOne,
-  OneToMany,
   JoinColumn,
   CreateDateColumn,
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
 import { User } from '../users/user.entity';
-
-@Entity()
-export class Result extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'int' })
-  ResultId: number;
-
-  @Column({ array: true, nullable: true, type: 'text', default: [] })
-  urls: Array<string>;
-
-  @Column({ type: 'int', nullable: true })
-  success: number;
-
-  @Column({ type: 'int', nullable: true })
-  reserved: number;
-
-  @Column({ type: 'int', nullable: true })
-  fail: number;
-
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
-
-  @Column({ type: 'int', nullable: true })
-  messageId: number;
-
-  @Column({ type: 'varchar', nullable: true })
-  shortUrl: string;
-
-  @Column({ type: 'int', nullable: true })
-  userId: number;
-
-  @ManyToOne(() => Message, (message) => message.results)
-  @JoinColumn({ name: 'messageId' })
-  message: Message;
-
-  @ManyToOne(() => User, (user) => user.results)
-  @JoinColumn({ name: 'userId' })
-  user: User;
-}
 
 @Entity()
 export class NcpResult extends BaseEntity {
@@ -69,14 +30,14 @@ export class NcpResult extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   fail: number;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @CreateDateColumn({ type: 'timestamp', nullable: false })
   createdAt: Date;
 
-  @ManyToOne(() => Message, (message) => message.results)
+  @ManyToOne(() => Message, (message) => message.ncpResults)
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
-  @ManyToOne(() => User, (user) => user.results)
+  @ManyToOne(() => User, (user) => user.ncpResults)
   @JoinColumn({ name: 'userId' })
   user: User;
 }
@@ -104,11 +65,11 @@ export class UrlResult extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   userId: number;
 
-  @ManyToOne(() => Message, (message) => message.results)
+  @ManyToOne(() => Message, (message) => message.urlResults)
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
-  @ManyToOne(() => User, (user) => user.results)
+  @ManyToOne(() => User, (user) => user.urlResults)
   @JoinColumn({ name: 'userId' })
   user: User;
 }
