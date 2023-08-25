@@ -30,7 +30,11 @@ export class NcpResult extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   fail: number;
 
-  @CreateDateColumn({ type: 'timestamp', nullable: false })
+  @Column({
+    type: 'timestamp',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
   @ManyToOne(() => Message, (message) => message.ncpResults)

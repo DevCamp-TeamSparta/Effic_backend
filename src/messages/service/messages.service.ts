@@ -208,8 +208,6 @@ export class MessagesService {
       responseType: 'json',
     })
       .then((response) => {
-        console.log(response.body);
-
         const urlInfo = new UrlInfo();
         urlInfo.originalUrl = response.body.originalURL;
         urlInfo.shortenUrl = response.body.shortURL;
@@ -220,7 +218,7 @@ export class MessagesService {
         return response.body;
       })
       .catch((e) => {
-        console.log(e.response.body);
+        console.error(e.response.body);
         throw new InternalServerErrorException();
       });
   }
@@ -429,8 +427,6 @@ export class MessagesService {
       testReceiverNumber / 2,
       testReceiverNumber,
     );
-    const abResultReceiver =
-      abTestMessageDto.receiverList.slice(testReceiverNumber);
 
     const result = await this.messageGroupRepo.createMessageGroup(user.userId);
     // A, B 메세지 보내기
@@ -448,7 +444,6 @@ export class MessagesService {
           shortenedUrls,
           abTestMessageDto.messageInfoList[0].content,
         );
-
         const body = {
           type: 'LMS',
           contentType: await this.getCotentType(abTestMessageDto),
@@ -478,6 +473,7 @@ export class MessagesService {
           'x-ncp-apigw-timestamp': now,
           'x-ncp-apigw-signature-v2': await this.signature(user, now),
         };
+        console.log(user.serviceId, user.accessKey, user.secretKey);
         const response = await axios.post(
           `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
           body,
@@ -485,6 +481,7 @@ export class MessagesService {
             headers,
           },
         );
+        console.log('!!!!>>');
 
         const urlForResult = abTestMessageDto.urlForResult;
         const idStringIndex =
