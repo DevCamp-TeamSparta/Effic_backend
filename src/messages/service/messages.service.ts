@@ -166,12 +166,16 @@ export class MessagesService {
       message.urlForResult = null;
       message.requestId = response.data.requestId;
 
+      await this.entityManager.save(message);
+
       const messageContent = new MessageContent();
       messageContent.messageId = message.messageId;
       messageContent.content = defaultMessageDto.content;
       messageContent.receiverList = defaultMessageDto.receiverList;
       messageContent.sentType = MessageType.D;
       messageContent.hostnumber = defaultMessageDto.hostnumber;
+
+      await this.entityManager.save(messageContent);
 
       const result: any = {};
       await this.entityManager.transaction(
@@ -183,7 +187,6 @@ export class MessagesService {
           message.messageGroupId = group.id;
           await transactionalEntityManager.save(message);
           result.id = group.id;
-          await transactionalEntityManager.save(messageContent);
         },
       );
       return {
