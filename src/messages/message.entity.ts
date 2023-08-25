@@ -27,7 +27,7 @@ export class Message extends BaseEntity {
   @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createdAt: Date;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
   receiverList: string[];
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
@@ -52,9 +52,9 @@ export class Message extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   messageGroupId: number;
 
-  // @ManyToOne(() => MessageGroup, (group) => group.messages)
-  // @JoinColumn({ name: 'messageGroupId' })
-  // messageGroup: MessageGroup;
+  @ManyToOne(() => MessageGroup, (group) => group.messages)
+  @JoinColumn({ name: 'messageGroupId' })
+  messageGroup: Promise<MessageGroup>;
 }
 
 @Entity()
@@ -62,7 +62,7 @@ export class MessageGroup extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @OneToMany(() => Message, 'messageGroupId')
+  @OneToMany(() => Message, (message) => message.messageGroup)
   messages: Message[];
 
   @Column({ type: 'int', nullable: false })

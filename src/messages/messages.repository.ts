@@ -81,7 +81,10 @@ export class MessageGroupRepo extends Repository<MessageGroup> {
     return await this.findOne({ where: { id: messageGroupId } });
   }
   async findAllByUserId(userId: number): Promise<MessageGroup[]> {
-    return await this.find({ where: { userId } });
+    return await this.createQueryBuilder('messageGroup')
+      .leftJoinAndSelect('messageGroup.messages', 'message')
+      .where('messageGroup.userId = :userId', { userId })
+      .getMany();
   }
 
   async createMessageGroup(userId: number): Promise<MessageGroup> {

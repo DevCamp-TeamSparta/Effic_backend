@@ -126,10 +126,8 @@ export class PaymentsService {
           imp_secret: iamConfig.secretKey,
         },
       });
-      console.log(getToken.data);
 
       const { access_token } = getToken.data.response;
-      console.log(access_token, imp_uid);
 
       // imp_uid로 포트원 서버에서 결제 정보 조회
       const getPaymentData = await axios({
@@ -161,7 +159,6 @@ export class PaymentsService {
         },
       });
       const { response } = getCancelData.data;
-      console.log(response);
       user.money -= refundMoney;
     } catch (error) {
       console.log(error);

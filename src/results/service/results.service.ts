@@ -21,6 +21,7 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 import { shortIoConfig } from 'config/short-io.config';
 import { Cron } from '@nestjs/schedule';
+import { MessageType } from 'src/messages/message.enum';
 
 @Injectable()
 export class ResultsService {
@@ -46,6 +47,10 @@ export class ResultsService {
       throw new BadRequestException('messageId or email is wrong');
     }
 
+    if (message.sentType === MessageType.N) {
+      return { success: 0, reserved: message.receiverList.length, fail: 0 };
+    }
+
     const now = Date.now().toString();
     const headers = {
       'x-ncp-apigw-timestamp': now,
@@ -58,8 +63,6 @@ export class ResultsService {
         `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${message.requestId}`,
         { headers },
       );
-
-      console.log(response.data);
 
       let success = 0;
       let fail = 0;
@@ -76,7 +79,8 @@ export class ResultsService {
       }
       return { success, reserved, fail };
     } catch (e) {
-      console.log(e.response.data);
+      console.log(message.requestId);
+      console.log('ncp error', e.response.data);
       throw new InternalServerErrorException();
     }
   }
@@ -172,6 +176,28 @@ export class ResultsService {
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
   }
+
+  async allMessageGroupResult(email: any) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('email is wrong');
+    }
+
+    const messageGroups = await this.messageGroupRepo.findAllByUserId(
+      user.userId,
+    );
+    if (!messageGroups) {
+      throw new BadRequestException('email is wrong');
+    }
+
+    const results = await Promise.all(
+      messageGroups.map(async (messageGroup) => {
+        return this.messageGroupResult(messageGroup.id, email);
+      }),
+    );
+    return results;
+  }
+
   async messageGroupResult(messageGroupId: number, email: string) {
     const result =
       this.messageGroupRepo.findOneByMessageGroupId(messageGroupId);
@@ -190,19 +216,32 @@ export class ResultsService {
     if (!messages) {
       throw new BadRequestException('messageGroupId is wrong');
     }
+    console.log(messageGroupId);
 
-    const results = messages.map((message) => {
-      console.log('!group 동작', message);
-      return this.messageResult(message.messageId);
-    });
+    const results = await Promise.all(
+      messages.map(async (message) => {
+        const [content, results] = await Promise.all([
+          this.messagesContentRepository.findOneByMessageId(message.messageId),
+          this.messageResult(message.messageId),
+        ]);
+        return {
+          message: message,
+          content: content,
+          results: results,
+        };
+      }),
+    );
     return results;
   }
   // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
   async messageResult(messageId: number) {
+    console.log(messageId);
     // 클릭했을 때 결과를 하나 만듦
     const message = await this.messagesRepository.findOneByMessageId(messageId);
     const user = await this.usersRepository.findOneByUserId(message.userId);
+    console.log('!!!!');
     const newNcpResult = await this.ncpResult(messageId, user.email);
+    console.log('!!!!2');
 
     const resultEntity = this.entityManager.create(NcpResult, {
       message: message,
@@ -263,6 +302,7 @@ export class ResultsService {
           result.urls.push({
             shortUrl: urlInfo.shortenUrl,
             originalUrl: urlInfo.originalUrl,
+            idString: url.idString,
             humanclicks: url.humanclicks,
             totalclicks: url.totalclicks,
           });

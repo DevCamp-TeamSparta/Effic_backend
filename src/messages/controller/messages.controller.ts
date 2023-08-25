@@ -48,6 +48,7 @@ export class MessagesController {
 
     const email = decodedAccessToken.email;
 
+    this.logger.verbose('AB test message sending2');
     const result = await this.messagesService.abTestMessage(
       email,
       abTestMessageDto,
