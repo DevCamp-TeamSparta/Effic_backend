@@ -8,7 +8,6 @@ import {
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersRepository } from '../../users/users.repository';
-import { ResultsService } from '../../results/service/results.service';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
@@ -24,7 +23,6 @@ export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
-    private readonly resultsService: ResultsService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -170,7 +168,7 @@ export class MessagesService {
 
       const messageContent = new MessageContent();
       messageContent.messageId = message.messageId;
-      messageContent.content = defaultMessageDto.content;
+      messageContent.content = defaultMessageDto;
       messageContent.receiverList = defaultMessageDto.receiverList;
       messageContent.sentType = MessageType.D;
       messageContent.hostnumber = defaultMessageDto.hostnumber;
@@ -521,6 +519,7 @@ export class MessagesService {
           abTestMessageDto.receiverList.slice(testReceiverNumber);
         messageContent.sentType = MessageType.A;
         messageContent.hostnumber = abTestMessageDto.hostnumber;
+        messageContent.messageGroupId = result.id;
 
         await this.entityManager.save(messageContent);
       } else if (i < 2) {
@@ -606,6 +605,7 @@ export class MessagesService {
           abTestMessageDto.receiverList.slice(testReceiverNumber);
         messageContent.sentType = MessageType.B;
         messageContent.hostnumber = abTestMessageDto.hostnumber;
+        messageContent.messageGroupId = result.id;
 
         await this.entityManager.save(messageContent);
       } else {
@@ -621,10 +621,6 @@ export class MessagesService {
         await this.entityManager.save(message);
       }
     }
-
-    // 2시간 뒤에 결과 확인해서 좋은 것으로 보내기
-
-    // db에서 false인 메세지 찾아서 보내고 삭제
 
     // 유저 금액 차감
     const deductionMoney = receiverPhones.length * 3;

@@ -20,7 +20,7 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 import got from 'got';
 import { shortIoConfig } from 'config/short-io.config';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression, Interval } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
 import { UrlInfo } from 'src/messages/message.entity';
 
@@ -315,9 +315,10 @@ export class ResultsService {
   }
 
   // ncp와 단축 url 결과를 합친 polling
-  @Cron('0 */1 * * *')
-  async handleNcpCron() {
-    this.logger.log('ncp polling');
+  // @Cron('*/1 * * * *', { name: 'result' })
+  @Cron('0 */1 * * *', { name: 'result' })
+  async handleResultCron() {
+    this.logger.log('result polling');
     const ncpmessages = await this.messagesRepository.findThreeDaysBeforeSend();
 
     for (const message of ncpmessages) {
@@ -377,8 +378,9 @@ export class ResultsService {
   }
 
   // A/B 테스트 결과 polling
-  @Cron('*/5 * * * *')
-  async handleAbTestCron() {
+  // @Cron('*/1 * * * *', { name: 'abtest' })
+  @Cron(CronExpression.EVERY_5_MINUTES, { name: 'abtest' })
+  async handleAbTestInterval() {
     this.logger.log('abtest polling');
     const messages = await this.messagesRepository.findNotSend();
 

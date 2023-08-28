@@ -105,12 +105,13 @@ Header:
 }
 
 ### result - messageId
-Get http://localhost:8000/results/40
+Get http://localhost:8000/results/62
 Content-Type: application/json
 
 
 ### abTest message sending
 Post http://localhost:8000/messages/abtest
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTIwODk2NzAsImV4cCI6MTY5MjE3NjA3MH0.X5YJGZ12Uq1rmjLCCGTmbHvEREWpECOQvhZPaBwVy8U
 Content-Type: application/json
 
 {
