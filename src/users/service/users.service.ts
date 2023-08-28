@@ -125,6 +125,7 @@ export class UsersService {
     serviceId: string,
     secretKey: string,
     advertisementOpt: boolean,
+    advertiseNumber: number,
     point: number,
   ) {
     this.checkAccessToken(null, `Bearer ${token}`);
@@ -145,6 +146,7 @@ export class UsersService {
       serviceId,
       secretKey,
       advertisementOpt,
+      advertiseNumber,
       point,
     };
     if (user) {

@@ -40,6 +40,7 @@ export class UsersController {
       serviceId,
       secretKey,
       advertisementOpt,
+      advertiseNumber,
       point,
     } = createUserDto;
 
@@ -52,6 +53,7 @@ export class UsersController {
       serviceId,
       secretKey,
       advertisementOpt,
+      advertiseNumber,
       point,
     );
 
@@ -68,6 +70,7 @@ export class UsersController {
       serviceId,
       secretKey,
       advertisementOpt,
+      advertiseNumber,
       accessToken,
       point,
     };

@@ -37,6 +37,10 @@ export class CreateUserDto {
   @IsOptional()
   secretKey?: string;
 
+  @IsNumber()
+  @IsOptional()
+  advertiseNumber?: number;
+
   @IsString()
   @IsOptional()
   accessToken?: string;
