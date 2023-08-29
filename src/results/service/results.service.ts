@@ -92,6 +92,10 @@ export class ResultsService {
       throw new BadRequestException('messageId is wrong');
     }
 
+    if (message.sentType === MessageType.N) {
+      return [];
+    }
+
     const statisticsArray = [];
 
     for (const idString of message.idString) {
@@ -220,10 +224,12 @@ export class ResultsService {
 
     const results = await Promise.all(
       messages.map(async (message) => {
+        console.log('??', message.messageId);
         const [content, results] = await Promise.all([
           this.messagesContentRepository.findOneByMessageId(message.messageId),
           this.messageResult(message.messageId),
         ]);
+        console.log(content);
         return {
           message: message,
           content: content,

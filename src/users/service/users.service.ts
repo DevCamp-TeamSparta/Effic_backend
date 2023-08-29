@@ -38,6 +38,7 @@ export class UsersService {
 
       return { email, accessToken };
     } catch (error) {
+      console.error(error);
       if (error instanceof NotFoundException) {
         const dummyUser = new User();
         dummyUser.email = email;

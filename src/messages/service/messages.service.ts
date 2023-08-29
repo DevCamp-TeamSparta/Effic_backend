@@ -484,7 +484,6 @@ export class MessagesService {
           'x-ncp-apigw-timestamp': now,
           'x-ncp-apigw-signature-v2': await this.signature(user, now),
         };
-        console.log(user.serviceId, user.accessKey, user.secretKey);
         const response = await axios.post(
           `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
           body,
