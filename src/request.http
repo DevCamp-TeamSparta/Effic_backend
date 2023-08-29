@@ -2,7 +2,7 @@
 POST http://localhost:8000/users/signup
 Header: 
   content-type: application/json
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzZAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MTYyMywiZXhwIjoxNjkyODU4MDIzfQ.Rtbf1oxTNZCQnwl-z2I1rsGbtIV1AyQRI7yvAbKqFSg
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzdAc3BhcnRhLmNvbSIsImlhdCI6MTY5MzI3MzYyOCwiZXhwIjoxNjkzMzYwMDI4fQ.rXCvuUWyl4eAVVbeTxQ5UDxU9TbQwMp46pyGyk_9DXE
 
 {
     "email": "clo7@sparta.com",
@@ -11,6 +11,7 @@ Header:
     "serviceId": "ncp:sms:kr:313324923877:clo",
     "secretKey": "z7KIKoY9QAtb1kGTlwWDBIigPfPWkLw9yALApZLv",
     "hostnumber": ["010-3628-9823"],
+    "advertiseNumber": ["08011111111"],
     "advertisementOpt": false
 }
 
@@ -19,7 +20,7 @@ Post http://localhost:8000/users/login
 Content-Type: application/json
 
 {
-    "email": "clo6@sparta.com"
+    "email": "clo7@sparta.com"
 }
 
 ### update User-info
@@ -105,12 +106,13 @@ Header:
 }
 
 ### result - messageId
-Get http://localhost:8000/results/40
+Get http://localhost:8000/results/62
 Content-Type: application/json
 
 
 ### abTest message sending
 Post http://localhost:8000/messages/abtest
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTIwODk2NzAsImV4cCI6MTY5MjE3NjA3MH0.X5YJGZ12Uq1rmjLCCGTmbHvEREWpECOQvhZPaBwVy8U
 Content-Type: application/json
 
 {
@@ -119,3 +121,13 @@ Content-Type: application/json
     "hostnumber": "01036289823",
     "receiverList": [{"phone": "01036289823", "name": "clo", "grade": "A"},{"phone": "01036289823", "name": "clo2", "grade": "B"},{"phone": "01036289823", "name": "clo3", "grade": "A"},{"phone": "01036289823", "name": "clo4", "grade": "C"},{"phone": "01036289823", "name": "clo5", "grade": "B"},{"phone": "01036289823", "name": "clo6", "grade": "D"}]
 }
+
+### money - 사용 금액 내역
+Get http://localhost:8000/results/payment/1
+Authorization: 
+Content-Type: application/json
+
+### money - 충전 금액 내역
+Get http://localhost:8000/payments/1
+Authorization:
+Content-Type: application/json

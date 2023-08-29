@@ -12,11 +12,11 @@ import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [
     TypeOrmModule.forRoot(CongfigValidator),
-    ScheduleModule.forRoot(),
     MessageModule,
     UsersModule,
     PaymentsModule,
     ResultsModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

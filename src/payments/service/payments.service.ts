@@ -165,4 +165,16 @@ export class PaymentsService {
       throw error;
     }
   }
+
+  // 충전금액 내역 조회
+  async userPayments(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const payments = await this.paymentsRepository.findAllByUserId(user.userId);
+
+    return payments;
+  }
 }

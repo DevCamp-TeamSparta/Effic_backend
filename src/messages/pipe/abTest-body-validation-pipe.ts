@@ -54,13 +54,13 @@ export class abTestMessageValidationPipe implements PipeTransform {
       throw new BadRequestException('There must be at least one same url');
     }
 
-    // const urlForResult = value.urlForResult;
-    // const findSameUrl2 = findSameUrl.filter((x) => urlForResult.includes(x));
-    // if (findSameUrl2.length !== findSameUrl.length) {
-    //   throw new BadRequestException(
-    //     'There must be at least one same url in urlForResult',
-    //   );
-    // }
+    const urlForResult = value.urlForResult;
+    const findSameUrl2 = findSameUrl.filter((x) => urlForResult.includes(x));
+    if (findSameUrl2.length === 0) {
+      throw new BadRequestException(
+        'There must be at least one same url in urlForResult',
+      );
+    }
 
     return value;
   }

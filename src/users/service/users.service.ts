@@ -126,6 +126,7 @@ export class UsersService {
     serviceId: string,
     secretKey: string,
     advertisementOpt: boolean,
+    advertiseNumber: string[],
     point: number,
   ) {
     this.checkAccessToken(null, `Bearer ${token}`);
@@ -138,6 +139,29 @@ export class UsersService {
       throw new HttpException('Email is not valid', HttpStatus.BAD_REQUEST);
     }
     const user = await this.usersRepository.findOneByEmail(email);
+
+    // for (const checkhostnumber of hostnumber) {
+    //   console.log('=========> ~ hostnumber:', hostnumber);
+    //   const checkhostNumber: Array<string> = [];
+
+    //   if (checkhostnumber.match(/\D/g)) {
+    //     const number = checkhostnumber.replace(/\D/g, '');
+    //     checkhostNumber.push(number);
+    //     console.log('=========> ~ checkhostNumber:', checkhostNumber);
+    //   }
+
+    //   const users = await this.usersRepository.findOneByHostNumber(
+    //     checkhostNumber[0],
+    //   );
+
+    //   if (users) {
+    //     throw new HttpException(
+    //       'Hostnumber already exists',
+    //       HttpStatus.BAD_REQUEST,
+    //     );
+    //   }
+    // }
+
     const newUser = {
       email,
       name,
@@ -146,11 +170,11 @@ export class UsersService {
       serviceId,
       secretKey,
       advertisementOpt,
+      advertiseNumber,
       point,
     };
     if (user) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
-      return;
     } else {
       await this.usersRepository.createUser(newUser);
     }
