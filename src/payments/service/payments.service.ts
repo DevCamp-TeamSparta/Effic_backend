@@ -203,7 +203,18 @@ export class PaymentsService {
     await this.entityManager.save(refund);
 
     const slackMessage = {
-      text: `환불신청이 들어왔습니다. \n환불신청금액: ${refundPaymentDto.refundMoney} \n예금주: ${refundPaymentDto.accountHolder} \n계좌번호: ${refundPaymentDto.accountNumber} \n은행명: ${refundPaymentDto.bankName} \n연락처: ${refundPaymentDto.contactNumber}`,
+      text: '환불신청이 들어왔습니다.',
+      attachments: [
+        {
+          color: '#36a64f',
+          fields: [
+            {
+              title: '신청정보',
+              value: `환불신청금액: ${refundPaymentDto.refundMoney}원\n예금주: ${refundPaymentDto.accountHolder}\n은행명: ${refundPaymentDto.bankName}\n계좌번호: ${refundPaymentDto.accountNumber}\n연락처: ${refundPaymentDto.contactNumber}`,
+            },
+          ],
+        },
+      ],
     };
 
     try {
