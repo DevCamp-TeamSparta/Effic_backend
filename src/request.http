@@ -2,15 +2,15 @@
 POST http://localhost:8000/users/signup
 Header: 
   content-type: application/json
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzdAc3BhcnRhLmNvbSIsImlhdCI6MTY5MzI3MzYyOCwiZXhwIjoxNjkzMzYwMDI4fQ.rXCvuUWyl4eAVVbeTxQ5UDxU9TbQwMp46pyGyk_9DXE
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzlAc3BhcnRhLmNvbSIsImlhdCI6MTY5MzI4NzM4OSwiZXhwIjoxNjkzMzczNzg5fQ.KcL6oM2VO0EgRTwMGqJCeICJlaLcR7B_gBPxtG0HP1k
 
 {
-    "email": "clo7@sparta.com",
+    "email": "clo9@sparta.com",
     "name": "clo2222",
     "accessKey": "cugC5Rn2vzGEWUJhHAKw",
     "serviceId": "ncp:sms:kr:313324923877:clo",
     "secretKey": "z7KIKoY9QAtb1kGTlwWDBIigPfPWkLw9yALApZLv",
-    "hostnumber": ["010-3628-9823"],
+    "hostnumber": ["010-3628-9825"],
     "advertiseNumber": ["08011111111"],
     "advertisementOpt": false
 }
@@ -20,7 +20,7 @@ Post http://localhost:8000/users/login
 Content-Type: application/json
 
 {
-    "email": "clo7@sparta.com"
+    "email": "clo9@sparta.com"
 }
 
 ### update User-info
@@ -131,3 +131,16 @@ Content-Type: application/json
 Get http://localhost:8000/payments/1
 Authorization:
 Content-Type: application/json
+
+### slack - 환불 메세지 보내기
+Post http://localhost:8000/payments/refund
+Authorization:
+Content-Type: application/json
+
+{
+  "refundMoney": 1000,
+  "accountHolder": "승",
+  "accountNumber": "1002-350-123456",
+  "bankName": "우리은행",
+  "contactNumber": "010-3628-9823"
+}
