@@ -25,6 +25,9 @@ export class Payment extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   merchant_uid: string;
 
+  @Column({ type: 'int', nullable: true })
+  userId: number;
+
   @ManyToOne(() => User, (user) => user.payments)
   @JoinColumn({ name: 'userId' })
   user: User;

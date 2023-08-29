@@ -11,4 +11,8 @@ export class PaymentsRepository extends Repository<Payment> {
   async findOneByPaymentId(merchant_uid: string): Promise<Payment> {
     return await this.findOne({ where: { merchant_uid } });
   }
+
+  async findAllByUserId(userId: number): Promise<Payment[]> {
+    return await this.find({ where: { userId } });
+  }
 }

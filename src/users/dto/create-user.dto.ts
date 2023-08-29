@@ -37,9 +37,9 @@ export class CreateUserDto {
   @IsOptional()
   secretKey?: string;
 
-  @IsNumber()
+  @IsArray()
   @IsOptional()
-  advertiseNumber?: number;
+  advertiseNumber?: string[];
 
   @IsString()
   @IsOptional()

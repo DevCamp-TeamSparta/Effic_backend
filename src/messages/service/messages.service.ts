@@ -104,7 +104,7 @@ export class MessagesService {
 
     if (isAdvertisement) {
       contentPrefix = '(광고)';
-      contentSuffix = '\n무료수신거부 08012341234';
+      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
     }
 
     const body = {
@@ -145,15 +145,6 @@ export class MessagesService {
           headers,
         },
       );
-
-      // 유저 금액 차감
-      const deductionMoney = receiverPhones.length * 3;
-      if (user.point >= deductionMoney) {
-        user.point -= deductionMoney;
-      } else {
-        user.money -= deductionMoney - user.point;
-        user.point = 0;
-      }
 
       const message = new Message();
       message.isSent = true;
@@ -277,7 +268,7 @@ export class MessagesService {
 
     if (isAdvertisement) {
       contentPrefix = '(광고)';
-      contentSuffix = '\n무료수신거부 08012341234';
+      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
     }
 
     const body = {
@@ -417,7 +408,7 @@ export class MessagesService {
 
     if (isAdvertisement) {
       contentPrefix = '(광고)';
-      contentSuffix = '\n무료수신거부 08012341234';
+      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
     }
 
     // 리시버를 3개로 나누기
@@ -621,17 +612,6 @@ export class MessagesService {
         await this.entityManager.save(message);
       }
     }
-
-    // 유저 금액 차감
-    const deductionMoney = receiverPhones.length * 3;
-    if (user.point >= deductionMoney) {
-      user.point -= deductionMoney;
-    } else {
-      user.money -= deductionMoney - user.point;
-      user.point = 0;
-    }
-
-    await this.entityManager.save(user);
     return {
       messageId: '',
       messageGroupId: result.id,

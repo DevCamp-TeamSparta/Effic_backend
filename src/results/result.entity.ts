@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
-  CreateDateColumn,
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
 import { User } from '../users/user.entity';
@@ -68,6 +67,39 @@ export class UrlResult extends BaseEntity {
 
   @Column({ type: 'int', nullable: true })
   userId: number;
+
+  @ManyToOne(() => Message, (message) => message.urlResults)
+  @JoinColumn({ name: 'messageId' })
+  message: Message;
+
+  @ManyToOne(() => User, (user) => user.urlResults)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+}
+
+@Entity()
+export class UsedPayments extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  usedPaymentId: number;
+
+  @Column({ type: 'int', nullable: true })
+  usedPayment: number;
+
+  @Column({ type: 'int', nullable: true })
+  alreadyUsed: number;
+
+  @Column({
+    type: 'timestamp',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Column({ type: 'int', nullable: true })
+  userId: number;
+
+  @Column({ type: 'int', nullable: true })
+  messageId: number;
 
   @ManyToOne(() => Message, (message) => message.urlResults)
   @JoinColumn({ name: 'messageId' })

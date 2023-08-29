@@ -11,7 +11,7 @@ import {
   UrlInfosRepository,
 } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
-import { NcpResult, UrlResult } from '../result.entity';
+import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
@@ -20,7 +20,7 @@ import axios from 'axios';
 import * as crypto from 'crypto';
 import got from 'got';
 import { shortIoConfig } from 'config/short-io.config';
-import { Cron, CronExpression, Interval } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
 import { UrlInfo } from 'src/messages/message.entity';
 
@@ -257,7 +257,7 @@ export class ResultsService {
     const newUrlResult = await this.shortUrlResult(messageId);
 
     for (const result of newUrlResult) {
-      const resultEntity2 = this.entityManager.create(UrlResult, {
+      const resultEntity = this.entityManager.create(UrlResult, {
         message: message,
         user: user,
         humanclicks: result.humanClicks,
@@ -266,7 +266,7 @@ export class ResultsService {
         ncpResultId: resultId,
       });
 
-      await this.entityManager.save(resultEntity2);
+      await this.entityManager.save(resultEntity);
     }
 
     // polling 결과들
@@ -314,8 +314,39 @@ export class ResultsService {
     return messageResults;
   }
 
+  // 결제 내역 조회
+  async paymentResult(userId: number, email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('email is wrong');
+    }
+
+    const payments = await this.entityManager.find(UsedPayments, {
+      where: { userId },
+    });
+    if (!payments) {
+      throw new BadRequestException('userId is wrong');
+    }
+
+    const paymentResults = [];
+
+    for (const payment of payments) {
+      const message = await this.messagesRepository.findOneByMessageId(
+        payment.messageId,
+      );
+
+      const result = {
+        message: payment.messageId,
+        payment: payment.usedPayment,
+        createdAt: message.createdAt,
+      };
+
+      paymentResults.push(result);
+    }
+    return paymentResults;
+  }
+
   // ncp와 단축 url 결과를 합친 polling
-  // @Cron('*/1 * * * *', { name: 'result' })
   @Cron('0 */1 * * *', { name: 'result' })
   async handleResultCron() {
     this.logger.log('result polling');
@@ -335,6 +366,35 @@ export class ResultsService {
           createdAt: new Date(),
           user: user,
         });
+
+        const payment = await this.entityManager.findOne(UsedPayments, {
+          where: { messageId: message.messageId },
+        });
+
+        if (payment) {
+          payment.alreadyUsed = payment.usedPayment;
+          payment.usedPayment = ncpResult.success * 3;
+          await this.entityManager.save(payment);
+        } else {
+          const paymentEntity = this.entityManager.create(UsedPayments, {
+            message: message,
+            user: user,
+            usedPayment: ncpResult.success * 3,
+            alreadyUsed: 0,
+          });
+
+          await this.entityManager.save(paymentEntity);
+        }
+
+        // 유저 금액 차감
+        const deductionMoney = payment.usedPayment - payment.alreadyUsed;
+        if (user.point >= deductionMoney) {
+          user.point -= deductionMoney;
+        } else {
+          user.point = 0;
+          user.money -= deductionMoney - user.point;
+        }
+        await this.entityManager.save(user);
 
         const resultId = (await this.entityManager.save(resultEntity))
           .ncpResultId;
@@ -378,7 +438,6 @@ export class ResultsService {
   }
 
   // A/B 테스트 결과 polling
-  // @Cron('*/1 * * * *', { name: 'abtest' })
   @Cron(CronExpression.EVERY_5_MINUTES, { name: 'abtest' })
   async handleAbTestInterval() {
     this.logger.log('abtest polling');
@@ -396,7 +455,6 @@ export class ResultsService {
         const bHumanClick = bShortUrlResult[0].humanClicks;
 
         if (aHumanClick >= bHumanClick) {
-          // aMessageId값을 이용해서 message 테이블에 접근
           const message = await this.messagesRepository.findOneByMessageId(
             aMessageId,
           );
@@ -480,7 +538,7 @@ export class ResultsService {
 
     if (isAdvertisement) {
       contentPrefix = '(광고)';
-      contentSuffix = '\n무료수신거부 08012341234';
+      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
     }
 
     const body = {

@@ -27,6 +27,7 @@ export class UsersRepository extends Repository<User> {
       serviceId,
       secretKey,
       advertisementOpt,
+      advertiseNumber,
     } = createUSerInfo;
 
     const extractedHostnumbers = hostnumber.map((hostnumber) =>
@@ -42,6 +43,7 @@ export class UsersRepository extends Repository<User> {
       serviceId: serviceId,
       secretKey: secretKey,
       advertisementOpt: advertisementOpt,
+      advertiseNumber: advertiseNumber,
       point: addedPoint,
     });
     return await this.save(newUser);
@@ -49,6 +51,10 @@ export class UsersRepository extends Repository<User> {
 
   async findOneByUserId(userId: number): Promise<User> {
     return await this.findOne({ where: { userId } });
+  }
+
+  async findOneByHostNumber(hostnumber: string): Promise<User | undefined> {
+    return await this.findOne({ where: { hostnumber } });
   }
 
   async updateUser(

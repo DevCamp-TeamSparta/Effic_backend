@@ -1,4 +1,13 @@
-import { Body, Controller, Logger, Post, Headers } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Logger,
+  Post,
+  Headers,
+  Get,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { PaymentsService } from '../service/payments.service';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { Payment } from '../payments.entity';
@@ -48,6 +57,22 @@ export class PaymentsController {
     );
 
     return payment;
+  }
+
+  // 충전금액 내역 조회
+  @Get('/:userId')
+  async userPayments(@Headers('authorization') authorization: string) {
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    this.logger.verbose('User payments');
+    const result = await this.paymentsService.userPayments(
+      decodedAccessToken.email,
+    );
+    return result;
   }
 
   // @Post('/cancel')

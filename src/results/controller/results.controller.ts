@@ -57,6 +57,25 @@ export class ResultsController {
     return result;
   }
 
+  // 결제 내역 조회
+  @Get('/payment/:userId')
+  async paymentResult(
+    @Param('userId') userId: number,
+    @Headers('Authorization') Authorization: string,
+  ) {
+    if (!Authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = Authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    this.logger.verbose('Payment result');
+    return await this.resultsService.paymentResult(
+      userId,
+      decodedAccessToken.email,
+    );
+  }
+
   @Get('/default/:messageId')
   async defaultMessageResult(@Param('messageId') messageId: number) {
     this.logger.verbose('Default message result');

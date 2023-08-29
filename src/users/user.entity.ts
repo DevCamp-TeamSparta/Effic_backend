@@ -38,6 +38,9 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   advertisementOpt: boolean;
 
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  advertiseNumber: Array<string>;
+
   @Column({ type: 'int', nullable: true })
   point: number;
 
