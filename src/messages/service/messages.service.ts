@@ -97,7 +97,7 @@ export class MessagesService {
       defaultMessageDto.content,
     );
 
-    const isAdvertisement = defaultMessageDto.advertisementInfo;
+    const isAdvertisement = defaultMessageDto.advertiseInfo;
 
     let contentPrefix = '';
     let contentSuffix = '';
@@ -260,7 +260,7 @@ export class MessagesService {
       testMessageDto.content,
     );
 
-    const isAdvertisement = testMessageDto.advertisementInfo;
+    const isAdvertisement = testMessageDto.advertiseInfo;
 
     let contentPrefix = '';
     let contentSuffix = '';
@@ -398,7 +398,7 @@ export class MessagesService {
     let shortenedUrls: string[] = [];
     let idStrings = [];
 
-    const isAdvertisement = abTestMessageDto.advertisementInfo;
+    const isAdvertisement = abTestMessageDto.advertiseInfo;
 
     let contentPrefix = '';
     let contentSuffix = '';

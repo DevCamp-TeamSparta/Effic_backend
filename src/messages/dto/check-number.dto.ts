@@ -13,15 +13,15 @@ export class CheckHostNumberDto {
 
   @IsNotEmpty()
   @IsString()
-  title: string;
+  accessKey: string;
 
   @IsNotEmpty()
   @IsString()
-  content: string;
+  secretKey: string;
 
   @IsNotEmpty()
   @IsString()
-  receiverList: string[];
+  serviceId: string;
 
   @IsNotEmpty()
   @IsBoolean()
