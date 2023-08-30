@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   NotFoundException,
-  Param,
   Post,
   Patch,
   Headers,
