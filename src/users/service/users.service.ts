@@ -143,6 +143,7 @@ export class UsersService {
     const extractedHostnumbers = hostnumber.map((hostnumber) =>
       hostnumber.replace(/\D/g, ''),
     );
+
     const allHostnumber = await this.usersRepository.findAllHostnumber();
     for (let i = 0; i < allHostnumber.length; i++) {
       for (let j = 0; j < extractedHostnumbers.length; j++) {
