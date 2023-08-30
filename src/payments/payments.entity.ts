@@ -25,6 +25,12 @@ export class Payment extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   merchant_uid: string;
 
+  @Column({ type: 'varchar', nullable: false })
+  paymentMethod: string;
+
+  @Column({ type: 'boolean', nullable: false, default: false })
+  isCompleted: boolean;
+
   @Column({ type: 'int', nullable: true })
   userId: number;
 

@@ -24,7 +24,11 @@ export class PaymentsService {
   ) {}
 
   // 결제금액 생성
-  async createPayment(email: string, money: number): Promise<Payment> {
+  async createPayment(
+    email: string,
+    money: number,
+    paymentMethod,
+  ): Promise<Payment> {
     const user = await this.usersRepository.findOneByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -49,6 +53,7 @@ export class PaymentsService {
     payment.createdAt = new Date();
     payment.user = user;
     payment.merchant_uid = merchant_uid();
+    payment.paymentMethod = paymentMethod;
 
     await this.entityManager.save(payment);
 
@@ -88,6 +93,8 @@ export class PaymentsService {
       user.money += amountToBePaid;
 
       await this.entityManager.save(user);
+
+      order.isCompleted = true;
 
       return 'success';
       // 결제 검증

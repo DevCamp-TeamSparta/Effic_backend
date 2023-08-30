@@ -32,8 +32,12 @@ export class PaymentsController {
 
     const email = decodedAccessToken.email;
 
-    const { money } = createPaymentDto;
-    const payment = await this.paymentsService.createPayment(email, money);
+    const { money, paymentMethod } = createPaymentDto;
+    const payment = await this.paymentsService.createPayment(
+      email,
+      money,
+      paymentMethod,
+    );
 
     return payment;
   }
