@@ -13,7 +13,11 @@ export class Payment extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   paymentId: number;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({
+    type: 'timestamp',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
   @Column({ type: 'varchar', nullable: false })
@@ -44,7 +48,11 @@ export class Refund extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   refundId: number;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({
+    type: 'timestamp',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
   @Column({ type: 'int', nullable: false })
