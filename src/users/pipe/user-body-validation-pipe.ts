@@ -7,7 +7,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 @Injectable()
 export class UserBodyValidationPipe implements PipeTransform {
   async transform(value: any): Promise<UpdateUserDto | CreateUserDto> {
-    const hostnumberRegex = /^(\d{3}-\d{3,4}-\d{4}|\d{11})$/;
+    const hostnumberRegex = /^[0-9]{7,11}$/;
 
     if (value.hostnumber && !hostnumberRegex.test(value.hostnumber)) {
       throw new BadRequestException('hostnumber is not valid');
