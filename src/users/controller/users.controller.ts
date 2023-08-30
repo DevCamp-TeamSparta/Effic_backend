@@ -29,13 +29,12 @@ export class UsersController {
   @Post('/signup')
   async createUser(
     @Body() createUserDto: CreateUserDto,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
   ): Promise<object> {
     this.logger.verbose('User signup');
 
     const Token = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(Token);
-    console.log(decodedAccessToken);
+    console.log(Token);
 
     const {
       email,
@@ -50,7 +49,7 @@ export class UsersController {
     } = createUserDto;
 
     await this.usersService.createUser(
-      decodedAccessToken,
+      Token,
       email,
       name,
       hostnumber,
@@ -84,7 +83,7 @@ export class UsersController {
   @Patch('/:userId')
   async updateUser(
     @Param('userId') userId: string,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
     @Body(new UserBodyValidationPipe()) updateUserDto: UpdateUserDto,
   ) {
     this.logger.verbose('User update');
@@ -96,7 +95,7 @@ export class UsersController {
   }
 
   @Post('/logout')
-  async logout(@Headers('authorization') authorization: string) {
+  async logout(@Headers('Authorization') authorization: string) {
     this.logger.verbose('User logout');
     const accessToken = authorization.split(' ')[1];
     const decodedAccessToken: any = jwt.decode(accessToken);
@@ -111,7 +110,7 @@ export class UsersController {
 
   // 마이페이지
   @Get('/me')
-  async findUser(@Headers('authorization') authorization: string) {
+  async findUser(@Headers('Authorization') authorization: string) {
     this.logger.verbose('User info');
 
     const accessToken = authorization.split(' ')[1];
