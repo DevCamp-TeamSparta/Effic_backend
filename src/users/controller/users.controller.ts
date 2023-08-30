@@ -35,6 +35,7 @@ export class UsersController {
 
     const Token = authorization.split(' ')[1];
     const decodedAccessToken: any = jwt.decode(Token);
+    console.log(decodedAccessToken);
 
     const {
       email,
