@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  HttpException,
-  HttpStatus,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersRepository } from '../../users/users.repository';
