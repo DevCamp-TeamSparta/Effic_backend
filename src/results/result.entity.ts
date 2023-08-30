@@ -29,11 +29,7 @@ export class NcpResult extends BaseEntity {
   @Column({ type: 'int', nullable: false, default: 0 })
   fail: number;
 
-  @Column({
-    type: 'timestamp',
-    nullable: false,
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @Column({ type: 'varchar', nullable: false })
   createdAt: Date;
 
   @ManyToOne(() => Message, (message) => message.ncpResults)
@@ -88,11 +84,7 @@ export class UsedPayments extends BaseEntity {
   @Column({ type: 'int', nullable: false, default: 0 })
   alreadyUsed: number;
 
-  @Column({
-    type: 'timestamp',
-    nullable: false,
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @Column({ type: 'varchar', nullable: false })
   createdAt: Date;
 
   @Column({ type: 'int', nullable: false })
