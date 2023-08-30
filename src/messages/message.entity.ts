@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  CreateDateColumn,
   JoinColumn,
   OneToOne,
 } from 'typeorm';
@@ -23,7 +24,7 @@ export class Message extends BaseEntity {
   @Column()
   sentType: MessageType;
 
-  @Column({ type: 'varchar', nullable: false })
+  @CreateDateColumn({ name: 'createdAt', type: 'timestamp' })
   createdAt: Date;
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
