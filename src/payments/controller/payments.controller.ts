@@ -23,7 +23,7 @@ export class PaymentsController {
   @Post()
   async createPayment(
     @Body() createPaymentDto: CreatePaymentDto,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
   ): Promise<Payment> {
     this.logger.verbose('Payment create');
 
@@ -41,7 +41,7 @@ export class PaymentsController {
   @Post('/complete')
   async completePayment(
     @Body() completePaymentDto: CompletePaymentDto,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
   ) {
     this.logger.verbose('Payment complete');
 
@@ -62,7 +62,7 @@ export class PaymentsController {
 
   // 충전금액 내역 조회
   @Get('/:userId')
-  async userPayments(@Headers('authorization') authorization: string) {
+  async userPayments(@Headers('Authorization') authorization: string) {
     if (!authorization) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -97,7 +97,7 @@ export class PaymentsController {
   @Post('/refund')
   async refundPayment(
     @Body() refundPaymentDto: RefundPaymentDto,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
   ) {
     this.logger.verbose('Payment refund');
 
