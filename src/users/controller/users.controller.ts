@@ -29,9 +29,13 @@ export class UsersController {
   @Post('/signup')
   async createUser(
     @Body() createUserDto: CreateUserDto,
-    @Headers('token') token: string,
+    @Headers('authorization') authorization: string,
   ): Promise<object> {
     this.logger.verbose('User signup');
+
+    const Token = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(Token);
+
     const {
       email,
       name,
@@ -45,7 +49,7 @@ export class UsersController {
     } = createUserDto;
 
     await this.usersService.createUser(
-      token,
+      decodedAccessToken,
       email,
       name,
       hostnumber,

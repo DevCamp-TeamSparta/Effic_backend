@@ -128,7 +128,7 @@ export class UsersService {
     advertiseNumber: string[],
     point: number,
   ) {
-    this.checkAccessToken(null, `Bearer ${token}`);
+    this.checkAccessToken(null, `${token}`);
     const payload = jwt.decode(token);
     if (typeof payload === 'string') {
       throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
