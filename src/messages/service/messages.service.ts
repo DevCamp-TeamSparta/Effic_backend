@@ -183,7 +183,6 @@ export class MessagesService {
         messageGroupId: result.id,
       };
     } catch (error) {
-      console.log(error);
       throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
     }
   }
