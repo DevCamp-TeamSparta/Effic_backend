@@ -14,19 +14,19 @@ export class NcpResult extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   ncpResultId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   messageId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   success: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   reserved: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   fail: number;
 
   @Column({
@@ -50,10 +50,10 @@ export class UrlResult extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   urlResultId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   humanclicks: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   totalclicks: number;
 
   @Column({ type: 'varchar', nullable: true })
@@ -62,10 +62,10 @@ export class UrlResult extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   ncpResultId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   messageId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   userId: number;
 
   @ManyToOne(() => Message, (message) => message.urlResults)
@@ -82,10 +82,10 @@ export class UsedPayments extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   usedPaymentId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   usedPayment: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   alreadyUsed: number;
 
   @Column({
@@ -95,10 +95,10 @@ export class UsedPayments extends BaseEntity {
   })
   createdAt: Date;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false })
   messageId: number;
 
   @ManyToOne(() => Message, (message) => message.urlResults)

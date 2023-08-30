@@ -177,11 +177,11 @@ export class UsersService {
 
   // 회원정보 수정
   async updateUser(
-    userId: number,
+    email: string,
     accessToken: string,
     updateUserDto: Partial<User>,
   ) {
-    const user = await this.usersRepository.findOneByUserId(userId);
+    const user = await this.usersRepository.findOneByEmail(email);
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -195,7 +195,7 @@ export class UsersService {
       throw new HttpException('Cannot change email', HttpStatus.BAD_REQUEST);
     }
 
-    return await this.usersRepository.updateUser(userId, updateUserDto);
+    return await this.usersRepository.updateUser(user.userId, updateUserDto);
   }
 
   async logout(user: User) {
