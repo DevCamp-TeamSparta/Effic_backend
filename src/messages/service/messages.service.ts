@@ -412,7 +412,8 @@ export class MessagesService {
     const result = await this.messageGroupRepo.createMessageGroup(user.userId);
     // A, B 메세지 보내기
     for (let i = 0; i < 3; i++) {
-      const isAdvertisement = abTestMessageDto.messageInfoList[i].advertiseInfo;
+      const isAdvertisement =
+        abTestMessageDto.messageInfoList[i]?.advertiseInfo;
 
       let contentPrefix = '';
       let contentSuffix = '';
