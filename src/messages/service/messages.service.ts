@@ -218,7 +218,7 @@ export class MessagesService {
       })
       .catch((e) => {
         console.error(e.response.body);
-        throw new InternalServerErrorException();
+        throw new HttpException(e.response.body, HttpStatus.BAD_REQUEST);
       });
   }
 
@@ -310,8 +310,7 @@ export class MessagesService {
       );
       return 'success';
     } catch (error) {
-      console.log(error);
-      throw new BadRequestException(error.response.data);
+      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -354,8 +353,7 @@ export class MessagesService {
 
       return 'success';
     } catch (error) {
-      console.log(error);
-      throw new BadRequestException(error.response.data);
+      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -618,6 +616,6 @@ export class MessagesService {
   }
   catch(error) {
     console.log(error);
-    throw new error();
+    throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
   }
 }
