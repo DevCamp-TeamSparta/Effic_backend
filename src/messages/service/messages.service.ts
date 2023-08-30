@@ -184,7 +184,7 @@ export class MessagesService {
       };
     } catch (error) {
       console.log(error);
-      throw new BadRequestException(error.response);
+      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
     }
   }
 
