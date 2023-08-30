@@ -32,3 +32,34 @@ export class Payment extends BaseEntity {
   @JoinColumn({ name: 'userId' })
   user: User;
 }
+
+@Entity()
+export class Refund extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  refundId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  createdAt: Date;
+
+  @Column({ type: 'int', nullable: false })
+  refundmoney: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  accountHolder: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  accountNumber: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  bankName: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  contactNumber: string;
+
+  @Column({ type: 'int', nullable: true })
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.payments)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+}

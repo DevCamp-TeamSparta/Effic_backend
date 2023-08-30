@@ -13,6 +13,7 @@ import { CreatePaymentDto } from '../dto/create-payment.dto';
 import { Payment } from '../payments.entity';
 import { CompletePaymentDto } from '../dto/complete-payment.dto';
 import * as jwt from 'jsonwebtoken';
+import { RefundPaymentDto } from '../dto/refund-payment.dto';
 
 @Controller('payments')
 export class PaymentsController {
@@ -91,4 +92,25 @@ export class PaymentsController {
 
   //   return payment;
   // }
+
+  // 환불신청
+  @Post('/refund')
+  async refundPayment(
+    @Body() refundPaymentDto: RefundPaymentDto,
+    @Headers('authorization') authorization: string,
+  ) {
+    this.logger.verbose('Payment refund');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    const payment = await this.paymentsService.refundPayment(
+      email,
+      refundPaymentDto,
+    );
+
+    return payment;
+  }
 }

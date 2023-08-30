@@ -140,21 +140,14 @@ export class UsersService {
     }
     const user = await this.usersRepository.findOneByEmail(email);
 
-    // for (const checkhostnumber of hostnumber) {
+    // const hostnumberArray = [];
+    // for (let i = 0; i < user.hostnumber.length; i++) {
+    //   hostnumberArray.push(user.hostnumber[i].replace(/[^0-9]/g, ''));
+    //   console.log('=========> ~ hostnumberArray:', hostnumberArray);
+    // }
+    // for (let i = 0; i < hostnumber.length; i++) {
     //   console.log('=========> ~ hostnumber:', hostnumber);
-    //   const checkhostNumber: Array<string> = [];
-
-    //   if (checkhostnumber.match(/\D/g)) {
-    //     const number = checkhostnumber.replace(/\D/g, '');
-    //     checkhostNumber.push(number);
-    //     console.log('=========> ~ checkhostNumber:', checkhostNumber);
-    //   }
-
-    //   const users = await this.usersRepository.findOneByHostNumber(
-    //     checkhostNumber[0],
-    //   );
-
-    //   if (users) {
+    //   if (hostnumberArray.includes(hostnumber[i].replace(/[^0-9]/g, ''))) {
     //     throw new HttpException(
     //       'Hostnumber already exists',
     //       HttpStatus.BAD_REQUEST,

@@ -8,10 +8,12 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { PaymentsRepository } from '../payments.repository';
 import { UsersRepository } from '../../users/users.repository';
-import { Payment } from '../payments.entity';
+import { Payment, Refund } from '../payments.entity';
 import axios from 'axios';
 import { iamConfig } from 'config/iam.config';
 import { v4 } from 'uuid';
+import { RefundPaymentDto } from '../dto/refund-payment.dto';
+import { slackConfig } from 'config/slack.config';
 
 @Injectable()
 export class PaymentsService {
@@ -176,5 +178,42 @@ export class PaymentsService {
     const payments = await this.paymentsRepository.findAllByUserId(user.userId);
 
     return payments;
+  }
+
+  // 환불신청
+  async refundPayment(email: string, refundPaymentDto: RefundPaymentDto) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.money < refundPaymentDto.refundMoney) {
+      throw new UnauthorizedException('Refund money is not enough');
+    }
+
+    const refund = new Refund();
+    refund.createdAt = new Date();
+    refund.refundmoney = refundPaymentDto.refundMoney;
+    refund.accountHolder = refundPaymentDto.accountHolder;
+    refund.accountNumber = refundPaymentDto.accountNumber;
+    refund.bankName = refundPaymentDto.bankName;
+    refund.contactNumber = refundPaymentDto.contactNumber;
+    refund.user = user;
+
+    await this.entityManager.save(refund);
+
+    const slackMessage = {
+      text: `환불신청이 들어왔습니다. \n환불신청금액: ${refundPaymentDto.refundMoney} \n예금주: ${refundPaymentDto.accountHolder} \n계좌번호: ${refundPaymentDto.accountNumber} \n은행명: ${refundPaymentDto.bankName} \n연락처: ${refundPaymentDto.contactNumber}`,
+    };
+
+    try {
+      await axios.post(slackConfig.alarmUrl, slackMessage, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.log('Error sending Slack Message', error);
+    }
   }
 }
