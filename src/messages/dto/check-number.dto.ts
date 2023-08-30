@@ -25,13 +25,8 @@ export class CheckHostNumberDto {
 
   @IsNotEmpty()
   @IsBoolean()
-  advertiseInfo?: boolean;
-
-  @IsOptional()
-  @IsString()
-  reservetime?: string;
+  advertiseInfo: boolean;
 
   @IsArray()
-  @IsNotEmpty()
   urlList?: string[];
 }
