@@ -335,10 +335,18 @@ export class ResultsService {
         payment.messageId,
       );
 
+      const messagecontent =
+        await this.messagesContentRepository.findOneByMessageId(
+          payment.messageId,
+        );
+
       const result = {
-        message: payment.messageId,
+        messageId: payment.messageId,
         payment: payment.usedPayment,
         createdAt: message.createdAt,
+        groupId: message.messageGroupId,
+        content: messagecontent.content,
+        type: messagecontent.sentType,
       };
 
       paymentResults.push(result);

@@ -14,32 +14,32 @@ export class CreateUserDto {
   email: string;
 
   @IsArray()
-  @IsNotEmpty()
-  hostnumber: string[];
+  @IsOptional()
+  hostnumber?: string[];
 
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsBoolean()
-  @IsNotEmpty()
-  advertisementOpt: boolean;
+  @IsOptional()
+  advertisementOpt?: boolean;
 
   @IsString()
-  @IsNotEmpty()
-  accessKey: string;
+  @IsOptional()
+  accessKey?: string;
 
   @IsString()
-  @IsNotEmpty()
-  serviceId: string;
+  @IsOptional()
+  serviceId?: string;
 
   @IsString()
-  @IsNotEmpty()
-  secretKey: string;
+  @IsOptional()
+  secretKey?: string;
 
   @IsArray()
-  @IsNotEmpty()
-  advertiseNumber: string[];
+  @IsOptional()
+  advertiseNumber?: string[];
 
   @IsString()
   @IsOptional()

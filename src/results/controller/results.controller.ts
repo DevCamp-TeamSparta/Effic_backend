@@ -44,6 +44,7 @@ export class ResultsController {
     @Param('messageId') messageId: number,
     @Headers('Authorization') authorization: string,
   ) {
+    this.logger.verbose('Message group result');
     if (!authorization) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
@@ -63,6 +64,7 @@ export class ResultsController {
     @Param('userId') userId: number,
     @Headers('Authorization') Authorization: string,
   ) {
+    this.logger.verbose('Payment result');
     if (!Authorization) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
