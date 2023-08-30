@@ -128,7 +128,7 @@ export class UsersService {
     advertiseNumber: string[],
     point: number,
   ) {
-    this.checkAccessToken(null, `${token}`);
+    this.checkAccessToken(null, `Bearer ${token}`);
     const payload = jwt.decode(token);
     console.log(payload);
     if (typeof payload === 'string') {
