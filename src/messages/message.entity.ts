@@ -24,7 +24,7 @@ export class Message extends BaseEntity {
   @Column()
   sentType: MessageType;
 
-  @Column({ type: 'timestamp', nullable: false })
+  @Column({ type: 'timestamp', nullable: true })
   createdAt: Date;
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
