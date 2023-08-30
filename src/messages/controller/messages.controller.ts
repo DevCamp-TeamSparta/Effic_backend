@@ -18,7 +18,7 @@ export class MessagesController {
   async defaultMessage(
     @Body(new DefaultMessageValidationPipe())
     defaultMessageDto: DefaultMessageDto,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
   ) {
     this.logger.verbose('Default message sending');
 
@@ -38,7 +38,7 @@ export class MessagesController {
   async abTestMessage(
     @Body(new abTestMessageValidationPipe())
     abTestMessageDto: AbTestMessageDto,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
   ) {
     this.logger.verbose('AB test message sending');
 
@@ -63,7 +63,7 @@ export class MessagesController {
   async testMessage(
     @Body(new TestMessageValidationPipe())
     testMessageDto: TestMessageDto,
-    @Headers('authorization') authorization: string,
+    @Headers('Authorization') authorization: string,
   ) {
     this.logger.verbose('Test message sending');
 
@@ -92,7 +92,7 @@ export class MessagesController {
   }
 
   @Get('/group')
-  async getGroupList(@Headers('authorization') authorization: string) {
+  async getGroupList(@Headers('Authorization') authorization: string) {
     const accessToken = authorization.split(' ')[1];
     const decodedAccessToken: any = jwt.decode(accessToken);
 

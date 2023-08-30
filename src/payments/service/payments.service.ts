@@ -24,7 +24,11 @@ export class PaymentsService {
   ) {}
 
   // 결제금액 생성
-  async createPayment(email: string, money: number): Promise<Payment> {
+  async createPayment(
+    email: string,
+    money: number,
+    paymentMethod,
+  ): Promise<Payment> {
     const user = await this.usersRepository.findOneByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -49,6 +53,7 @@ export class PaymentsService {
     payment.createdAt = new Date();
     payment.user = user;
     payment.merchant_uid = merchant_uid();
+    payment.paymentMethod = paymentMethod;
 
     await this.entityManager.save(payment);
 
@@ -88,6 +93,8 @@ export class PaymentsService {
       user.money += amountToBePaid;
 
       await this.entityManager.save(user);
+
+      order.isCompleted = true;
 
       return 'success';
       // 결제 검증
@@ -203,7 +210,18 @@ export class PaymentsService {
     await this.entityManager.save(refund);
 
     const slackMessage = {
-      text: `환불신청이 들어왔습니다. \n환불신청금액: ${refundPaymentDto.refundMoney} \n예금주: ${refundPaymentDto.accountHolder} \n계좌번호: ${refundPaymentDto.accountNumber} \n은행명: ${refundPaymentDto.bankName} \n연락처: ${refundPaymentDto.contactNumber}`,
+      text: '환불신청이 들어왔습니다.',
+      attachments: [
+        {
+          color: '#36a64f',
+          fields: [
+            {
+              title: '신청정보',
+              value: `환불신청금액: ${refundPaymentDto.refundMoney}원\n예금주: ${refundPaymentDto.accountHolder}\n은행명: ${refundPaymentDto.bankName}\n계좌번호: ${refundPaymentDto.accountNumber}\n연락처: ${refundPaymentDto.contactNumber}`,
+            },
+          ],
+        },
+      ],
     };
 
     try {

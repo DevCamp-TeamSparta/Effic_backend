@@ -53,8 +53,8 @@ export class UsersRepository extends Repository<User> {
     return await this.findOne({ where: { userId } });
   }
 
-  async findOneByHostNumber(hostnumber: string): Promise<User | undefined> {
-    return await this.findOne({ where: { hostnumber } });
+  async findAllHostnumber(): Promise<User[]> {
+    return await this.find({ select: ['hostnumber'] });
   }
 
   async updateUser(

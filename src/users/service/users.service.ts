@@ -131,6 +131,7 @@ export class UsersService {
   ) {
     this.checkAccessToken(null, `Bearer ${token}`);
     const payload = jwt.decode(token);
+    console.log(payload);
     if (typeof payload === 'string') {
       throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
     }
@@ -140,20 +141,20 @@ export class UsersService {
     }
     const user = await this.usersRepository.findOneByEmail(email);
 
-    // const hostnumberArray = [];
-    // for (let i = 0; i < user.hostnumber.length; i++) {
-    //   hostnumberArray.push(user.hostnumber[i].replace(/[^0-9]/g, ''));
-    //   console.log('=========> ~ hostnumberArray:', hostnumberArray);
-    // }
-    // for (let i = 0; i < hostnumber.length; i++) {
-    //   console.log('=========> ~ hostnumber:', hostnumber);
-    //   if (hostnumberArray.includes(hostnumber[i].replace(/[^0-9]/g, ''))) {
-    //     throw new HttpException(
-    //       'Hostnumber already exists',
-    //       HttpStatus.BAD_REQUEST,
-    //     );
-    //   }
-    // }
+    const extractedHostnumbers = hostnumber.map((hostnumber) =>
+      hostnumber.replace(/\D/g, ''),
+    );
+    const allHostnumber = await this.usersRepository.findAllHostnumber();
+    for (let i = 0; i < allHostnumber.length; i++) {
+      for (let j = 0; j < extractedHostnumbers.length; j++) {
+        if (allHostnumber[i].hostnumber.includes(extractedHostnumbers[j])) {
+          throw new HttpException(
+            'Hostnumber already exists',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+    }
 
     const newUser = {
       email,
