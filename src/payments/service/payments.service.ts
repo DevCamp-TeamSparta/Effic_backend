@@ -96,6 +96,8 @@ export class PaymentsService {
 
       order.isCompleted = true;
 
+      await this.entityManager.save(order);
+
       return 'success';
       // 결제 검증
       // const { amount, status } = paymentData;

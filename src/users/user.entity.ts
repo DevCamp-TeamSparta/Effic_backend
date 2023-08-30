@@ -44,7 +44,7 @@ export class User extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   point: number;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'int', nullable: false, default: 0 })
   money: number;
 
   @OneToMany(() => Message, (message) => message.user, { cascade: true })

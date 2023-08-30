@@ -239,15 +239,13 @@ export class ResultsService {
     );
     return results;
   }
+
   // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
   async messageResult(messageId: number) {
-    console.log(messageId);
     // 클릭했을 때 결과를 하나 만듦
     const message = await this.messagesRepository.findOneByMessageId(messageId);
     const user = await this.usersRepository.findOneByUserId(message.userId);
-    console.log('!!!!');
     const newNcpResult = await this.ncpResult(messageId, user.email);
-    console.log('!!!!2');
 
     const resultEntity = this.entityManager.create(NcpResult, {
       message: message,
@@ -341,10 +339,18 @@ export class ResultsService {
         payment.messageId,
       );
 
+      const messagecontent =
+        await this.messagesContentRepository.findOneByMessageId(
+          payment.messageId,
+        );
+
       const result = {
-        message: payment.messageId,
+        messageId: payment.messageId,
         payment: payment.usedPayment,
         createdAt: message.createdAt,
+        groupId: message.messageGroupId,
+        content: messagecontent.content,
+        type: messagecontent.sentType,
       };
 
       paymentResults.push(result);

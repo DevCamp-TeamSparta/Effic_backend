@@ -28,7 +28,7 @@ export class UsersController {
 
   @Post('/signup')
   async createUser(
-    @Body() createUserDto: CreateUserDto,
+    @Body(new UserBodyValidationPipe()) createUserDto: CreateUserDto,
     @Headers('Authorization') authorization: string,
   ): Promise<object> {
     this.logger.verbose('User signup');
