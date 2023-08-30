@@ -9,7 +9,10 @@ export class UserBodyValidationPipe implements PipeTransform {
   async transform(value: any): Promise<UpdateUserDto | CreateUserDto> {
     const hostnumberRegex = /^(\d{7}|\d{8}|\d{9}|\d{10}|\d{11})$/;
 
-    if (value.hostnumber && !hostnumberRegex.test(value.hostnumber)) {
+    if (
+      value.hostnumber.length &&
+      value.hostnumber.every((n) => !hostnumberRegex.test(n))
+    ) {
       throw new BadRequestException('hostnumber is not valid');
     }
 
