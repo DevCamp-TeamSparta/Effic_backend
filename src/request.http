@@ -20,7 +20,7 @@ Post http://localhost:8000/users/login
 Content-Type: application/json
 
 {
-    "email": "clo10@sparta.com"
+    "email": "clo3@sparta.com"
 }
 
 ### update User-info
@@ -73,7 +73,8 @@ Content-Type: application/json
     "hostnumber": "01036289823",
     "accessKey":,
     "secretKey":,
-    "serviceId":
+    "serviceId":,
+    "advertiseInfo": false,
 }
 
 ### dafault message result - shortio
@@ -124,7 +125,7 @@ Content-Type: application/json
 
 ### money - 사용 금액 내역 (userId)
 Get http://localhost:8000/results/payment/1
-Authorization: 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTMzNzcyNDMsImV4cCI6MTY5MzQ2MzY0M30._PYhQqklOQ24kA2aY5Bdo8Ro6pePYMQq3ENftSRRskM
 Content-Type: application/json
 
 ### money - 충전 금액 내역 (userId)
