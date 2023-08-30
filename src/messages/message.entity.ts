@@ -5,7 +5,6 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
-  CreateDateColumn,
   JoinColumn,
   OneToOne,
 } from 'typeorm';
@@ -25,7 +24,7 @@ export class Message extends BaseEntity {
   sentType: MessageType;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
   })

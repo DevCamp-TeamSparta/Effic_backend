@@ -30,7 +30,7 @@ export class NcpResult extends BaseEntity {
   fail: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
   })
@@ -89,7 +89,7 @@ export class UsedPayments extends BaseEntity {
   alreadyUsed: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
   })

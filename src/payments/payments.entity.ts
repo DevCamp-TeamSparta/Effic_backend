@@ -14,7 +14,7 @@ export class Payment extends BaseEntity {
   paymentId: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
   })
@@ -49,7 +49,7 @@ export class Refund extends BaseEntity {
   refundId: number;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
   })
