@@ -139,18 +139,22 @@ export class UsersService {
     }
     const user = await this.usersRepository.findOneByEmail(email);
 
-    const hostnumberArray = [];
-    for (let i = 0; i < user.hostnumber.length; i++) {
-      hostnumberArray.push(user.hostnumber[i].replace(/[^0-9]/g, ''));
-      console.log('=========> ~ hostnumberArray:', hostnumberArray);
-    }
-    for (let i = 0; i < hostnumber.length; i++) {
-      console.log('=========> ~ hostnumber:', hostnumber);
-      if (hostnumberArray.includes(hostnumber[i].replace(/[^0-9]/g, ''))) {
-        throw new HttpException(
-          'Hostnumber already exists',
-          HttpStatus.BAD_REQUEST,
-        );
+    // 회원가입하려는 user의 hostnumber에 문자가 있으면 숫자만 남긴 새로운 배열을 만듦
+    const extractedHostnumbers = hostnumber.map((hostnumber) =>
+      hostnumber.replace(/\D/g, ''),
+    );
+    // user 테이블에 모든 hostnumber를 가져옴
+    const allHostnumber = await this.usersRepository.findAllHostnumber();
+    console.log('=========> ~ allHostnumber:', allHostnumber);
+    // 모든 hostnumber과 회원가입하려는 user의 extractedHostnumbers를 비교해서 이미 존재하면 에러
+    for (let i = 0; i < allHostnumber.length; i++) {
+      for (let j = 0; j < extractedHostnumbers.length; j++) {
+        if (allHostnumber[i].hostnumber.includes(extractedHostnumbers[j])) {
+          throw new HttpException(
+            'Hostnumber already exists',
+            HttpStatus.BAD_REQUEST,
+          );
+        }
       }
     }
 
