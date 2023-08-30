@@ -80,18 +80,18 @@ export class UsersController {
     };
   }
 
-  @Patch('/:userId')
+  @Patch('/me')
   async updateUser(
-    @Param('userId') userId: string,
     @Headers('Authorization') authorization: string,
     @Body(new UserBodyValidationPipe()) updateUserDto: UpdateUserDto,
   ) {
     this.logger.verbose('User update');
-    await this.usersService.updateUser(
-      parseInt(userId),
-      authorization,
-      updateUserDto,
-    );
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    await this.usersService.updateUser(email, authorization, updateUserDto);
   }
 
   @Post('/logout')
