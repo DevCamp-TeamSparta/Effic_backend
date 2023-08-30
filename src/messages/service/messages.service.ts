@@ -478,7 +478,6 @@ export class MessagesService {
             headers,
           },
         );
-        console.log('!!!!>>');
 
         const urlForResult = abTestMessageDto.urlForResult;
         const idStringIndex =
