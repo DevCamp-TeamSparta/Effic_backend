@@ -1,10 +1,4 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export class CheckHostNumberDto {
   @IsNotEmpty()
@@ -26,7 +20,4 @@ export class CheckHostNumberDto {
   @IsNotEmpty()
   @IsBoolean()
   advertiseInfo: boolean;
-
-  @IsArray()
-  urlList?: string[];
 }
