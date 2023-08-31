@@ -423,7 +423,6 @@ export class ResultsService {
           );
           newMessage.isSent = true;
           newMessage.sentType = MessageType.A;
-          newMessage.createdAt = new Date();
           newMessage.requestId = response.res;
           newMessage.idString = response.idStrings;
           newMessage.urlForResult = response.idStrings[index];
@@ -442,7 +441,6 @@ export class ResultsService {
 
           newMessage.isSent = true;
           newMessage.sentType = MessageType.B;
-          newMessage.createdAt = new Date();
           newMessage.requestId = response.res;
           newMessage.idString = response.idStrings;
           newMessage.urlForResult = response.idStrings[index];
