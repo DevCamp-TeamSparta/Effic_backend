@@ -20,16 +20,16 @@ Post http://localhost:8000/users/login
 Content-Type: application/json
 
 {
-    "email": "clo3@sparta.com"
+    "email": "clo@sparta.com"
 }
 
 ### update User-info
-Patch http://localhost:8000/users/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzRAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MDkxNCwiZXhwIjoxNjkyODU3MzE0fQ.jMwFRtCGu0dE6wpZ0R5y-KD0R4bb5gwciZqeUCcmND4
+Patch http://localhost:8000/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoiY2xvM0BzcGFydGEuY29tIiwiaWF0IjoxNjkzMzg4NTk3LCJleHAiOjE2OTM0NzQ5OTd9.Gb7okqJIgwjQVd2MRmuUwle2h0jntllfzLMYp-gKOcQ
 Content-Type: application/json
 
 {
-    "hostnumber": ["010-3628-9823"],
+    "hostnumber": ["01036289827"]
 }
 
 ### logout
@@ -39,7 +39,7 @@ Content-Type: application/json
 
 ### dafault message sending
 Post http://localhost:8000/messages/default
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzRAc3BhcnRhLmNvbSIsImlhdCI6MTY5Mjc3MDkxNCwiZXhwIjoxNjkyODU3MzE0fQ.jMwFRtCGu0dE6wpZ0R5y-KD0R4bb5gwciZqeUCcmND4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTMzOTMwNjEsImV4cCI6MTY5MzQ3OTQ2MX0.ydgObk2ykaxW8cFb8QdOCk0utFaHxkn7Ciiprwfzji4
 Content-Type: application/json
 
 {

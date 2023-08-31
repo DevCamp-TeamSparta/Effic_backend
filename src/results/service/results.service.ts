@@ -11,7 +11,7 @@ import {
   UrlInfosRepository,
 } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
-import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
+import { NcpResult, UrlResult } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
@@ -224,7 +224,6 @@ export class ResultsService {
 
     const results = await Promise.all(
       messages.map(async (message) => {
-        console.log('??', message.messageId);
         const [content, results] = await Promise.all([
           this.messagesContentRepository.findOneByMessageId(message.messageId),
           this.messageResult(message.messageId),
@@ -324,39 +323,45 @@ export class ResultsService {
     if (!user) {
       throw new BadRequestException('email is wrong');
     }
-
-    const payments = await this.entityManager.find(UsedPayments, {
-      where: { userId },
-    });
-    if (!payments) {
-      throw new BadRequestException('userId is wrong');
-    }
-
-    const paymentResults = [];
-
-    for (const payment of payments) {
-      const message = await this.messagesRepository.findOneByMessageId(
-        payment.messageId,
-      );
-
-      const messagecontent =
-        await this.messagesContentRepository.findOneByMessageId(
-          payment.messageId,
-        );
-
-      const result = {
-        messageId: payment.messageId,
-        payment: payment.usedPayment,
-        createdAt: message.createdAt,
-        groupId: message.messageGroupId,
-        content: messagecontent.content,
-        type: messagecontent.sentType,
-      };
-
-      paymentResults.push(result);
-    }
-    return paymentResults;
   }
+  // async paymentResult(userId: number, email: string) {
+  //   const user = await this.usersRepository.findOneByEmail(email);
+  //   if (!user) {
+  //     throw new BadRequestException('email is wrong');
+  //   }
+
+  //   const payments = await this.entityManager.find(UsedPayments, {
+  //     where: { userId },
+  //   });
+  //   if (!payments) {
+  //     throw new BadRequestException('userId is wrong');
+  //   }
+
+  //   const paymentResults = [];
+
+  //   for (const payment of payments) {
+  //     const message = await this.messagesRepository.findOneByMessageId(
+  //       payment.messageId,
+  //     );
+
+  //     const messagecontent =
+  //       await this.messagesContentRepository.findOneByMessageId(
+  //         payment.messageId,
+  //       );
+
+  //     const result = {
+  //       messageId: payment.messageId,
+  //       payment: payment.usedPayment,
+  //       createdAt: message.createdAt,
+  //       groupId: message.messageGroupId,
+  //       content: messagecontent.content,
+  //       type: messagecontent.sentType,
+  //     };
+
+  //     paymentResults.push(result);
+  //   }
+  //   return paymentResults;
+  // }
 
   // ncp와 단축 url 결과를 합친 polling
   @Cron('0 */1 * * *', { name: 'result' })
@@ -379,34 +384,24 @@ export class ResultsService {
           user: user,
         });
 
-        const payment = await this.entityManager.findOne(UsedPayments, {
-          where: { messageId: message.messageId },
-        });
+        // const payment = await this.entityManager.findOne(UsedPayments, {
+        //   where: { messageId: message.messageId },
+        // });
 
-        if (payment) {
-          payment.alreadyUsed = payment.usedPayment;
-          payment.usedPayment = ncpResult.success * 3;
-          await this.entityManager.save(payment);
-        } else {
-          const paymentEntity = this.entityManager.create(UsedPayments, {
-            message: message,
-            user: user,
-            usedPayment: ncpResult.success * 3,
-            alreadyUsed: 0,
-          });
+        // if (payment) {
+        //   payment.alreadyUsed = payment.usedPayment;
+        //   payment.usedPayment = ncpResult.success * 3;
+        //   await this.entityManager.save(payment);
+        // } else {
+        //   const paymentEntity = this.entityManager.create(UsedPayments, {
+        //     message: message,
+        //     user: user,
+        //     usedPayment: ncpResult.success * 3,
+        //     alreadyUsed: 0,
+        //   });
 
-          await this.entityManager.save(paymentEntity);
-        }
-
-        // 유저 금액 차감
-        const deductionMoney = payment.usedPayment - payment.alreadyUsed;
-        if (user.point >= deductionMoney) {
-          user.point -= deductionMoney;
-        } else {
-          user.point = 0;
-          user.money -= deductionMoney - user.point;
-        }
-        await this.entityManager.save(user);
+        //   await this.entityManager.save(paymentEntity);
+        // }
 
         const resultId = (await this.entityManager.save(resultEntity))
           .ncpResultId;

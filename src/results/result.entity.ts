@@ -82,11 +82,11 @@ export class UsedPayments extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   usedPaymentId: number;
 
-  @Column({ type: 'int', nullable: false, default: 0 })
-  usedPayment: number;
+  //   @Column({ type: 'int', nullable: false, default: 0 })
+  //   usedPayment: number;
 
-  @Column({ type: 'int', nullable: false, default: 0 })
-  alreadyUsed: number;
+  //   @Column({ type: 'int', nullable: false, default: 0 })
+  //   alreadyUsed: number;
 
   @Column({
     type: 'timestamptz',

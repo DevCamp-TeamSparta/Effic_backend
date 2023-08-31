@@ -140,6 +140,17 @@ export class MessagesService {
         },
       );
 
+      // 유저 금액 차감
+      const deductionMoney = receiverPhones.length * 3;
+      if (user.point >= deductionMoney) {
+        user.point -= deductionMoney;
+      } else {
+        user.money -= deductionMoney - user.point;
+        user.point = 0;
+      }
+
+      await this.entityManager.save(user);
+
       const message = new Message();
       message.isSent = true;
       message.sentType = MessageType.D;
@@ -601,6 +612,17 @@ export class MessagesService {
         await this.entityManager.save(message);
       }
     }
+    // 유저 금액 차감
+    const deductionMoney = receiverPhones.length * 3;
+    if (user.point >= deductionMoney) {
+      user.point -= deductionMoney;
+    } else {
+      user.money -= deductionMoney - user.point;
+      user.point = 0;
+    }
+
+    await this.entityManager.save(user);
+
     return {
       messageId: '',
       messageGroupId: result.id,
