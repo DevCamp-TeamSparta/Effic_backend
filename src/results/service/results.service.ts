@@ -156,7 +156,7 @@ export class ResultsService {
       statisticsArray.push({ totalClicks, humanClicks });
     } catch (error) {
       console.log(error);
-      throw new error();
+      throw error;
     }
     return statisticsArray;
   }
@@ -613,5 +613,42 @@ export class ResultsService {
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
+  }
+
+  // 문자발송이 끝난 건에 대해 실패한 전송 환불
+  @Cron(CronExpression.EVERY_5_MINUTES, { name: 'refund' })
+  async handleRefundCron() {
+    this.logger.log('refund polling');
+
+    const messages =
+      await this.messagesRepository.findThreeDaysBeforeSendAndNotChecked();
+
+    for (const message of messages) {
+      try {
+        const user = await this.usersRepository.findOneByUserId(message.userId);
+        const ncpResult =
+          await this.ncpResultsRepository.findLastOneByMessageId(
+            message.messageId,
+          );
+
+        const fail = ncpResult.fail;
+        const money = fail * 3;
+
+        user.money += money;
+        await this.usersRepository.save(user);
+
+        message.isMoneyCheck = true;
+        await this.messagesRepository.save(message);
+
+        console.log(
+          `Refund for message ${message.messageId} is completed. ${money} won is refunded.`,
+        );
+      } catch (error) {
+        console.error(
+          `Failed to refund for message ${message.messageId}. We will check it again.`,
+          error,
+        );
+      }
+    }
   }
 }

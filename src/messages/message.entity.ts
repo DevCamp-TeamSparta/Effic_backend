@@ -17,7 +17,7 @@ export class Message extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   messageId: number;
 
-  @Column()
+  @Column({ type: 'boolean', nullable: false, default: false })
   isSent: boolean;
 
   @Column()
@@ -41,6 +41,9 @@ export class Message extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: true })
   requestId: string;
+
+  @Column({ type: 'boolean', nullable: false, default: false })
+  isMoneyCheck: boolean;
 
   @Column({ type: 'int', nullable: false })
   userId: number;
