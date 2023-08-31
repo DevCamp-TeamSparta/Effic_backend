@@ -174,6 +174,8 @@ export class MessagesService {
 
       const payment = new UsedPayments();
       payment.usedPayment = deductionMoney;
+      payment.userId = user.userId;
+      payment.messageId = message.messageId;
 
       await this.entityManager.save(payment);
 
@@ -194,7 +196,11 @@ export class MessagesService {
         messageGroupId: result.id,
       };
     } catch (error) {
-      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+      if (error.response) {
+        throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+      }
+
+      throw error;
     }
   }
 
