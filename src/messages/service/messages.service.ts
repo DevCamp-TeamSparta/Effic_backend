@@ -403,16 +403,6 @@ export class MessagesService {
     let shortenedUrls: string[] = [];
     let idStrings = [];
 
-    const isAdvertisement = abTestMessageDto.advertiseInfo;
-
-    let contentPrefix = '';
-    let contentSuffix = '';
-
-    if (isAdvertisement) {
-      contentPrefix = '(광고)';
-      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
-    }
-
     // 리시버를 3개로 나누기
     let testReceiverNumber = 0;
     if (Math.ceil(receiverPhones.length / 2) % 2 == 1) {
@@ -433,6 +423,17 @@ export class MessagesService {
     const result = await this.messageGroupRepo.createMessageGroup(user.userId);
     // A, B 메세지 보내기
     for (let i = 0; i < 3; i++) {
+      const isAdvertisement =
+        abTestMessageDto.messageInfoList[i]?.advertiseInfo;
+
+      let contentPrefix = '';
+      let contentSuffix = '';
+
+      if (isAdvertisement) {
+        contentPrefix = '(광고)';
+        contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
+      }
+
       if (i < 1) {
         //A 메세지 보내기 + 저장
         for (const url of abTestMessageDto.messageInfoList[0].urlList) {
@@ -446,6 +447,7 @@ export class MessagesService {
           shortenedUrls,
           abTestMessageDto.messageInfoList[0].content,
         );
+
         const body = {
           type: 'LMS',
           contentType: await this.getCotentType(abTestMessageDto),
