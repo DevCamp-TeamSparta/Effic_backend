@@ -38,6 +38,16 @@ export class MessagesRepository extends Repository<Message> {
       .andWhere('message.isSent = :status', { status: false })
       .getMany();
   }
+
+  async findThreeDaysBeforeSendAndNotChecked(): Promise<Message[]> {
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+    return this.createQueryBuilder('message')
+      .where('message.createdAt < :threeDaysAgo', { threeDaysAgo })
+      .andWhere('message.isMoneyCheck = :status', { status: false })
+      .getMany();
+  }
 }
 
 @Injectable()

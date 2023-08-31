@@ -37,4 +37,11 @@ export class NcpResultsRepository extends Repository<NcpResult> {
   async findAllByMessageId(messageId: number): Promise<NcpResult[]> {
     return await this.find({ where: { messageId } });
   }
+
+  async findLastOneByMessageId(messageId: number): Promise<NcpResult> {
+    return await this.findOne({
+      where: { messageId },
+      order: { ncpResultId: 'DESC' },
+    });
+  }
 }
