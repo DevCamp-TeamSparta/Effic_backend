@@ -141,22 +141,6 @@ export class UsersService {
     }
     const user = await this.usersRepository.findOneByEmail(email);
 
-    const extractedHostnumbers = hostnumber.map((hostnumber) =>
-      hostnumber.replace(/\D/g, ''),
-    );
-
-    const allHostnumber = await this.usersRepository.findAllHostnumber();
-    for (let i = 0; i < allHostnumber.length; i++) {
-      for (let j = 0; j < extractedHostnumbers.length; j++) {
-        if (allHostnumber[i].hostnumber.includes(extractedHostnumbers[j])) {
-          throw new HttpException(
-            'Hostnumber already exists',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-      }
-    }
-
     const newUser = {
       email,
       name,
