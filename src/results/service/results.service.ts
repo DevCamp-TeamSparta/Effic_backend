@@ -631,14 +631,21 @@ export class ResultsService {
             message.messageId,
           );
 
+        const usedPayment = await this.entityManager.findOne(UsedPayments, {
+          where: { messageId: message.messageId },
+        });
+
         const fail = ncpResult.fail;
         const money = fail * 3;
 
         user.money += money;
-        await this.usersRepository.save(user);
-
         message.isMoneyCheck = true;
-        await this.messagesRepository.save(message);
+        usedPayment.usedPayment -= money;
+        usedPayment.refundPayment += money;
+
+        await this.entityManager.save(user);
+        await this.entityManager.save(message);
+        await this.entityManager.save(usedPayment);
 
         console.log(
           `Refund for message ${message.messageId} is completed. ${money} won is refunded.`,
