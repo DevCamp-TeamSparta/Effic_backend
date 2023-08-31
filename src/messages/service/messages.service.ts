@@ -11,6 +11,7 @@ import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { UrlInfo } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
+import { UsedPayments } from 'src/results/result.entity';
 
 @Injectable()
 export class MessagesService {
@@ -170,6 +171,11 @@ export class MessagesService {
       messageContent.hostnumber = defaultMessageDto.hostnumber;
 
       await this.entityManager.save(messageContent);
+
+      const payment = new UsedPayments();
+      payment.usedPayment = deductionMoney;
+
+      await this.entityManager.save(payment);
 
       const result: any = {};
       await this.entityManager.transaction(

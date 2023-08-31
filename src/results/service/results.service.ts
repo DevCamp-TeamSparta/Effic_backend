@@ -11,7 +11,7 @@ import {
   UrlInfosRepository,
 } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
-import { NcpResult, UrlResult } from '../result.entity';
+import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
@@ -323,45 +323,13 @@ export class ResultsService {
     if (!user) {
       throw new BadRequestException('email is wrong');
     }
+
+    const payments = await this.entityManager.find(UsedPayments, {
+      where: { userId },
+    });
+
+    return payments;
   }
-  // async paymentResult(userId: number, email: string) {
-  //   const user = await this.usersRepository.findOneByEmail(email);
-  //   if (!user) {
-  //     throw new BadRequestException('email is wrong');
-  //   }
-
-  //   const payments = await this.entityManager.find(UsedPayments, {
-  //     where: { userId },
-  //   });
-  //   if (!payments) {
-  //     throw new BadRequestException('userId is wrong');
-  //   }
-
-  //   const paymentResults = [];
-
-  //   for (const payment of payments) {
-  //     const message = await this.messagesRepository.findOneByMessageId(
-  //       payment.messageId,
-  //     );
-
-  //     const messagecontent =
-  //       await this.messagesContentRepository.findOneByMessageId(
-  //         payment.messageId,
-  //       );
-
-  //     const result = {
-  //       messageId: payment.messageId,
-  //       payment: payment.usedPayment,
-  //       createdAt: message.createdAt,
-  //       groupId: message.messageGroupId,
-  //       content: messagecontent.content,
-  //       type: messagecontent.sentType,
-  //     };
-
-  //     paymentResults.push(result);
-  //   }
-  //   return paymentResults;
-  // }
 
   // ncp와 단축 url 결과를 합친 polling
   @Cron('0 */1 * * *', { name: 'result' })
@@ -383,25 +351,6 @@ export class ResultsService {
           createdAt: new Date(),
           user: user,
         });
-
-        // const payment = await this.entityManager.findOne(UsedPayments, {
-        //   where: { messageId: message.messageId },
-        // });
-
-        // if (payment) {
-        //   payment.alreadyUsed = payment.usedPayment;
-        //   payment.usedPayment = ncpResult.success * 3;
-        //   await this.entityManager.save(payment);
-        // } else {
-        //   const paymentEntity = this.entityManager.create(UsedPayments, {
-        //     message: message,
-        //     user: user,
-        //     usedPayment: ncpResult.success * 3,
-        //     alreadyUsed: 0,
-        //   });
-
-        //   await this.entityManager.save(paymentEntity);
-        // }
 
         const resultId = (await this.entityManager.save(resultEntity))
           .ncpResultId;
@@ -468,13 +417,17 @@ export class ResultsService {
           const index = message.idString.indexOf(message.urlForResult);
 
           const response = await this.sendAbTestWinnerMessage(aMessageId);
-          message.isSent = true;
-          message.sentType = MessageType.A;
-          message.createdAt = new Date();
-          message.requestId = response.res;
-          message.idString = response.idStrings;
-          message.urlForResult = response.shortenedUrls[index];
-          await this.messagesRepository.save(message);
+
+          const newMessage = await this.messagesRepository.findOneByMessageId(
+            2 + aMessageId,
+          );
+          newMessage.isSent = true;
+          newMessage.sentType = MessageType.A;
+          newMessage.createdAt = new Date();
+          newMessage.requestId = response.res;
+          newMessage.idString = response.idStrings;
+          newMessage.urlForResult = response.idStrings[index];
+          await this.messagesRepository.save(newMessage);
         } else {
           const message = await this.messagesRepository.findOneByMessageId(
             bMessageId,
@@ -482,13 +435,18 @@ export class ResultsService {
           const index = message.idString.indexOf(message.urlForResult);
 
           const response = await this.sendAbTestWinnerMessage(bMessageId);
-          message.isSent = true;
-          message.sentType = MessageType.B;
-          message.createdAt = new Date();
-          message.requestId = response.res;
-          message.idString = response.idStrings;
-          message.urlForResult = response.shortenedUrls[index];
-          await this.messagesRepository.save(message);
+
+          const newMessage = await this.messagesRepository.findOneByMessageId(
+            1 + bMessageId,
+          );
+
+          newMessage.isSent = true;
+          newMessage.sentType = MessageType.B;
+          newMessage.createdAt = new Date();
+          newMessage.requestId = response.res;
+          newMessage.idString = response.idStrings;
+          newMessage.urlForResult = response.idStrings[index];
+          await this.messagesRepository.save(newMessage);
         }
       } catch (error) {
         console.error(
