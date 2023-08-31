@@ -22,7 +22,7 @@ import got from 'got';
 import { shortIoConfig } from 'config/short-io.config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
-import { UrlInfo } from 'src/messages/message.entity';
+import { MessageContent, UrlInfo } from 'src/messages/message.entity';
 
 @Injectable()
 export class ResultsService {
@@ -427,6 +427,19 @@ export class ResultsService {
           newMessage.idString = response.idStrings;
           newMessage.urlForResult = response.idStrings[index];
           await this.messagesRepository.save(newMessage);
+
+          const usedMessageContent =
+            await this.messagesContentRepository.findOneByMessageId(aMessageId);
+
+          const newMessageContent = new MessageContent();
+          newMessageContent.messageId = aMessageId + 2;
+          newMessageContent.sentType = MessageType.A;
+          newMessageContent.content = usedMessageContent.content;
+          newMessageContent.hostnumber = usedMessageContent.hostnumber;
+          newMessageContent.receiverList =
+            usedMessageContent.remainReceiverList;
+
+          await this.messagesContentRepository.save(newMessageContent);
         } else {
           const message = await this.messagesRepository.findOneByMessageId(
             bMessageId,
@@ -445,6 +458,19 @@ export class ResultsService {
           newMessage.idString = response.idStrings;
           newMessage.urlForResult = response.idStrings[index];
           await this.messagesRepository.save(newMessage);
+
+          const usedMessageContent =
+            await this.messagesContentRepository.findOneByMessageId(bMessageId);
+
+          const newMessageContent = new MessageContent();
+          newMessageContent.messageId = aMessageId + 1;
+          newMessageContent.sentType = MessageType.B;
+          newMessageContent.content = usedMessageContent.content;
+          newMessageContent.hostnumber = usedMessageContent.hostnumber;
+          newMessageContent.receiverList =
+            usedMessageContent.remainReceiverList;
+
+          await this.messagesContentRepository.save(newMessageContent);
         }
       } catch (error) {
         console.error(
