@@ -83,10 +83,19 @@ export class UsedPayments extends BaseEntity {
   usedPaymentId: number;
 
   @Column({ type: 'int', nullable: false, default: 0 })
-  usedPayment: number;
+  usedPoint: number;
+
+  @Column({ type: 'int', nullable: false, default: 0 })
+  usedMoney: number;
 
   @Column({ type: 'int', nullable: false, default: 0 })
   refundPayment: number;
+
+  @Column({ type: 'int', nullable: false, default: 0 })
+  remainPoint: number;
+
+  @Column({ type: 'int', nullable: false, default: 0 })
+  remainMoney: number;
 
   @Column({
     type: 'timestamptz',

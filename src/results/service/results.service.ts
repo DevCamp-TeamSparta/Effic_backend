@@ -316,7 +316,19 @@ export class ResultsService {
       where: { userId },
     });
 
-    return payments;
+    const finalPayments = payments.map((payment) => {
+      const finalPayment = {
+        messageId: payment.messageId,
+        createdAt: payment.createdAt,
+        finalPayment:
+          payment.usedPoint + payment.usedMoney - payment.refundPayment,
+        remainPoint: payment.remainPoint,
+        remainMoney: payment.remainMoney,
+      };
+      return finalPayment;
+    });
+
+    return finalPayments;
   }
 
   // ncp와 단축 url 결과를 합친 polling
@@ -680,19 +692,28 @@ export class ResultsService {
         });
 
         const fail = ncpResult.fail;
-        const money = fail * 3;
+        const refundAmount = fail * 3;
 
-        user.money += money;
-        message.isMoneyCheck = true;
-        usedPayment.usedPayment -= money;
-        usedPayment.refundPayment += money;
+        if (usedPayment.usedPoint > 0) {
+          user.point += refundAmount;
+          message.isMoneyCheck = true;
+          usedPayment.refundPayment += refundAmount;
+          usedPayment.remainPoint += refundAmount;
+        } else {
+          user.money += refundAmount;
+          message.isMoneyCheck = true;
+          usedPayment.refundPayment += refundAmount;
+          usedPayment.remainMoney += refundAmount;
+        }
 
-        await this.entityManager.save(user);
-        await this.entityManager.save(message);
-        await this.entityManager.save(usedPayment);
+        this.entityManager.transaction(async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(user);
+          await transactionalEntityManager.save(message);
+          await transactionalEntityManager.save(usedPayment);
+        });
 
         console.log(
-          `Refund for message ${message.messageId} is completed. ${money} won is refunded.`,
+          `Refund for message ${message.messageId} is completed. ${refundAmount} won is refunded.`,
         );
       } catch (error) {
         console.error(
