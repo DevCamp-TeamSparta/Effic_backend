@@ -64,9 +64,8 @@ export class PaymentsController {
     return payment;
   }
 
-  // 충전금액 내역 조회
-  @Get('/:userId')
-  async userPayments(@Headers('Authorization') authorization: string) {
+  @Get('/me')
+  async myPayments(@Headers('Authorization') authorization: string) {
     if (!authorization) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }

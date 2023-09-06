@@ -19,7 +19,7 @@ import { EntityManager } from 'typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
 import got from 'got';
-import { shortIoConfig } from 'config/short-io.config';
+import { shortIoConfig, tlyConfig } from 'config/short-io.config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
 import { MessageContent, UrlInfo } from 'src/messages/message.entity';
@@ -100,28 +100,45 @@ export class ResultsService {
 
     for (const idString of message.idString) {
       try {
-        const response = await axios.get(
-          `https://api-v2.short.io/statistics/link/${idString}`,
+        const urlInfo = await this.urlInfosRepository.findOneByIdString(
+          idString,
+        );
+        if (!urlInfo) {
+          throw new BadRequestException('idString is wrong');
+        }
+        const tlyResponse = await axios.get(
+          'https://t.ly/api/v1/link/stats?short_url=' +
+            urlInfo.tlyUrlInfo.shortenUrl,
           {
-            params: {
-              period: 'week',
-              tzOffset: '0',
-            },
             headers: {
-              accept: '*/*',
-              authorization: shortIoConfig.secretKey,
+              Authorization: 'Bearer ' + tlyConfig.secretKey,
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
             },
           },
         );
 
-        const totalClicks = response.data.totalClicks;
-        const humanClicks = response.data.humanClicks;
+        // const response = await axios.get(
+        //   `https://api-v2.short.io/statistics/link/${idString}`,
+        //   {
+        //     params: {
+        //       period: 'week',
+        //       tzOffset: '0',
+        //     },
+        //     headers: {
+        //       accept: '*/*',
+        //       authorization: shortIoConfig.secretKey,
+        //     },
+        //   },
+        // );
+        const totalClicks = tlyResponse.data.clicks || 0;
+        const humanClicks = tlyResponse.data.unique_clicks || 0;
 
         console.log(response.data.clickStatistics.datasets[0].data);
 
         statisticsArray.push({ totalClicks, humanClicks, idString });
       } catch (error) {
-        console.log(error);
+        console.error(error);
         throw new InternalServerErrorException();
       }
     }

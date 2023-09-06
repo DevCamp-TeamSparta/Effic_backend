@@ -5,8 +5,8 @@ import { UsersRepository } from '../../users/users.repository';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
-import { shortIoConfig } from 'config/short-io.config';
-import { Message } from '../message.entity';
+import { shortIoConfig, tlyConfig } from 'config/short-io.config';
+import { Message, TlyUrlInfo } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { UrlInfo } from '../message.entity';
@@ -206,6 +206,24 @@ export class MessagesService {
 
   // 단축 URL 생성
   async ShortenUrl(url: string) {
+    // TODO: t.ly로 단축 & DB에 저장
+    const token = tlyConfig.secretKey;
+    const tlyResponse = await got<{
+      short_url: string;
+      long_url: string;
+      short_id: string;
+    }>({
+      method: 'POST',
+      url: 'https://t.ly/api/v1/link/shorten',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      json: {
+        long_url: url,
+      },
+      responseType: 'json',
+    });
+
     return got<{
       shortURL: string;
       idString: string;
@@ -217,8 +235,8 @@ export class MessagesService {
         authorization: shortIoConfig.secretKey,
       },
       json: {
-        originalURL: url,
-        domain: 'au9k.short.gy',
+        originalURL: tlyResponse.body.short_url,
+        domain: 'effi.kr',
         allowDuplicates: true,
       },
       responseType: 'json',
@@ -229,7 +247,16 @@ export class MessagesService {
         urlInfo.shortenUrl = response.body.shortURL;
         urlInfo.idString = response.body.idString;
 
-        this.entityManager.save(urlInfo);
+        const tlyUrlInfo = new TlyUrlInfo();
+        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
+        tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
+        tlyUrlInfo.idString = tlyResponse.body.short_id;
+        tlyUrlInfo.firstShortenId = response.body.idString;
+
+        Promise.all([
+          this.entityManager.save(urlInfo),
+          this.entityManager.save(tlyUrlInfo),
+        ]);
 
         return response.body;
       })

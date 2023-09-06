@@ -90,11 +90,11 @@ export class PaymentsService {
         merchant_uid,
       );
       amountToBePaid = order.chargemoney;
-      user.money += amountToBePaid;
+      user.money += paymentData.response.amount;
 
       await this.entityManager.save(user);
-
       order.isCompleted = true;
+      order.receiptUrl = paymentData.response.receipt_url;
 
       await this.entityManager.save(order);
 
@@ -233,7 +233,8 @@ export class PaymentsService {
         },
       });
     } catch (error) {
-      console.log('Error sending Slack Message', error);
+      console.error('Error sending Slack Message', error);
+      throw new HttpException('Error sending Slack Message', 500);
     }
   }
 }
