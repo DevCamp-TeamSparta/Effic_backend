@@ -648,16 +648,16 @@ export class ResultsService {
       responseType: 'json',
     })
       .then((response) => {
-        const urlInfo = new UrlInfo();
-        urlInfo.originalUrl = response.body.originalURL;
-        urlInfo.shortenUrl = response.body.shortURL;
-        urlInfo.idString = response.body.idString;
-
         const tlyUrlInfo = new TlyUrlInfo();
-        tlyUrlInfo.originalUrl = response.body.originalURL;
+        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
         tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
         tlyUrlInfo.idString = tlyResponse.body.short_id;
         tlyUrlInfo.firstShortenId = response.body.idString;
+
+        const urlInfo = new UrlInfo();
+        urlInfo.originalUrl = tlyResponse.body.long_url;
+        urlInfo.shortenUrl = response.body.shortURL;
+        urlInfo.idString = response.body.idString;
 
         this.entityManager.transaction(async (transactionalEntityManager) => {
           await transactionalEntityManager.save(tlyUrlInfo);
