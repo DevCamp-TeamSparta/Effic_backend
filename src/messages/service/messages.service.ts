@@ -248,7 +248,7 @@ export class MessagesService {
         urlInfo.idString = response.body.idString;
 
         const tlyUrlInfo = new TlyUrlInfo();
-        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
+        tlyUrlInfo.originalUrl = response.body.originalURL;
         tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
         tlyUrlInfo.idString = tlyResponse.body.short_id;
         tlyUrlInfo.firstShortenId = response.body.idString;

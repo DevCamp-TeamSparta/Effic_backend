@@ -608,7 +608,11 @@ export class ResultsService {
     return content;
   }
 
-  async ShortenUrl(url: string) {
+  async ShortenUrl(url: string): Promise<{
+    shortURL: string;
+    idString: string;
+    originalURL: string;
+  }> {
     const token = tlyConfig.secretKey;
     const tlyResponse = await got<{
       short_url: string;
@@ -650,15 +654,15 @@ export class ResultsService {
         urlInfo.idString = response.body.idString;
 
         const tlyUrlInfo = new TlyUrlInfo();
-        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
+        tlyUrlInfo.originalUrl = response.body.originalURL;
         tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
         tlyUrlInfo.idString = tlyResponse.body.short_id;
         tlyUrlInfo.firstShortenId = response.body.idString;
 
-        Promise.all([
-          this.entityManager.save(urlInfo),
-          this.entityManager.save(tlyUrlInfo),
-        ]);
+        this.entityManager.transaction(async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(tlyUrlInfo);
+          await transactionalEntityManager.save(urlInfo);
+        });
 
         return response.body;
       })
