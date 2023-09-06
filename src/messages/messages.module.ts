@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MessagesController } from './controller/messages.controller';
 import { MessagesService } from './service/messages.service';
-import { Message, MessageGroup } from './message.entity';
+import { Message, MessageGroup, TlyUrlInfo, UrlInfo } from './message.entity';
 import { UsersRepository } from 'src/users/users.repository';
 import {
   MessagesRepository,
@@ -16,7 +16,13 @@ import { NcpResultsRepository } from 'src/results/results.repository';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Message, MessageGroup, MessageGroupRepo]),
+    TypeOrmModule.forFeature([
+      Message,
+      MessageGroup,
+      MessageGroupRepo,
+      UrlInfo,
+      TlyUrlInfo,
+    ]),
   ],
   controllers: [MessagesController],
   providers: [

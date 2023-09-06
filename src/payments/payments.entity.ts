@@ -32,6 +32,9 @@ export class Payment extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   paymentMethod: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  receiptUrl: string;
+
   @Column({ type: 'boolean', nullable: false, default: false })
   isCompleted: boolean;
 

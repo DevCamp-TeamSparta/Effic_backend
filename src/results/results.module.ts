@@ -14,9 +14,12 @@ import {
   UrlInfosRepository,
   MessagesContentRepository,
 } from 'src/messages/messages.repository';
+import { TlyUrlInfo, UrlInfo } from 'src/messages/message.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NcpResult, UrlResult])],
+  imports: [
+    TypeOrmModule.forFeature([NcpResult, UrlResult, UrlInfo, TlyUrlInfo]),
+  ],
   controllers: [ResultsController],
   providers: [
     ResultsService,

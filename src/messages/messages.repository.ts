@@ -68,7 +68,12 @@ export class UrlInfosRepository extends Repository<UrlInfo> {
   }
 
   async findOneByIdString(idString: string): Promise<UrlInfo> {
-    return await this.findOne({ where: { idString } });
+    return await this.findOne({
+      where: { idString },
+      relations: {
+        tlyUrlInfo: true,
+      },
+    });
   }
 }
 
