@@ -22,7 +22,11 @@ import got from 'got';
 import { shortIoConfig, tlyConfig } from 'config/short-io.config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
-import { MessageContent, UrlInfo } from 'src/messages/message.entity';
+import {
+  MessageContent,
+  TlyUrlInfo,
+  UrlInfo,
+} from 'src/messages/message.entity';
 
 @Injectable()
 export class ResultsService {
@@ -153,24 +157,24 @@ export class ResultsService {
     const statisticsArray = [];
 
     try {
-      const response = await axios.get(
-        `https://api-v2.short.io/statistics/link/${message.urlForResult}`,
-        {
-          params: {
-            period: 'week',
-            tzOffset: '0',
-          },
-          headers: {
-            accept: '*/*',
-            authorization: shortIoConfig.secretKey,
-          },
-        },
-      );
-
-      const totalClicks = response.data.totalClicks;
-      const humanClicks = response.data.humanClicks;
-
-      statisticsArray.push({ totalClicks, humanClicks });
+      // const urlInfo = await this.urlInfosRepository.findOneByIdString(idString);
+      // if (!urlInfo) {
+      //   throw new BadRequestException('idString is wrong');
+      // }
+      // const tlyResponse = await axios.get(
+      //   'https://t.ly/api/v1/link/stats?short_url=' +
+      //     urlInfo.tlyUrlInfo.shortenUrl,
+      //   {
+      //     headers: {
+      //       Authorization: 'Bearer ' + tlyConfig.secretKey,
+      //       'Content-Type': 'application/json',
+      //       Accept: 'application/json',
+      //     },
+      //   },
+      // );
+      // const totalClicks = tlyResponse.data.clicks || 0;
+      // const humanClicks = tlyResponse.data.unique_clicks || 0;
+      // statisticsArray.push({ totalClicks, humanClicks });
     } catch (error) {
       console.log(error);
       throw error;
@@ -605,6 +609,23 @@ export class ResultsService {
   }
 
   async ShortenUrl(url: string) {
+    const token = tlyConfig.secretKey;
+    const tlyResponse = await got<{
+      short_url: string;
+      long_url: string;
+      short_id: string;
+    }>({
+      method: 'POST',
+      url: 'https://t.ly/api/v1/link/shorten',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      json: {
+        long_url: url,
+      },
+      responseType: 'json',
+    });
+
     return got<{
       shortURL: string;
       idString: string;
@@ -628,7 +649,16 @@ export class ResultsService {
         urlInfo.shortenUrl = response.body.shortURL;
         urlInfo.idString = response.body.idString;
 
-        this.entityManager.save(urlInfo);
+        const tlyUrlInfo = new TlyUrlInfo();
+        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
+        tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
+        tlyUrlInfo.idString = tlyResponse.body.short_id;
+        tlyUrlInfo.firstShortenId = response.body.idString;
+
+        Promise.all([
+          this.entityManager.save(urlInfo),
+          this.entityManager.save(tlyUrlInfo),
+        ]);
 
         return response.body;
       })

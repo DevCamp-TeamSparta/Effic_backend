@@ -1,16 +1,15 @@
 ### Create User
 POST http://localhost:8000/users/signup
-Header: 
-  content-type: application/json
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzEwQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTMzNTgxMDIsImV4cCI6MTY5MzQ0NDUwMn0.8DWlTwjHKLFQhYdjsXZQ3874QXQcXS_R-rYNmRMmKEU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjkzOTgxNTY4LCJleHAiOjE2OTQwNjc5Njh9.wtd6CLkethnPASO_aN5lJ1nz1rq6vxWS0A2y6K1gzdQ
+Content-Type: application/json
 
 {
-    "email": "clo10@sparta.com",
-    "name": "clo2222",
-    "accessKey": "cugC5Rn2vzGEWUJhHAKw",
-    "serviceId": "ncp:sms:kr:313324923877:clo",
-    "secretKey": "z7KIKoY9QAtb1kGTlwWDBIigPfPWkLw9yALApZLv",
-    "hostnumber": ["010-3628-9823"],
+    "email": "clo@sparta.com",
+    "name": "clo",
+    "accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
+    "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
+    "secretKey": "x5zzaAzozM5h0k36cROO6LEuUMyRqP0di1eWXHJu",
+    "hostnumber": ["15228016"],
     "advertiseNumber": ["08011111111"],
     "advertisementOpt": false
 }
@@ -79,7 +78,7 @@ Content-Type: application/json
 
 ### dafault message result - shortio
 ### test용입니다 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/default/42
+Get http://localhost:8000/results/default/68
 Content-Type: application/json
 
 
@@ -97,12 +96,12 @@ Content-Type: application/json
 
 ### create payment
 Post http://localhost:8000/payments
-Header: 
-  content-type: application/json
-  email: clo@sparta.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjkzOTgxNTY4LCJleHAiOjE2OTQwNjc5Njh9.wtd6CLkethnPASO_aN5lJ1nz1rq6vxWS0A2y6K1gzdQ
+Content-Type: application/json
 
 {
-    "money": 1000
+    "money": 1000,
+    "paymentMethod": "card"
 }
 
 ### result - messageId

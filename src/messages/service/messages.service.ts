@@ -253,15 +253,15 @@ export class MessagesService {
         tlyUrlInfo.idString = tlyResponse.body.short_id;
         tlyUrlInfo.firstShortenId = response.body.idString;
 
-        Promise.all([
-          this.entityManager.save(urlInfo),
-          this.entityManager.save(tlyUrlInfo),
-        ]);
+        this.entityManager.transaction(async (transactionalEntityManager) => {
+          await transactionalEntityManager.save(tlyUrlInfo);
+          await transactionalEntityManager.save(urlInfo);
+        });
 
         return response.body;
       })
       .catch((e) => {
-        console.error(e.response.body);
+        console.error('shorten fail', e.response.body);
         throw new HttpException(e.response.body, HttpStatus.BAD_REQUEST);
       });
   }

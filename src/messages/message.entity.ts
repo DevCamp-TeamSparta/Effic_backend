@@ -154,6 +154,7 @@ export class UrlInfo extends BaseEntity {
   @JoinColumn({
     name: 'idString',
     referencedColumnName: 'firstShortenId',
+    foreignKeyConstraintName: 'firstShortenId',
   })
   tlyUrlInfo: TlyUrlInfo;
 }
