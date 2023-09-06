@@ -86,9 +86,8 @@ Content-Type: application/json
 ### dafault message result - ncp 
 ### test용입니다 실제로 사용되지 않습니다.
 Get http://localhost:8000/results/default/ncp/42
-Header: 
-  content-type: application/json
-  email: clo@sparta.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTM0NjAxMjQsImV4cCI6MTY5MzU0NjUyNH0.GPzbRQRLrxlZu4ZVlIg_pviNbRGWgfx_QQNiwwiq9xI
+Content-Type: application/json
 
 ### get url info
 ### test용입니다. 실제로 사용되지 않습니다.

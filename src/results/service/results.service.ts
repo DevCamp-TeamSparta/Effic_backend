@@ -117,6 +117,8 @@ export class ResultsService {
         const totalClicks = response.data.totalClicks;
         const humanClicks = response.data.humanClicks;
 
+        console.log(response.data.clickStatistics.datasets[0].data);
+
         statisticsArray.push({ totalClicks, humanClicks, idString });
       } catch (error) {
         console.log(error);
@@ -220,7 +222,6 @@ export class ResultsService {
     if (!messages) {
       throw new BadRequestException('messageGroupId is wrong');
     }
-    console.log(messageGroupId);
 
     const results = await Promise.all(
       messages.map(async (message) => {
@@ -228,7 +229,6 @@ export class ResultsService {
           this.messagesContentRepository.findOneByMessageId(message.messageId),
           this.messageResult(message.messageId),
         ]);
-        console.log(content);
         return {
           message: message,
           content: content,

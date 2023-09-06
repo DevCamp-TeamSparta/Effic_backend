@@ -33,7 +33,6 @@ export class UsersController {
     this.logger.verbose('User signup');
 
     const Token = authorization.split(' ')[1];
-    console.log(Token);
 
     const {
       email,

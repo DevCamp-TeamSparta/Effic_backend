@@ -131,7 +131,6 @@ export class UsersService {
   ) {
     this.checkAccessToken(null, `Bearer ${token}`);
     const payload = jwt.decode(token);
-    console.log(payload);
     if (typeof payload === 'string') {
       throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
     }
