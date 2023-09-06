@@ -58,7 +58,7 @@ export class ResultsController {
     return result;
   }
 
-  // 결제 내역 조회
+  // 사용 내역 조회
   @Get('/payment/:userId')
   async paymentResult(
     @Param('userId') userId: number,

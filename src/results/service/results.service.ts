@@ -134,8 +134,6 @@ export class ResultsService {
         const totalClicks = tlyResponse.data.clicks || 0;
         const humanClicks = tlyResponse.data.unique_clicks || 0;
 
-        console.log(response.data.clickStatistics.datasets[0].data);
-
         statisticsArray.push({ totalClicks, humanClicks, idString });
       } catch (error) {
         console.error(error);
@@ -334,7 +332,7 @@ export class ResultsService {
     return messageResults;
   }
 
-  // 결제 내역 조회
+  // 사용 내역 조회
   async paymentResult(userId: number, email: string) {
     const user = await this.usersRepository.findOneByEmail(email);
     if (!user) {
