@@ -118,7 +118,6 @@ export class MessageContent extends BaseEntity {
 
   @Column({ type: 'int', nullable: true })
   messageGroupId: number;
-  messageContent: any[];
 }
 
 @Entity()

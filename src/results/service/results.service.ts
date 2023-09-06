@@ -103,50 +103,36 @@ export class ResultsService {
     const statisticsArray = [];
 
     for (const idString of message.idString) {
-      try {
-        const urlInfo = await this.urlInfosRepository.findOneByIdString(
-          idString,
-        );
-        if (!urlInfo) {
-          throw new BadRequestException('idString is wrong');
-        }
-        const tlyResponse = await axios.get(
-          'https://t.ly/api/v1/link/stats?short_url=' +
-            urlInfo.tlyUrlInfo.shortenUrl,
-          {
-            headers: {
-              Authorization: 'Bearer ' + tlyConfig.secretKey,
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-          },
-        );
-
-        // const response = await axios.get(
-        //   `https://api-v2.short.io/statistics/link/${idString}`,
-        //   {
-        //     params: {
-        //       period: 'week',
-        //       tzOffset: '0',
-        //     },
-        //     headers: {
-        //       accept: '*/*',
-        //       authorization: shortIoConfig.secretKey,
-        //     },
-        //   },
-        // );
-        const totalClicks = tlyResponse.data.clicks || 0;
-        const humanClicks = tlyResponse.data.unique_clicks || 0;
-
-        statisticsArray.push({ totalClicks, humanClicks, idString });
-      } catch (error) {
-        console.error(error);
-        throw new InternalServerErrorException();
-      }
+      statisticsArray.push({ ...this.getResult(idString), idString });
     }
     return statisticsArray;
   }
 
+  async getResult(idString: string) {
+    try {
+      const urlInfo = await this.urlInfosRepository.findOneByIdString(idString);
+      if (!urlInfo) {
+        throw new BadRequestException('idString is wrong');
+      }
+      const tlyResponse = await axios.get(
+        'https://t.ly/api/v1/link/stats?short_url=' +
+          urlInfo.tlyUrlInfo.shortenUrl,
+        {
+          headers: {
+            Authorization: 'Bearer ' + tlyConfig.secretKey,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        },
+      );
+      const totalClicks = tlyResponse.data.clicks || 0;
+      const humanClicks = tlyResponse.data.unique_clicks || 0;
+      return { totalClicks, humanClicks };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException();
+    }
+  }
   // 단축 url A/B 비교 결과
   async shortUrlAbTestResult(messageId: number) {
     const message = await this.messagesRepository.findOneByMessageId(messageId);
@@ -157,24 +143,7 @@ export class ResultsService {
     const statisticsArray = [];
 
     try {
-      // const urlInfo = await this.urlInfosRepository.findOneByIdString(idString);
-      // if (!urlInfo) {
-      //   throw new BadRequestException('idString is wrong');
-      // }
-      // const tlyResponse = await axios.get(
-      //   'https://t.ly/api/v1/link/stats?short_url=' +
-      //     urlInfo.tlyUrlInfo.shortenUrl,
-      //   {
-      //     headers: {
-      //       Authorization: 'Bearer ' + tlyConfig.secretKey,
-      //       'Content-Type': 'application/json',
-      //       Accept: 'application/json',
-      //     },
-      //   },
-      // );
-      // const totalClicks = tlyResponse.data.clicks || 0;
-      // const humanClicks = tlyResponse.data.unique_clicks || 0;
-      // statisticsArray.push({ totalClicks, humanClicks });
+      statisticsArray.push(this.getResult(message.urlForResult));
     } catch (error) {
       console.log(error);
       throw error;
@@ -642,7 +611,7 @@ export class ResultsService {
       },
       json: {
         originalURL: url,
-        domain: 'au9k.short.gy',
+        domain: 'effi.kr',
         allowDuplicates: true,
       },
       responseType: 'json',
