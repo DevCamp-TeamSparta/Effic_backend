@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Message } from '../messages/message.entity';
+import { Message, MessageGroup } from '../messages/message.entity';
 import { User } from '../users/user.entity';
 
 @Entity()
@@ -107,12 +107,8 @@ export class UsedPayments extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @Column({ type: 'int', nullable: false })
-  messageId: number;
-
-  @ManyToOne(() => Message, (message) => message.urlResults)
-  @JoinColumn({ name: 'messageId' })
-  message: Message;
+  @Column({ type: 'int', nullable: false, default: 0 })
+  messageGroupId: number;
 
   @ManyToOne(() => User, (user) => user.urlResults)
   @JoinColumn({ name: 'userId' })

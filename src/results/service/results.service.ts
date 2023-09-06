@@ -318,7 +318,7 @@ export class ResultsService {
 
     const finalPayments = payments.map((payment) => {
       const finalPayment = {
-        messageId: payment.messageId,
+        messageGroupId: payment.messageGroupId,
         createdAt: payment.createdAt,
         finalPayment:
           payment.usedPoint + payment.usedMoney - payment.refundPayment,
@@ -688,7 +688,7 @@ export class ResultsService {
           );
 
         const usedPayment = await this.entityManager.findOne(UsedPayments, {
-          where: { messageId: message.messageId },
+          where: { messageGroupId: message.messageGroupId },
         });
 
         const fail = ncpResult.fail;

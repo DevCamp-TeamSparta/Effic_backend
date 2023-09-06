@@ -176,13 +176,6 @@ export class MessagesService {
 
       await this.entityManager.save(messageContent);
 
-      payment.userId = user.userId;
-      payment.messageId = message.messageId;
-      payment.remainMoney = user.money;
-      payment.remainPoint = user.point;
-
-      await this.entityManager.save(payment);
-
       const result: any = {};
       await this.entityManager.transaction(
         async (transactionalEntityManager) => {
@@ -195,6 +188,14 @@ export class MessagesService {
           result.id = group.id;
         },
       );
+
+      payment.userId = user.userId;
+      payment.messageGroupId = result.id;
+      payment.remainMoney = user.money;
+      payment.remainPoint = user.point;
+
+      await this.entityManager.save(payment);
+
       return {
         messageId: message.messageId,
         messageGroupId: result.id,
@@ -658,15 +659,26 @@ export class MessagesService {
       }
     }
     // 유저 금액 차감
+    const payment = new UsedPayments();
     const deductionMoney = receiverPhones.length * 3;
     if (user.point >= deductionMoney) {
       user.point -= deductionMoney;
+      payment.usedPoint = deductionMoney;
     } else {
       user.money -= deductionMoney - user.point;
       user.point = 0;
+      payment.usedPoint = deductionMoney;
+      payment.usedMoney = deductionMoney - payment.usedPoint;
     }
 
     await this.entityManager.save(user);
+
+    payment.userId = user.userId;
+    payment.messageGroupId = result.id;
+    payment.remainMoney = user.money;
+    payment.remainPoint = user.point;
+
+    await this.entityManager.save(payment);
 
     return {
       messageId: '',
