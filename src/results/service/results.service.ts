@@ -103,7 +103,7 @@ export class ResultsService {
     const statisticsArray = [];
 
     for (const idString of message.idString) {
-      statisticsArray.push({ ...this.getResult(idString), idString });
+      statisticsArray.push({ ...(await this.getResult(idString)), idString });
     }
     return statisticsArray;
   }
