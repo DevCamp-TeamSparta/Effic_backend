@@ -59,6 +59,12 @@ export class MessagesContentRepository extends Repository<MessageContent> {
   async findOneByMessageId(messageId: number): Promise<MessageContent> {
     return await this.findOne({ where: { messageId } });
   }
+
+  async findOneByMessageGroupId(
+    messageGroupId: number,
+  ): Promise<MessageContent> {
+    return await this.findOne({ where: { messageGroupId } });
+  }
 }
 
 @Injectable()

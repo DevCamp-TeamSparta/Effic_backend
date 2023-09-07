@@ -316,19 +316,37 @@ export class ResultsService {
       where: { userId },
     });
 
-    const finalPayments = payments.map((payment) => {
-      const finalPayment = {
+    let condition = '';
+    const paymentResults = [];
+
+    for (const payment of payments) {
+      const messageContent =
+        await this.messagesContentRepository.findOneByMessageGroupId(
+          payment.messageGroupId,
+        );
+
+      if (
+        messageContent.sentType === MessageType.A ||
+        messageContent.sentType === MessageType.B
+      ) {
+        condition = 'a/b test';
+      } else {
+        condition = 'default';
+      }
+
+      const result = {
         messageGroupId: payment.messageGroupId,
-        createdAt: payment.createdAt,
+        title: messageContent.content.title,
+        type: condition,
         finalPayment:
           payment.usedPoint + payment.usedMoney - payment.refundPayment,
         remainPoint: payment.remainPoint,
         remainMoney: payment.remainMoney,
+        createdAt: payment.createdAt,
       };
-      return finalPayment;
-    });
-
-    return finalPayments;
+      paymentResults.push(result);
+    }
+    return paymentResults;
   }
 
   // ncp와 단축 url 결과를 합친 polling

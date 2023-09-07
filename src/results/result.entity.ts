@@ -6,7 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Message, MessageGroup } from '../messages/message.entity';
+import { Message } from '../messages/message.entity';
 import { User } from '../users/user.entity';
 
 @Entity()

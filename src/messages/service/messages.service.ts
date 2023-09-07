@@ -174,8 +174,6 @@ export class MessagesService {
       messageContent.sentType = MessageType.D;
       messageContent.hostnumber = defaultMessageDto.hostnumber;
 
-      await this.entityManager.save(messageContent);
-
       const result: any = {};
       await this.entityManager.transaction(
         async (transactionalEntityManager) => {
@@ -184,7 +182,9 @@ export class MessagesService {
             user.userId,
           );
           message.messageGroupId = group.id;
+          messageContent.messageGroupId = group.id;
           await transactionalEntityManager.save(message);
+          await transactionalEntityManager.save(messageContent);
           result.id = group.id;
         },
       );
@@ -439,7 +439,7 @@ export class MessagesService {
     if (totalMoney < receiverPhones.length * 3) {
       const requiredPoints = receiverPhones.length * 3 - totalMoney;
       throw new HttpException(
-        `need more points: ${requiredPoints}`,
+        `need more moneys: ${requiredPoints}`,
         HttpStatus.FORBIDDEN,
       );
     }
