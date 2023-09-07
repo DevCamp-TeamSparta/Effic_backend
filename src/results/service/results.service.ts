@@ -133,6 +133,7 @@ export class ResultsService {
       throw new InternalServerErrorException();
     }
   }
+
   // 단축 url A/B 비교 결과
   async shortUrlAbTestResult(messageId: number) {
     const message = await this.messagesRepository.findOneByMessageId(messageId);

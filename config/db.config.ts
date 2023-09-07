@@ -9,5 +9,15 @@ export const CongfigValidator: TypeOrmModuleOptions = {
   password: process.env.PG_PASSWORD,
   database: process.env.PG_DB,
   entities: ['dist/**/*.entity{.ts,.js}'],
-  synchronize: true,
+  synchronize: false,
 };
+
+export const OrmConfig = {
+  ...CongfigValidator,
+  migrationsTableName: 'migrations',
+  migrations: ['migrations/*.ts'],
+  cli: {
+    migrationsDir: 'migrations',
+  },
+};
+export default OrmConfig;
