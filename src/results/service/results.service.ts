@@ -481,7 +481,7 @@ export class ResultsService {
             await this.messagesContentRepository.findOneByMessageId(bMessageId);
 
           const newMessageContent = new MessageContent();
-          newMessageContent.messageId = aMessageId + 1;
+          newMessageContent.messageId = bMessageId + 1;
           newMessageContent.sentType = MessageType.B;
           newMessageContent.content = usedMessageContent.content;
           newMessageContent.hostnumber = usedMessageContent.hostnumber;
