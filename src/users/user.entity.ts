@@ -63,3 +63,21 @@ export class User extends BaseEntity {
   })
   urlResults: UrlResult[];
 }
+
+// @Entity()
+// export class UserNcpInfo extends BaseEntity {
+//   @PrimaryGeneratedColumn({ type: 'int' })
+//   userInfoNcpId: number;
+
+//   @Column({ type: 'varchar', nullable: false })
+//   accessKey: string;
+
+//   @Column({ type: 'varchar', nullable: false })
+//   serviceId: string;
+
+//   @Column({ type: 'varchar', nullable: false })
+//   secretKey: string;
+
+//   @Column({ type: 'int', nullable: false })
+//   userId: number;
+// }
