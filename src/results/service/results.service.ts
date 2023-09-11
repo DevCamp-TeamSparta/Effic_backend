@@ -83,12 +83,13 @@ export class ResultsService {
             reserved++;
           }
         }
-        return { success, reserved, fail };
       } catch (error) {
         console.error(error);
         throw new InternalServerErrorException();
       }
     }
+
+    return { success, reserved, fail };
   }
 
   // 단축 url 결과
