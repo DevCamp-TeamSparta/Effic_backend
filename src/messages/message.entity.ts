@@ -39,8 +39,8 @@ export class Message extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   urlForResult: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  requestId: string;
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  requestIdList: string[];
 
   @Column({ type: 'boolean', nullable: false, default: false })
   isMoneyCheck: boolean;

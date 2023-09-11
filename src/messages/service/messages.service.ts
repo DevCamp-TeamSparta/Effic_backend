@@ -59,7 +59,7 @@ export class MessagesService {
   }
 
   // 기본메세지 보내기
-  async defaultMessage(email, defaultMessageDto) {
+  async sendDefaultMessage(email, defaultMessageDto) {
     // 유저정보 확인
     const user = await this.usersRepository.findOneByEmail(email);
 
@@ -77,140 +77,47 @@ export class MessagesService {
       );
     }
 
-    const shortenedUrls: string[] = [];
-    const idStrings = [];
+    const requestIdList: string[] = [];
+    const receiverList = defaultMessageDto.receiverList;
+    const receiverLength = receiverList.length;
+    const receiverCount = Math.ceil(receiverLength / 1000);
+    let takeBody;
 
-    for (const url of defaultMessageDto.urlList) {
-      const response = await this.ShortenUrl(url);
-      shortenedUrls.push(response.shortURL);
-      idStrings.push(response.idString);
+    for (let i = 0; i < receiverCount; i++) {
+      const receiverListForSend = receiverList.slice(i * 1000, (i + 1) * 1000);
+      const body = await this.makeBody(
+        user,
+        defaultMessageDto,
+        defaultMessageDto,
+        receiverListForSend,
+      );
+      takeBody = body;
+      requestIdList.push(body.response.data.requestId);
     }
 
-    const newContent = await this.replaceUrlContent(
-      defaultMessageDto.urlList,
-      shortenedUrls,
-      defaultMessageDto.content,
+    const saveMessageInfo = await this.saveMessageInfo(
+      MessageType.D,
+      user,
+      receiverPhones,
+      takeBody.idStrings,
+      requestIdList,
+      defaultMessageDto,
     );
 
-    const isAdvertisement = defaultMessageDto.advertiseInfo;
+    await this.deductedUserMoney(
+      user,
+      receiverPhones,
+      await this.saveMessageInfo,
+    );
 
-    let contentPrefix = '';
-    let contentSuffix = '';
-
-    if (isAdvertisement) {
-      contentPrefix = '(광고)';
-      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
-    }
-
-    const body = {
-      type: 'LMS',
-      contentType: await this.getCotentType(defaultMessageDto),
-      countryCode: '82',
-      from: defaultMessageDto.hostnumber,
-      subject: defaultMessageDto.title,
-      content: defaultMessageDto.content,
-      messages: defaultMessageDto.receiverList.map((info) => ({
-        to: info.phone,
-        content: `${contentPrefix} ${this.createMessage(
-          newContent,
-          info,
-        )} ${contentSuffix}`,
-      })),
-      ...(defaultMessageDto.reservetime
-        ? {
-            reserveTime: defaultMessageDto.reservetime,
-            reserveTimeZone: 'Asia/Seoul',
-          }
-        : {}),
+    return {
+      messageId: saveMessageInfo.messageId,
+      messageGroupId: saveMessageInfo.messageGroupId,
     };
-
-    let headers;
-    try {
-      const now = Date.now().toString();
-      headers = {
-        'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-iam-access-key': user.accessKey,
-        'x-ncp-apigw-timestamp': now,
-        'x-ncp-apigw-signature-v2': await this.signature(user, now),
-      };
-      const response = await axios.post(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-        body,
-        {
-          headers,
-        },
-      );
-
-      // 유저 금액 차감
-      const payment = new UsedPayments();
-      const deductionMoney = receiverPhones.length * 3;
-      if (user.point >= deductionMoney) {
-        user.point -= deductionMoney;
-        payment.usedPoint = deductionMoney;
-      } else {
-        user.money -= deductionMoney - user.point;
-        user.point = 0;
-        payment.usedPoint = deductionMoney;
-        payment.usedMoney = deductionMoney - payment.usedPoint;
-      }
-
-      await this.entityManager.save(user);
-
-      const message = new Message();
-      message.isSent = true;
-      message.sentType = MessageType.D;
-      message.user = user;
-      message.receiverList = receiverPhones;
-      message.idString = idStrings;
-      message.urlForResult = null;
-      message.requestId = response.data.requestId;
-
-      await this.entityManager.save(message);
-
-      const messageContent = new MessageContent();
-      messageContent.messageId = message.messageId;
-      messageContent.content = defaultMessageDto;
-      messageContent.receiverList = defaultMessageDto.receiverList;
-      messageContent.sentType = MessageType.D;
-      messageContent.hostnumber = defaultMessageDto.hostnumber;
-
-      const result: any = {};
-      await this.entityManager.transaction(
-        async (transactionalEntityManager) => {
-          await transactionalEntityManager.save(user);
-          const group = await this.messageGroupRepo.createMessageGroup(
-            user.userId,
-          );
-          message.messageGroupId = group.id;
-          messageContent.messageGroupId = group.id;
-          await transactionalEntityManager.save(message);
-          await transactionalEntityManager.save(messageContent);
-          result.id = group.id;
-        },
-      );
-
-      payment.userId = user.userId;
-      payment.messageGroupId = result.id;
-      payment.remainMoney = user.money;
-      payment.remainPoint = user.point;
-
-      await this.entityManager.save(payment);
-
-      return {
-        messageId: message.messageId,
-        messageGroupId: result.id,
-      };
-    } catch (error) {
-      if (error.response) {
-        throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
-      }
-
-      throw error;
-    }
   }
 
   // 단축 URL 생성
-  async ShortenUrl(url: string) {
+  async makeShortenUrl(url: string) {
     // TODO: t.ly로 단축 & DB에 저장
     const token = tlyConfig.secretKey;
     const tlyResponse = await got<{
@@ -271,7 +178,77 @@ export class MessagesService {
       });
   }
 
-  async signature(user, timestamp) {
+  async makeBody(user, messageInfoList, messageDto, receiverList) {
+    const shortenedUrls = [];
+    const idStrings = [];
+
+    for (const url of messageInfoList.urlList) {
+      const response = await this.makeShortenUrl(url);
+      shortenedUrls.push(response.shortURL);
+      idStrings.push(response.idString);
+    }
+
+    const newContent = await this.replaceUrlContent(
+      messageInfoList.urlList,
+      shortenedUrls,
+      messageInfoList.content,
+    );
+
+    const isAdvertisement = messageDto.advertiseInfo;
+
+    let contentPrefix = '';
+    let contentSuffix = '';
+
+    if (isAdvertisement) {
+      contentPrefix = '(광고)';
+      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
+    }
+
+    const body = {
+      type: 'LMS',
+      contentType: await this.getCotentType(messageDto),
+      countryCode: '82',
+      from: messageDto.hostnumber,
+      subject: messageInfoList.title,
+      content: messageInfoList.content,
+      messages: receiverList.map((info) => ({
+        to: info.phone,
+        content: `${contentPrefix} ${this.createMessage(
+          newContent,
+          info,
+        )} ${contentSuffix}`,
+      })),
+      ...(messageDto.reservetime
+        ? {
+            reserveTime: messageDto.reservetime,
+            reserveTimeZone: 'Asia/Seoul',
+          }
+        : {}),
+    };
+
+    let headers;
+    try {
+      const now = Date.now().toString();
+      headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': user.accessKey,
+        'x-ncp-apigw-timestamp': now,
+        'x-ncp-apigw-signature-v2': await this.makeSignature(user, now),
+      };
+      const response = await axios.post(
+        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+        body,
+        {
+          headers,
+        },
+      );
+      return { body, response, idStrings };
+    } catch (error) {
+      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async makeSignature(user, timestamp) {
     const message = [];
     const hmac = crypto.createHmac('sha256', user.secretKey);
     const space = ' ';
@@ -289,82 +266,132 @@ export class MessagesService {
     return signature.toString();
   }
 
+  // 정보 저장
+  async saveMessageInfo(
+    messageType,
+    user,
+    receiverPhones,
+    idStrings,
+    requestIdList,
+    messageInfoDto,
+  ) {
+    const message = new Message();
+    message.isSent = true;
+    message.sentType = messageType;
+    message.user = user;
+    message.receiverList = receiverPhones;
+    message.idString = idStrings;
+    message.urlForResult = null;
+    message.requestIdList = requestIdList;
+
+    await this.entityManager.save(message);
+
+    const messageContent = new MessageContent();
+    messageContent.messageId = message.messageId;
+    messageContent.content = messageInfoDto;
+    messageContent.receiverList = messageInfoDto.receiverList;
+    messageContent.sentType = messageType;
+    messageContent.hostnumber = messageInfoDto.hostnumber;
+
+    const result: any = {};
+    await this.entityManager.transaction(async (transactionalEntityManager) => {
+      await transactionalEntityManager.save(user);
+      const group = await this.messageGroupRepo.createMessageGroup(user.userId);
+      message.messageGroupId = group.id;
+      messageContent.messageGroupId = group.id;
+      await transactionalEntityManager.save(message);
+      await transactionalEntityManager.save(messageContent);
+      result.id = group.id;
+    });
+
+    return {
+      messageId: message.messageId,
+      messageGroupId: result.id,
+    };
+  }
+
+  async saveAbMessageInfo(
+    MessageType,
+    user,
+    receiverPhones,
+    idStrings,
+    idStringForResult,
+    messageGroupId,
+    requestIdList,
+    abMessageContent,
+    abMessageReceiverList,
+    abMessageRemain,
+    abMessageHostnumber,
+  ) {
+    const message = new Message();
+    message.isSent = true;
+    message.sentType = MessageType;
+    message.user = user;
+    message.receiverList = receiverPhones;
+    message.idString = idStrings;
+    message.urlForResult = idStringForResult;
+    message.messageGroupId = messageGroupId;
+    message.requestIdList = requestIdList;
+    await this.entityManager.save(message);
+
+    const messageContent = new MessageContent();
+    messageContent.messageId = message.messageId;
+    messageContent.content = abMessageContent;
+    messageContent.receiverList = abMessageReceiverList;
+    messageContent.remainReceiverList = abMessageRemain;
+    messageContent.sentType = MessageType;
+    messageContent.hostnumber = abMessageHostnumber;
+    messageContent.messageGroupId = messageGroupId;
+
+    await this.entityManager.save(messageContent);
+
+    return {
+      messageId: message.messageId,
+      messageGroupId: messageGroupId,
+    };
+  }
+
+  // 유저금액 차감
+  async deductedUserMoney(user, receiverPhones, saveMessageInfo) {
+    const payment = new UsedPayments();
+    const deductionMoney = receiverPhones.length * 3;
+    if (user.point >= deductionMoney) {
+      user.point -= deductionMoney;
+      payment.usedPoint = deductionMoney;
+    } else {
+      user.money -= deductionMoney - user.point;
+      user.point = 0;
+      payment.usedPoint = deductionMoney;
+      payment.usedMoney = deductionMoney - payment.usedPoint;
+    }
+
+    await this.entityManager.save(user);
+
+    payment.userId = user.userId;
+    payment.messageGroupId = saveMessageInfo.messageGroupId;
+    payment.remainMoney = user.money;
+    payment.remainPoint = user.point;
+
+    await this.entityManager.save(payment);
+  }
+
   // 테스트 메세지 보내기
-  async testMessage(email, testMessageDto) {
+  async sendTestMessage(email, testMessageDto) {
     // 유저정보 확인
     const user = await this.usersRepository.findOneByEmail(email);
 
-    const shortenedUrls: string[] = [];
-    const idStrings = [];
-
-    for (const url of testMessageDto.urlList) {
-      const response = await this.ShortenUrl(url);
-      shortenedUrls.push(response.shortURL);
-      idStrings.push(response.idString);
-    }
-
-    const newContent = await this.replaceUrlContent(
-      testMessageDto.urlList,
-      shortenedUrls,
-      testMessageDto.content,
+    await this.makeBody(
+      user,
+      testMessageDto,
+      testMessageDto,
+      testMessageDto.receiverList,
     );
 
-    const isAdvertisement = testMessageDto.advertiseInfo;
-
-    let contentPrefix = '';
-    let contentSuffix = '';
-
-    if (isAdvertisement) {
-      contentPrefix = '(광고)';
-      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
-    }
-
-    const body = {
-      type: 'LMS',
-      contentType: await this.getCotentType(testMessageDto),
-      countryCode: '82',
-      from: testMessageDto.hostnumber,
-      subject: testMessageDto.title,
-      content: testMessageDto.content,
-      messages: testMessageDto.receiverList.map((info) => ({
-        to: info.phone,
-        content: `${contentPrefix} ${this.createMessage(
-          newContent,
-          info,
-        )} ${contentSuffix}`,
-      })),
-      ...(testMessageDto.reservetime
-        ? {
-            reserveTime: testMessageDto.reservetime,
-            reserveTimeZone: 'Asia/Seoul',
-          }
-        : {}),
-    };
-
-    let headers;
-    try {
-      const now = Date.now().toString();
-      headers = {
-        'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-iam-access-key': user.accessKey,
-        'x-ncp-apigw-timestamp': now,
-        'x-ncp-apigw-signature-v2': await this.signature(user, now),
-      };
-      const response = await axios.post(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-        body,
-        {
-          headers,
-        },
-      );
-      return 'success';
-    } catch (error) {
-      throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
-    }
+    return 'success';
   }
 
   // hostnumbercheck 메세지
-  async hostNumberCheckMessage(checkHostNumberDto) {
+  async checkHostNumberMessage(checkHostNumberDto) {
     const body = {
       type: 'LMS',
       contentType: await this.getCotentType(checkHostNumberDto),
@@ -425,7 +452,7 @@ export class MessagesService {
   }
 
   // AB테스트 메세지 보내기
-  async abTestMessage(email, abTestMessageDto) {
+  async sendAbTestMessage(email, abTestMessageDto) {
     // 유저정보 확인
     const user = await this.usersRepository.findOneByEmail(email);
 
@@ -443,9 +470,6 @@ export class MessagesService {
         HttpStatus.FORBIDDEN,
       );
     }
-
-    let shortenedUrls: string[] = [];
-    let idStrings = [];
 
     // 리시버를 3개로 나누기
     let testReceiverNumber = 0;
@@ -467,184 +491,90 @@ export class MessagesService {
     const result = await this.messageGroupRepo.createMessageGroup(user.userId);
     // A, B 메세지 보내기
     for (let i = 0; i < 3; i++) {
-      const isAdvertisement =
-        abTestMessageDto.messageInfoList[i]?.advertiseInfo;
-
-      let contentPrefix = '';
-      let contentSuffix = '';
-
-      if (isAdvertisement) {
-        contentPrefix = '(광고)';
-        contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
-      }
-
       if (i < 1) {
-        //A 메세지 보내기 + 저장
-        for (const url of abTestMessageDto.messageInfoList[0].urlList) {
-          const response = await this.ShortenUrl(url);
-          shortenedUrls.push(response.shortURL);
-          idStrings.push(response.idString);
+        const requestIdList: string[] = [];
+        const receiverList = aTestReceiver;
+        const receiverLength = receiverList.length;
+        const receiverCount = Math.ceil(receiverLength / 1000);
+        let takeBody;
+
+        for (let i = 0; i < receiverCount; i++) {
+          const receiverListForSend = receiverList.slice(
+            i * 1000,
+            (i + 1) * 1000,
+          );
+          const body = await this.makeBody(
+            user,
+            abTestMessageDto.messageInfoList[0],
+            abTestMessageDto,
+            receiverListForSend,
+          );
+          takeBody = body;
+          requestIdList.push(body.response.data.requestId);
         }
-
-        const newContent = await this.replaceUrlContent(
-          abTestMessageDto.messageInfoList[0].urlList,
-          shortenedUrls,
-          abTestMessageDto.messageInfoList[0].content,
-        );
-
-        const body = {
-          type: 'LMS',
-          contentType: await this.getCotentType(abTestMessageDto),
-          countryCode: '82',
-          from: abTestMessageDto.hostnumber,
-          subject: abTestMessageDto.messageInfoList[0].title,
-          content: abTestMessageDto.messageInfoList[0].content,
-          messages: aTestReceiver.map((info) => ({
-            to: info.phone,
-            content: `${contentPrefix} ${this.createMessage(
-              newContent,
-              info,
-            )} ${contentSuffix}`,
-          })),
-          ...(abTestMessageDto.reservetime
-            ? {
-                reserveTime: abTestMessageDto.reservetime,
-                reserveTimeZone: 'Asia/Seoul',
-              }
-            : {}),
-        };
-
-        const now = Date.now().toString();
-        const headers = {
-          'Content-Type': 'application/json; charset=utf-8',
-          'x-ncp-iam-access-key': user.accessKey,
-          'x-ncp-apigw-timestamp': now,
-          'x-ncp-apigw-signature-v2': await this.signature(user, now),
-        };
-        const response = await axios.post(
-          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-          body,
-          {
-            headers,
-          },
-        );
 
         const urlForResult = abTestMessageDto.urlForResult;
         const idStringIndex =
           abTestMessageDto.messageInfoList[0].urlList.indexOf(urlForResult);
-        const idStringForResult = idStrings[idStringIndex];
+        const idStringForResult = takeBody.idStrings[idStringIndex];
 
-        const message = new Message();
-        message.isSent = true;
-        message.sentType = MessageType.A;
-        message.user = user;
-        message.receiverList = receiverPhones.slice(0, aTestReceiver.length);
-        message.idString = idStrings;
-        message.urlForResult = idStringForResult;
-        message.requestId = response.data.requestId;
-        message.messageGroupId = result.id;
-        await this.entityManager.save(message);
-
-        const messageContent = new MessageContent();
-        messageContent.messageId = message.messageId;
-        messageContent.content = abTestMessageDto.messageInfoList[0];
-        messageContent.receiverList = abTestMessageDto.receiverList.slice(
-          0,
-          aTestReceiver.length,
+        await this.saveAbMessageInfo(
+          MessageType.A,
+          user,
+          receiverPhones.slice(0, aTestReceiver.length),
+          takeBody.idStrings,
+          idStringForResult,
+          result.id,
+          requestIdList,
+          abTestMessageDto.messageInfoList[0],
+          abTestMessageDto.receiverList.slice(0, aTestReceiver.length),
+          abTestMessageDto.receiverList.slice(testReceiverNumber),
+          abTestMessageDto.hostnumber,
         );
-        messageContent.remainReceiverList =
-          abTestMessageDto.receiverList.slice(testReceiverNumber);
-        messageContent.sentType = MessageType.A;
-        messageContent.hostnumber = abTestMessageDto.hostnumber;
-        messageContent.messageGroupId = result.id;
-
-        await this.entityManager.save(messageContent);
       } else if (i < 2) {
         //B 메세지 보내기 + 저장
-        shortenedUrls = [];
-        idStrings = [];
-        for (const url of abTestMessageDto.messageInfoList[1].urlList) {
-          const response = await this.ShortenUrl(url);
-          shortenedUrls.push(response.shortURL);
-          idStrings.push(response.idString);
+        const requestIdList: string[] = [];
+        const receiverList = bTestReceiver;
+        const receiverLength = receiverList.length;
+        const receiverCount = Math.ceil(receiverLength / 1000);
+        let takeBody;
+
+        for (let i = 0; i < receiverCount; i++) {
+          const receiverListForSend = receiverList.slice(
+            i * 1000,
+            (i + 1) * 1000,
+          );
+          const body = await this.makeBody(
+            user,
+            abTestMessageDto.messageInfoList[1],
+            abTestMessageDto,
+            receiverListForSend,
+          );
+          takeBody = body;
+          requestIdList.push(body.response.data.requestId);
         }
-
-        const newContent = await this.replaceUrlContent(
-          abTestMessageDto.messageInfoList[1].urlList,
-          shortenedUrls,
-          abTestMessageDto.messageInfoList[1].content,
-        );
-
-        const body = {
-          type: 'LMS',
-          contentType: await this.getCotentType(abTestMessageDto),
-          countryCode: '82',
-          from: abTestMessageDto.hostnumber,
-          subject: abTestMessageDto.messageInfoList[1].title,
-          content: abTestMessageDto.messageInfoList[1].content,
-          messages: bTestReceiver.map((info) => ({
-            to: info.phone,
-            content: `${contentPrefix} ${this.createMessage(
-              newContent,
-              info,
-            )} ${contentSuffix}`,
-          })),
-          ...(abTestMessageDto.reservetime
-            ? {
-                reserveTime: abTestMessageDto.reservetime,
-                reserveTimeZone: 'Asia/Seoul',
-              }
-            : {}),
-        };
-
-        const now = Date.now().toString();
-        const headers = {
-          'Content-Type': 'application/json; charset=utf-8',
-          'x-ncp-iam-access-key': user.accessKey,
-          'x-ncp-apigw-timestamp': now,
-          'x-ncp-apigw-signature-v2': await this.signature(user, now),
-        };
-        const response = await axios.post(
-          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-          body,
-          {
-            headers,
-          },
-        );
 
         const urlForResult = abTestMessageDto.urlForResult;
         const idStringIndex =
           abTestMessageDto.messageInfoList[1].urlList.indexOf(urlForResult);
-        const idStringForResult = idStrings[idStringIndex];
+        const idStringForResult = takeBody.idStrings[idStringIndex];
 
-        const message = new Message();
-        message.isSent = true;
-        message.sentType = MessageType.B;
-        message.user = user;
-        message.receiverList = receiverPhones.slice(
-          aTestReceiver.length,
-          testReceiverNumber,
+        await this.saveAbMessageInfo(
+          MessageType.B,
+          user,
+          receiverPhones.slice(aTestReceiver.length, testReceiverNumber),
+          takeBody.idStrings,
+          idStringForResult,
+          result.id,
+          requestIdList,
+          abTestMessageDto.messageInfoList[1],
+          abTestMessageDto.receiverList.slice(
+            aTestReceiver.length,
+            testReceiverNumber,
+          ),
+          abTestMessageDto.receiverList.slice(testReceiverNumber),
+          abTestMessageDto.hostnumber,
         );
-        message.idString = idStrings;
-        message.urlForResult = idStringForResult;
-        message.requestId = response.data.requestId;
-        message.messageGroupId = result.id;
-        await this.entityManager.save(message);
-
-        const messageContent = new MessageContent();
-        messageContent.messageId = message.messageId;
-        messageContent.content = abTestMessageDto.messageInfoList[1];
-        messageContent.receiverList = abTestMessageDto.receiverList.slice(
-          aTestReceiver.length,
-          testReceiverNumber,
-        );
-        messageContent.remainReceiverList =
-          abTestMessageDto.receiverList.slice(testReceiverNumber);
-        messageContent.sentType = MessageType.B;
-        messageContent.hostnumber = abTestMessageDto.hostnumber;
-        messageContent.messageGroupId = result.id;
-
-        await this.entityManager.save(messageContent);
       } else {
         const message = new Message();
         message.isSent = false;
@@ -653,35 +583,18 @@ export class MessagesService {
         message.receiverList = receiverPhones.slice(testReceiverNumber);
         message.idString = null;
         message.urlForResult = null;
-        message.requestId = null;
         message.messageGroupId = result.id;
         await this.entityManager.save(message);
       }
     }
     // 유저 금액 차감
-    const payment = new UsedPayments();
-    const deductionMoney = receiverPhones.length * 3;
-    if (user.point >= deductionMoney) {
-      user.point -= deductionMoney;
-      payment.usedPoint = deductionMoney;
-    } else {
-      user.money -= deductionMoney - user.point;
-      user.point = 0;
-      payment.usedPoint = deductionMoney;
-      payment.usedMoney = deductionMoney - payment.usedPoint;
-    }
-
-    await this.entityManager.save(user);
-
-    payment.userId = user.userId;
-    payment.messageGroupId = result.id;
-    payment.remainMoney = user.money;
-    payment.remainPoint = user.point;
-
-    await this.entityManager.save(payment);
+    await this.deductedUserMoney(
+      user,
+      receiverPhones,
+      await this.saveAbMessageInfo,
+    );
 
     return {
-      messageId: '',
       messageGroupId: result.id,
     };
   }

@@ -27,11 +27,12 @@ export class MessagesController {
 
     const email = decodedAccessToken.email;
 
-    const messageId = await this.messagesService.defaultMessage(
+    const messageId = await this.messagesService.sendDefaultMessage(
       email,
       defaultMessageDto,
     );
-    return { ...messageId };
+
+    return { messageId };
   }
 
   @Post('/abtest')
@@ -48,13 +49,12 @@ export class MessagesController {
     const email = decodedAccessToken.email;
 
     this.logger.verbose('AB test message sending2');
-    const result = await this.messagesService.abTestMessage(
+    const result = await this.messagesService.sendAbTestMessage(
       email,
       abTestMessageDto,
     );
 
     return {
-      messageId: result.messageId,
       messageGroupId: result.messageGroupId,
     };
   }
@@ -72,7 +72,7 @@ export class MessagesController {
 
     const email = decodedAccessToken.email;
 
-    const message = await this.messagesService.testMessage(
+    const message = await this.messagesService.sendTestMessage(
       email,
       testMessageDto,
     );
@@ -84,7 +84,7 @@ export class MessagesController {
   async checkHostNumber(@Body() checkHostNumberDto: CheckHostNumberDto) {
     this.logger.verbose('Check host number');
 
-    const message = await this.messagesService.hostNumberCheckMessage(
+    const message = await this.messagesService.checkHostNumberMessage(
       checkHostNumberDto,
     );
 

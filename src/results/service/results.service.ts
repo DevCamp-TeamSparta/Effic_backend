@@ -64,7 +64,7 @@ export class ResultsService {
 
     try {
       const response = await axios.get(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${message.requestId}`,
+        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${message.requestIdList}`,
         { headers },
       );
 
@@ -83,7 +83,7 @@ export class ResultsService {
       }
       return { success, reserved, fail };
     } catch (e) {
-      console.log(message.requestId);
+      console.log(message.requestIdList);
       console.log('ncp error', e.response.data);
       throw new InternalServerErrorException();
     }
@@ -442,7 +442,7 @@ export class ResultsService {
           );
           newMessage.isSent = true;
           newMessage.sentType = MessageType.A;
-          newMessage.requestId = response.res;
+          newMessage.requestIdList = response.res;
           newMessage.idString = response.idStrings;
           newMessage.urlForResult = response.idStrings[index];
           await this.messagesRepository.save(newMessage);
@@ -473,7 +473,7 @@ export class ResultsService {
 
           newMessage.isSent = true;
           newMessage.sentType = MessageType.B;
-          newMessage.requestId = response.res;
+          newMessage.requestIdList = response.res;
           newMessage.idString = response.idStrings;
           newMessage.urlForResult = response.idStrings[index];
           await this.messagesRepository.save(newMessage);
