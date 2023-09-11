@@ -63,15 +63,15 @@ export class ResultsService {
     };
 
     try {
+      let success = 0;
+      let fail = 0;
+      let reserved = 0;
+
       for (const requestId of message.requestIdList) {
         const response = await axios.get(
           `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${requestId}`,
           { headers },
         );
-
-        let success = 0;
-        let fail = 0;
-        let reserved = 0;
 
         for (let i = 0; i < response.data.itemCount; i++) {
           if (response.data.messages[i].statusName === 'success') {
