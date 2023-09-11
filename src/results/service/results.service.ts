@@ -60,6 +60,7 @@ export class ResultsService {
     let reserved = 0;
 
     for (const requestId of message.requestIdList) {
+      console.log(requestId);
       const now = Date.now().toString();
       const headers = {
         'x-ncp-apigw-timestamp': now,
@@ -439,7 +440,7 @@ export class ResultsService {
           const response = await this.sendAbTestWinnerMessage(aMessageId);
 
           const newMessage = await this.messagesRepository.findOneByMessageId(
-            2 + aMessageId,
+            aMessageId + 2,
           );
           newMessage.isSent = true;
           newMessage.sentType = MessageType.A;
@@ -550,49 +551,59 @@ export class ResultsService {
       contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
     }
 
-    const body = {
-      type: 'LMS',
-      contentType: await this.getCotentType(messageContent.content),
-      countryCode: '82',
-      from: messageContent.hostnumber,
-      subject: messageContent.content.title,
-      content: messageContent.content.content,
-      messages: messageContent.remainReceiverList.map((info) => ({
-        to: info.phone,
-        content: `${contentPrefix} ${this.createMessage(
-          newContent,
-          info,
-        )} ${contentSuffix}`,
-      })),
-      ...(messageContent.content.reserveTime
-        ? {
-            reserveTime: messageContent.content.reserveTime,
-            reserveTimeZone: 'Asia/Seoul',
-          }
-        : {}),
-    };
+    const requestIdList: string[] = [];
+    const receiverList = messageContent.remainReceiverList;
+    const receiverLength = receiverList.length;
+    const receiverCount = Math.ceil(receiverLength / 1000);
 
-    let headers;
-    try {
-      const now = Date.now().toString();
-      headers = {
-        'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-iam-access-key': user.accessKey,
-        'x-ncp-apigw-timestamp': now,
-        'x-ncp-apigw-signature-v2': await this.makeSignature(user, now),
+    for (let i = 0; i < receiverCount; i++) {
+      const receiverListForSend = receiverList.slice(i * 1000, (i + 1) * 1000);
+
+      const body = {
+        type: 'LMS',
+        contentType: await this.getCotentType(messageContent.content),
+        countryCode: '82',
+        from: messageContent.hostnumber,
+        subject: messageContent.content.title,
+        content: messageContent.content.content,
+        messages: receiverListForSend.map((info) => ({
+          to: info.phone,
+          content: `${contentPrefix} ${this.createMessage(
+            newContent,
+            info,
+          )} ${contentSuffix}`,
+        })),
+        ...(messageContent.content.reserveTime
+          ? {
+              reserveTime: messageContent.content.reserveTime,
+              reserveTimeZone: 'Asia/Seoul',
+            }
+          : {}),
       };
-      const response = await axios.post(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-        body,
-        {
-          headers,
-        },
-      );
-      this.logger.log(response.data, idStrings, shortenedUrls);
-      return { res: response.data.requestId, idStrings, shortenedUrls };
-    } catch (error) {
-      console.log(error);
-      throw new BadRequestException(error.response.data);
+
+      let headers;
+      try {
+        const now = Date.now().toString();
+        headers = {
+          'Content-Type': 'application/json; charset=utf-8',
+          'x-ncp-iam-access-key': user.accessKey,
+          'x-ncp-apigw-timestamp': now,
+          'x-ncp-apigw-signature-v2': await this.makeSignature(user, now),
+        };
+        const response = await axios.post(
+          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+          body,
+          {
+            headers,
+          },
+        );
+        requestIdList.push(response.data.requestId);
+        this.logger.log(response.data, idStrings, shortenedUrls);
+        return { res: requestIdList, idStrings, shortenedUrls };
+      } catch (error) {
+        console.log(error);
+        throw new BadRequestException(error.response.data);
+      }
     }
   }
 
