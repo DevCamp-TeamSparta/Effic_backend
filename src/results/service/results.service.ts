@@ -60,7 +60,6 @@ export class ResultsService {
     let reserved = 0;
 
     for (const requestId of message.requestIdList) {
-      console.log(requestId);
       const now = Date.now().toString();
       const headers = {
         'x-ncp-apigw-timestamp': now,
@@ -88,7 +87,6 @@ export class ResultsService {
         throw new InternalServerErrorException();
       }
     }
-
     return { success, reserved, fail };
   }
 
