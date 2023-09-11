@@ -63,25 +63,27 @@ export class ResultsService {
     };
 
     try {
-      const response = await axios.get(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${message.requestIdList}`,
-        { headers },
-      );
+      for (const requestId of message.requestIdList) {
+        const response = await axios.get(
+          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${requestId}`,
+          { headers },
+        );
 
-      let success = 0;
-      let fail = 0;
-      let reserved = 0;
+        let success = 0;
+        let fail = 0;
+        let reserved = 0;
 
-      for (let i = 0; i < response.data.itemCount; i++) {
-        if (response.data.messages[i].statusName === 'success') {
-          success++;
-        } else if (response.data.messages[i].statusName === 'fail') {
-          fail++;
-        } else if (response.data.messages[i].statusName === 'reserved') {
-          reserved++;
+        for (let i = 0; i < response.data.itemCount; i++) {
+          if (response.data.messages[i].statusName === 'success') {
+            success++;
+          } else if (response.data.messages[i].statusName === 'fail') {
+            fail++;
+          } else if (response.data.messages[i].statusName === 'reserved') {
+            reserved++;
+          }
         }
+        return { success, reserved, fail };
       }
-      return { success, reserved, fail };
     } catch (e) {
       console.log(message.requestIdList);
       console.log('ncp error', e.response.data);
