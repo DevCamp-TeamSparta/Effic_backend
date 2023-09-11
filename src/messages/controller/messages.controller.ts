@@ -31,8 +31,7 @@ export class MessagesController {
       email,
       defaultMessageDto,
     );
-
-    return { messageId };
+    return { ...messageId };
   }
 
   @Post('/abtest')
