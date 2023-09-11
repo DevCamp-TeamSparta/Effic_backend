@@ -55,19 +55,19 @@ export class ResultsService {
       return { success: 0, reserved: message.receiverList.length, fail: 0 };
     }
 
-    const now = Date.now().toString();
-    const headers = {
-      'x-ncp-apigw-timestamp': now,
-      'x-ncp-iam-access-key': user.accessKey,
-      'x-ncp-apigw-signature-v2': await this.signature(user, message, now),
-    };
+    for (const requestId of message.requestIdList) {
+      const now = Date.now().toString();
+      const headers = {
+        'x-ncp-apigw-timestamp': now,
+        'x-ncp-iam-access-key': user.accessKey,
+        'x-ncp-apigw-signature-v2': await this.signature(user, requestId, now),
+      };
 
-    try {
-      let success = 0;
-      let fail = 0;
-      let reserved = 0;
+      try {
+        let success = 0;
+        let fail = 0;
+        let reserved = 0;
 
-      for (const requestId of message.requestIdList) {
         const response = await axios.get(
           `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${requestId}`,
           { headers },
@@ -83,11 +83,10 @@ export class ResultsService {
           }
         }
         return { success, reserved, fail };
+      } catch (error) {
+        console.error(error);
+        throw new InternalServerErrorException();
       }
-    } catch (e) {
-      console.log(message.requestIdList);
-      console.log('ncp error', e.response.data);
-      throw new InternalServerErrorException();
     }
   }
 
@@ -154,7 +153,7 @@ export class ResultsService {
     return statisticsArray;
   }
 
-  async signature(user, messageId, timestamp) {
+  async signature(user, requestId, timestamp) {
     const message = [];
     const hmac = crypto.createHmac('sha256', user.secretKey);
     const space = ' ';
@@ -163,7 +162,7 @@ export class ResultsService {
     message.push(method);
     message.push(space);
     message.push(
-      `/sms/v2/services/${user.serviceId}/messages?requestId=${messageId.requestId}`,
+      `/sms/v2/services/${user.serviceId}/messages?requestId=${requestId}`,
     );
     message.push(newLine);
     message.push(timestamp);
