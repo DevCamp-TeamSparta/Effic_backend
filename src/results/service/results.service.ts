@@ -55,6 +55,10 @@ export class ResultsService {
       return { success: 0, reserved: message.receiverList.length, fail: 0 };
     }
 
+    let success = 0;
+    let fail = 0;
+    let reserved = 0;
+
     for (const requestId of message.requestIdList) {
       const now = Date.now().toString();
       const headers = {
@@ -64,10 +68,6 @@ export class ResultsService {
       };
 
       try {
-        let success = 0;
-        let fail = 0;
-        let reserved = 0;
-
         const response = await axios.get(
           `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${requestId}`,
           { headers },
