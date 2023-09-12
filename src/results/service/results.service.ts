@@ -19,15 +19,10 @@ import { MessagesService } from 'src/messages/service/messages.service';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
-import got from 'got';
-import { shortIoConfig, tlyConfig } from 'config/short-io.config';
+import { tlyConfig } from 'config/short-io.config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
-import {
-  MessageContent,
-  TlyUrlInfo,
-  UrlInfo,
-} from 'src/messages/message.entity';
+import { MessageContent } from 'src/messages/message.entity';
 
 @Injectable()
 export class ResultsService {
@@ -548,83 +543,6 @@ export class ResultsService {
         shortenedUrls: body.shortenedUrls,
       };
     }
-  }
-
-  async replaceUrlContent(
-    urlList: string[],
-    shortenedUrls: string[],
-    content: string,
-  ) {
-    if (urlList) {
-      urlList.forEach((url, index) => {
-        content = content.replaceAll(url, shortenedUrls[index]);
-      });
-    }
-    return content;
-  }
-
-  async ShortenUrl(url: string): Promise<{
-    shortURL: string;
-    idString: string;
-    originalURL: string;
-  }> {
-    const token = tlyConfig.secretKey;
-    const tlyResponse = await got<{
-      short_url: string;
-      long_url: string;
-      short_id: string;
-    }>({
-      method: 'POST',
-      url: 'https://t.ly/api/v1/link/shorten',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      json: {
-        long_url: url,
-      },
-      responseType: 'json',
-    });
-
-    return got<{
-      shortURL: string;
-      idString: string;
-      originalURL: string;
-    }>({
-      method: 'POST',
-      url: 'https://api.short.io/links',
-      headers: {
-        authorization: shortIoConfig.secretKey,
-      },
-      json: {
-        originalURL: url,
-        domain: 'effi.kr',
-        allowDuplicates: true,
-      },
-      responseType: 'json',
-    })
-      .then((response) => {
-        const tlyUrlInfo = new TlyUrlInfo();
-        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
-        tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
-        tlyUrlInfo.idString = tlyResponse.body.short_id;
-        tlyUrlInfo.firstShortenId = response.body.idString;
-
-        const urlInfo = new UrlInfo();
-        urlInfo.originalUrl = tlyResponse.body.long_url;
-        urlInfo.shortenUrl = response.body.shortURL;
-        urlInfo.idString = response.body.idString;
-
-        this.entityManager.transaction(async (transactionalEntityManager) => {
-          await transactionalEntityManager.save(tlyUrlInfo);
-          await transactionalEntityManager.save(urlInfo);
-        });
-
-        return response.body;
-      })
-      .catch((e) => {
-        console.error(e.response.body);
-        throw new InternalServerErrorException();
-      });
   }
 
   // 문자발송이 끝난 건에 대해 실패한 전송 환불
