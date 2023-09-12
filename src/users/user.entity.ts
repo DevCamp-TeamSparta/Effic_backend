@@ -23,6 +23,9 @@ export class User extends BaseEntity {
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
 
+  // @Column({ type: 'boolean', nullable: false, default: false })
+  // isNcp: boolean;
+
   @Column({ type: 'varchar', nullable: false })
   accessKey: string;
 

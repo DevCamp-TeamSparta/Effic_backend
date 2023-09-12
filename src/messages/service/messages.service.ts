@@ -242,7 +242,7 @@ export class MessagesService {
           headers,
         },
       );
-      return { body, response, idStrings };
+      return { body, response, idStrings, shortenedUrls };
     } catch (error) {
       throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
     }

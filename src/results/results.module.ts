@@ -15,6 +15,7 @@ import {
   MessagesContentRepository,
 } from 'src/messages/messages.repository';
 import { TlyUrlInfo, UrlInfo } from 'src/messages/message.entity';
+import { MessagesService } from 'src/messages/service/messages.service';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TlyUrlInfo, UrlInfo } from 'src/messages/message.entity';
   controllers: [ResultsController],
   providers: [
     ResultsService,
+    MessagesService,
     UsersRepository,
     NcpResultsRepository,
     UrlResultsRepository,

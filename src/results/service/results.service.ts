@@ -14,6 +14,7 @@ import { UsersRepository } from 'src/users/users.repository';
 import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
+import { MessagesService } from 'src/messages/service/messages.service';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
@@ -32,6 +33,7 @@ import {
 export class ResultsService {
   private logger = new Logger('ResultsService');
   constructor(
+    private readonly messagesService: MessagesService,
     private readonly usersRepository: UsersRepository,
     private readonly messagesRepository: MessagesRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
@@ -525,84 +527,28 @@ export class ResultsService {
 
     const user = await this.usersRepository.findOneByUserId(message.userId);
 
-    const shortenedUrls: string[] = [];
-    const idStrings = [];
-
-    for (const url of messageContent.content.urlList) {
-      const response = await this.ShortenUrl(url);
-      shortenedUrls.push(response.shortURL);
-      idStrings.push(response.idString);
-    }
-
-    const newContent = await this.replaceUrlContent(
-      messageContent.content.urlList,
-      shortenedUrls,
-      messageContent.content.content,
-    );
-
-    const isAdvertisement = messageContent.content.advertiseInfo;
-
-    let contentPrefix = '';
-    let contentSuffix = '';
-
-    if (isAdvertisement) {
-      contentPrefix = '(광고)';
-      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
-    }
-
     const requestIdList: string[] = [];
     const receiverList = messageContent.remainReceiverList;
     const receiverLength = receiverList.length;
     const receiverCount = Math.ceil(receiverLength / 1000);
+    let takeBody;
 
     for (let i = 0; i < receiverCount; i++) {
       const receiverListForSend = receiverList.slice(i * 1000, (i + 1) * 1000);
-
-      const body = {
-        type: 'LMS',
-        contentType: await this.getCotentType(messageContent.content),
-        countryCode: '82',
-        from: messageContent.hostnumber,
-        subject: messageContent.content.title,
-        content: messageContent.content.content,
-        messages: receiverListForSend.map((info) => ({
-          to: info.phone,
-          content: `${contentPrefix} ${this.createMessage(
-            newContent,
-            info,
-          )} ${contentSuffix}`,
-        })),
-        ...(messageContent.content.reserveTime
-          ? {
-              reserveTime: messageContent.content.reserveTime,
-              reserveTimeZone: 'Asia/Seoul',
-            }
-          : {}),
+      const body = await this.messagesService.makeBody(
+        user,
+        messageContent.content,
+        messageContent,
+        receiverListForSend,
+      );
+      takeBody = body;
+      requestIdList.push(body.response.data.requestId);
+      this.logger.log(body.response.data, body.idStrings, body.shortenedUrls);
+      return {
+        res: requestIdList,
+        idStrings: body.idStrings,
+        shortenedUrls: body.shortenedUrls,
       };
-
-      let headers;
-      try {
-        const now = Date.now().toString();
-        headers = {
-          'Content-Type': 'application/json; charset=utf-8',
-          'x-ncp-iam-access-key': user.accessKey,
-          'x-ncp-apigw-timestamp': now,
-          'x-ncp-apigw-signature-v2': await this.makeSignature(user, now),
-        };
-        const response = await axios.post(
-          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
-          body,
-          {
-            headers,
-          },
-        );
-        requestIdList.push(response.data.requestId);
-        this.logger.log(response.data, idStrings, shortenedUrls);
-        return { res: requestIdList, idStrings, shortenedUrls };
-      } catch (error) {
-        console.log(error);
-        throw new BadRequestException(error.response.data);
-      }
     }
   }
 
@@ -681,24 +627,6 @@ export class ResultsService {
         console.error(e.response.body);
         throw new InternalServerErrorException();
       });
-  }
-
-  async makeSignature(user, timestamp) {
-    const message = [];
-    const hmac = crypto.createHmac('sha256', user.secretKey);
-    const space = ' ';
-    const newLine = '\n';
-    const method = 'POST';
-    message.push(method);
-    message.push(space);
-    message.push(`/sms/v2/services/${user.serviceId}/messages`);
-    message.push(newLine);
-    message.push(timestamp);
-    message.push(newLine);
-    message.push(user.accessKey);
-
-    const signature = hmac.update(message.join('')).digest('base64');
-    return signature.toString();
   }
 
   // 문자발송이 끝난 건에 대해 실패한 전송 환불
