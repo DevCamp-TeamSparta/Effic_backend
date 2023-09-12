@@ -14,8 +14,8 @@ import { UsersRepository } from 'src/users/users.repository';
 import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
 import { UrlResultsRepository } from '../results.repository';
 import { NcpResultsRepository } from '../results.repository';
-import { MessagesService } from 'src/messages/service/messages.service';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
+import { MessagesService } from 'src/messages/service/messages.service';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
@@ -33,8 +33,8 @@ import {
 export class ResultsService {
   private logger = new Logger('ResultsService');
   constructor(
-    private readonly messagesService: MessagesService,
     private readonly usersRepository: UsersRepository,
+    private readonly messagesService: MessagesService,
     private readonly messagesRepository: MessagesRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
     private readonly urlResultsRepository: UrlResultsRepository,
@@ -531,7 +531,6 @@ export class ResultsService {
     const receiverList = messageContent.remainReceiverList;
     const receiverLength = receiverList.length;
     const receiverCount = Math.ceil(receiverLength / 1000);
-    let takeBody;
 
     for (let i = 0; i < receiverCount; i++) {
       const receiverListForSend = receiverList.slice(i * 1000, (i + 1) * 1000);
@@ -541,7 +540,6 @@ export class ResultsService {
         messageContent,
         receiverListForSend,
       );
-      takeBody = body;
       requestIdList.push(body.response.data.requestId);
       this.logger.log(body.response.data, body.idStrings, body.shortenedUrls);
       return {
