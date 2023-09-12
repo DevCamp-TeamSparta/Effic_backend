@@ -12,8 +12,10 @@ import {
 } from 'src/messages/messages.repository';
 import { UsersRepository } from 'src/users/users.repository';
 import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
-import { UrlResultsRepository } from '../results.repository';
-import { NcpResultsRepository } from '../results.repository';
+import {
+  UrlResultsRepository,
+  NcpResultsRepository,
+} from '../results.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { MessagesService } from 'src/messages/service/messages.service';
 import { EntityManager } from 'typeorm';
@@ -61,7 +63,11 @@ export class ResultsService {
       const headers = {
         'x-ncp-apigw-timestamp': now,
         'x-ncp-iam-access-key': user.accessKey,
-        'x-ncp-apigw-signature-v2': await this.signature(user, requestId, now),
+        'x-ncp-apigw-signature-v2': await this.makeSignature(
+          user,
+          requestId,
+          now,
+        ),
       };
 
       try {
@@ -150,7 +156,7 @@ export class ResultsService {
     return statisticsArray;
   }
 
-  async signature(user, requestId, timestamp) {
+  async makeSignature(user, requestId, timestamp) {
     const message = [];
     const hmac = crypto.createHmac('sha256', user.secretKey);
     const space = ' ';
@@ -526,6 +532,7 @@ export class ResultsService {
     const receiverList = messageContent.remainReceiverList;
     const receiverLength = receiverList.length;
     const receiverCount = Math.ceil(receiverLength / 1000);
+    let takeBody;
 
     for (let i = 0; i < receiverCount; i++) {
       const receiverListForSend = receiverList.slice(i * 1000, (i + 1) * 1000);
@@ -535,14 +542,15 @@ export class ResultsService {
         messageContent,
         receiverListForSend,
       );
+      takeBody = body;
       requestIdList.push(body.response.data.requestId);
       this.logger.log(body.response.data, body.idStrings, body.shortenedUrls);
-      return {
-        res: requestIdList,
-        idStrings: body.idStrings,
-        shortenedUrls: body.shortenedUrls,
-      };
     }
+    return {
+      res: requestIdList,
+      idStrings: takeBody.idStrings,
+      shortenedUrls: takeBody.shortenedUrls,
+    };
   }
 
   // 문자발송이 끝난 건에 대해 실패한 전송 환불

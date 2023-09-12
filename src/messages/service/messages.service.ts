@@ -419,7 +419,7 @@ export class MessagesService {
           now,
         ),
       };
-      const response = await axios.post(
+      await axios.post(
         `https://sens.apigw.ntruss.com/sms/v2/services/${checkHostNumberDto.serviceId}/messages`,
         body,
         {
