@@ -104,11 +104,7 @@ export class MessagesService {
       defaultMessageDto,
     );
 
-    await this.deductedUserMoney(
-      user,
-      receiverPhones,
-      await this.saveMessageInfo,
-    );
+    await this.deductedUserMoney(user, receiverPhones, saveMessageInfo);
 
     return {
       messageId: saveMessageInfo.messageId,
