@@ -23,8 +23,8 @@ export class User extends BaseEntity {
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
 
-  // @Column({ type: 'boolean', nullable: false, default: false })
-  // isNcp: boolean;
+  @Column({ type: 'boolean', nullable: false, default: true })
+  isNcp: boolean;
 
   @Column({ type: 'varchar', nullable: false })
   accessKey: string;
@@ -67,20 +67,20 @@ export class User extends BaseEntity {
   urlResults: UrlResult[];
 }
 
-// @Entity()
-// export class UserNcpInfo extends BaseEntity {
-//   @PrimaryGeneratedColumn({ type: 'int' })
-//   userInfoNcpId: number;
+@Entity()
+export class UserNcpInfo extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  userInfoNcpId: number;
 
-//   @Column({ type: 'varchar', nullable: false })
-//   accessKey: string;
+  @Column({ type: 'varchar', nullable: false })
+  accessKey: string;
 
-//   @Column({ type: 'varchar', nullable: false })
-//   serviceId: string;
+  @Column({ type: 'varchar', nullable: false })
+  serviceId: string;
 
-//   @Column({ type: 'varchar', nullable: false })
-//   secretKey: string;
+  @Column({ type: 'varchar', nullable: false })
+  secretKey: string;
 
-//   @Column({ type: 'int', nullable: false })
-//   userId: number;
-// }
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+}

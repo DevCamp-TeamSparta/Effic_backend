@@ -311,14 +311,14 @@ export class ResultsService {
   }
 
   // 사용 내역 조회
-  async paymentResult(userId: number, email: string) {
+  async paymentResult(email: string) {
     const user = await this.usersRepository.findOneByEmail(email);
     if (!user) {
       throw new BadRequestException('email is wrong');
     }
 
     const payments = await this.entityManager.find(UsedPayments, {
-      where: { userId },
+      where: { userId: user.userId },
     });
 
     let condition = '';
