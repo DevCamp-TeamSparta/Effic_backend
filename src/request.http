@@ -1,6 +1,6 @@
 ### Create User
 POST http://localhost:8000/users/signup
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjkzOTgxNTY4LCJleHAiOjE2OTQwNjc5Njh9.wtd6CLkethnPASO_aN5lJ1nz1rq6vxWS0A2y6K1gzdQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk0NTk2ODgxLCJleHAiOjE2OTQ2ODMyODF9.Q2y91DtvtO-iXnBleP_ui9YF42rg7hv-1kntw0Dw38c
 Content-Type: application/json
 
 {
@@ -28,7 +28,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtY
 Content-Type: application/json
 
 {
-    "hostnumber": ["01036289827"]
+    "hostnumber": ["01036289827"],
+    "advertiseNumber": ["0801111112"],
+    "name": "clo2"
 }
 
 ### logout

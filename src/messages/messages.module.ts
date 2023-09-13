@@ -3,7 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MessagesController } from './controller/messages.controller';
 import { MessagesService } from './service/messages.service';
 import { Message, MessageGroup } from './message.entity';
-import { UsersRepository } from 'src/users/users.repository';
+import {
+  UserNcpInfoRepository,
+  UsersRepository,
+} from 'src/users/users.repository';
 import {
   MessagesRepository,
   MessagesContentRepository,
@@ -24,6 +27,7 @@ import { NcpResultsRepository } from 'src/results/results.repository';
     MessagesRepository,
     ResultsService,
     UsersRepository,
+    UserNcpInfoRepository,
     UrlInfosRepository,
     UrlResultsRepository,
     NcpResultsRepository,

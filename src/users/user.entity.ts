@@ -26,23 +26,11 @@ export class User extends BaseEntity {
   @Column({ type: 'boolean', nullable: false, default: true })
   isNcp: boolean;
 
-  @Column({ type: 'varchar', nullable: false })
-  accessKey: string;
-
-  @Column({ type: 'varchar', nullable: false })
-  serviceId: string;
-
-  @Column({ type: 'varchar', nullable: false })
-  secretKey: string;
-
   @Column({ type: 'varchar', nullable: true })
   refreshToken: string;
 
   @Column({ type: 'boolean', nullable: false })
   advertisementOpt: boolean;
-
-  @Column({ array: true, nullable: true, type: 'text', default: [] })
-  advertiseNumber: Array<string>;
 
   @Column({ type: 'int', nullable: true })
   point: number;
@@ -80,6 +68,12 @@ export class UserNcpInfo extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: false })
   secretKey: string;
+
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  advertiseNumber: Array<string>;
+
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  hostnumber: Array<string>;
 
   @Column({ type: 'int', nullable: false })
   userId: number;

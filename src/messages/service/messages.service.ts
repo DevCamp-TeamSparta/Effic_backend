@@ -1,7 +1,10 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { UsersRepository } from '../../users/users.repository';
+import {
+  UsersRepository,
+  UserNcpInfoRepository,
+} from '../../users/users.repository';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
@@ -17,6 +20,7 @@ import { UsedPayments } from 'src/results/result.entity';
 export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
@@ -104,11 +108,7 @@ export class MessagesService {
       defaultMessageDto,
     );
 
-    await this.deductedUserMoney(
-      user,
-      receiverPhones,
-      await this.saveMessageInfo,
-    );
+    await this.deductedUserMoney(user, receiverPhones, saveMessageInfo);
 
     return {
       messageId: saveMessageInfo.messageId,
@@ -182,6 +182,10 @@ export class MessagesService {
     const shortenedUrls = [];
     const idStrings = [];
 
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      user.userId,
+    );
+
     for (const url of messageInfoList.urlList) {
       const response = await this.makeShortenUrl(url);
       shortenedUrls.push(response.shortURL);
@@ -201,7 +205,7 @@ export class MessagesService {
 
     if (isAdvertisement) {
       contentPrefix = '(광고)';
-      contentSuffix = `\n무료수신거부 ${user.advertiseNumber}`;
+      contentSuffix = `\n무료수신거부 ${userNcpInfo.advertiseNumber}`;
     }
 
     const body = {
@@ -231,12 +235,12 @@ export class MessagesService {
       const now = Date.now().toString();
       headers = {
         'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-iam-access-key': user.accessKey,
+        'x-ncp-iam-access-key': userNcpInfo.accessKey,
         'x-ncp-apigw-timestamp': now,
-        'x-ncp-apigw-signature-v2': await this.makeSignature(user, now),
+        'x-ncp-apigw-signature-v2': await this.makeSignature(userNcpInfo, now),
       };
       const response = await axios.post(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages`,
+        `https://sens.apigw.ntruss.com/sms/v2/services/${userNcpInfo.serviceId}/messages`,
         body,
         {
           headers,
@@ -248,19 +252,19 @@ export class MessagesService {
     }
   }
 
-  async makeSignature(user, timestamp) {
+  async makeSignature(userNcpInfo, timestamp) {
     const message = [];
-    const hmac = crypto.createHmac('sha256', user.secretKey);
+    const hmac = crypto.createHmac('sha256', userNcpInfo.secretKey);
     const space = ' ';
     const newLine = '\n';
     const method = 'POST';
     message.push(method);
     message.push(space);
-    message.push(`/sms/v2/services/${user.serviceId}/messages`);
+    message.push(`/sms/v2/services/${userNcpInfo.serviceId}/messages`);
     message.push(newLine);
     message.push(timestamp);
     message.push(newLine);
-    message.push(user.accessKey);
+    message.push(userNcpInfo.accessKey);
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
@@ -471,6 +475,7 @@ export class MessagesService {
     );
 
     const result = await this.messageGroupRepo.createMessageGroup(user.userId);
+    let takeAbMessageInfo;
     // A, B 메세지 보내기
     for (let i = 0; i < 3; i++) {
       if (i < 1) {
@@ -500,7 +505,7 @@ export class MessagesService {
           abTestMessageDto.messageInfoList[0].urlList.indexOf(urlForResult);
         const idStringForResult = takeBody.idStrings[idStringIndex];
 
-        await this.saveAbMessageInfo(
+        const AbMessageInfo = await this.saveAbMessageInfo(
           MessageType.A,
           user,
           receiverPhones.slice(0, aTestReceiver.length),
@@ -513,6 +518,7 @@ export class MessagesService {
           abTestMessageDto.receiverList.slice(testReceiverNumber),
           abTestMessageDto.hostnumber,
         );
+        takeAbMessageInfo = AbMessageInfo;
       } else if (i < 2) {
         //B 메세지 보내기 + 저장
         const requestIdList: string[] = [];
@@ -541,7 +547,7 @@ export class MessagesService {
           abTestMessageDto.messageInfoList[1].urlList.indexOf(urlForResult);
         const idStringForResult = takeBody.idStrings[idStringIndex];
 
-        await this.saveAbMessageInfo(
+        const AbMessageInfo = await this.saveAbMessageInfo(
           MessageType.B,
           user,
           receiverPhones.slice(aTestReceiver.length, testReceiverNumber),
@@ -557,6 +563,7 @@ export class MessagesService {
           abTestMessageDto.receiverList.slice(testReceiverNumber),
           abTestMessageDto.hostnumber,
         );
+        takeAbMessageInfo = AbMessageInfo;
       } else {
         const message = new Message();
         message.isSent = false;
@@ -570,11 +577,7 @@ export class MessagesService {
       }
     }
     // 유저 금액 차감
-    await this.deductedUserMoney(
-      user,
-      receiverPhones,
-      await this.saveAbMessageInfo,
-    );
+    await this.deductedUserMoney(user, receiverPhones, takeAbMessageInfo);
 
     return {
       messageGroupId: result.id,
