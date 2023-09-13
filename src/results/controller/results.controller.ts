@@ -60,10 +60,7 @@ export class ResultsController {
 
   // 사용 내역 조회
   @Get('/payment/me')
-  async paymentResult(
-    @Param('userId') userId: number,
-    @Headers('Authorization') Authorization: string,
-  ) {
+  async paymentResult(@Headers('Authorization') Authorization: string) {
     this.logger.verbose('Payment result');
     if (!Authorization) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -72,10 +69,7 @@ export class ResultsController {
     const decodedAccessToken: any = jwt.decode(accessToken);
 
     this.logger.verbose('Payment result');
-    return await this.resultsService.paymentResult(
-      userId,
-      decodedAccessToken.email,
-    );
+    return await this.resultsService.paymentResult(decodedAccessToken.email);
   }
 
   @Get('/default/:messageId')
