@@ -197,4 +197,21 @@ export class UsersService {
   // 전화번호부는 유저가 삭제 및 수정할 수 있음
   // 주소록에는 각 전화번호부의 제목, id가 들어가야함
   // 주소록 id 1번은 각 전화번호부에서 이름과 전화번호를 가져오고, 중복된 값은 한번만 가져옴
+
+  // 전화번호부 생성
+  // async createPhonebook(userId: number, createPhonebookDto) {
+  //   const { title, name, phone, variableKey } = createPhonebookDto;
+  //   const user = await this.usersRepository.findOneByUserId(userId);
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+  //   const phonebook = {
+  //     title,
+  //     name,
+  //     phone,
+  //     variableKey,
+  //   };
+  //   user.phonebooks.push(phonebook);
+  //   await this.usersRepository.save(user);
+  // }
 }
