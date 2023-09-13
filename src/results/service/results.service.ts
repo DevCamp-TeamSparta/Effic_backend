@@ -148,7 +148,7 @@ export class ResultsService {
     const statisticsArray = [];
 
     try {
-      statisticsArray.push(this.getResult(message.urlForResult));
+      statisticsArray.push(await this.getResult(message.urlForResult));
     } catch (error) {
       console.log(error);
       throw error;
