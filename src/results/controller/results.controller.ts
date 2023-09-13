@@ -59,7 +59,7 @@ export class ResultsController {
   }
 
   // 사용 내역 조회
-  @Get('/payment/:userId')
+  @Get('/payment/me')
   async paymentResult(
     @Param('userId') userId: number,
     @Headers('Authorization') Authorization: string,

@@ -38,7 +38,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   refreshToken: string;
 
-  @Column({ type: 'boolean', nullable: false, default: false })
+  @Column({ type: 'boolean', nullable: false })
   advertisementOpt: boolean;
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })

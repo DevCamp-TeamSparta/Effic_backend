@@ -84,8 +84,8 @@ Content-Type: application/json
 
 ### dafault message result - ncp 
 ### test용입니다 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/default/ncp/42
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTM0NjAxMjQsImV4cCI6MTY5MzU0NjUyNH0.GPzbRQRLrxlZu4ZVlIg_pviNbRGWgfx_QQNiwwiq9xI
+Get http://localhost:8000/results/default/ncp/23
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0MDUzNDEsImV4cCI6MTY5NDQ5MTc0MX0.EzZnKByWYN0jbb_mogFluYy3FjY_lvD2F0dXd1zsrws
 Content-Type: application/json
 
 ### get url info
@@ -122,12 +122,12 @@ Content-Type: application/json
 }
 
 ### money - 사용 금액 내역 (userId)
-Get http://localhost:8000/results/payment/1
+Get http://localhost:8000/results/payment/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTMzNzcyNDMsImV4cCI6MTY5MzQ2MzY0M30._PYhQqklOQ24kA2aY5Bdo8Ro6pePYMQq3ENftSRRskM
 Content-Type: application/json
 
 ### money - 충전 금액 내역 (userId)
-Get http://localhost:8000/payments/1
+Get http://localhost:8000/payments/me
 Authorization:
 Content-Type: application/json
 
@@ -143,3 +143,7 @@ Content-Type: application/json
   "bankName": "우리은행",
   "contactNumber": "010-3628-9823"
 }
+
+###test
+get https://api.effic.biz/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0ODI4NTMsImV4cCI6MTY5NDU2OTI1M30.VbRHK7ATGGfFjFub1KNklXlJ6KhWXXHzGxbOjsakOAU
