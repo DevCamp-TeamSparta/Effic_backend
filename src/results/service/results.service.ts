@@ -10,7 +10,10 @@ import {
   MessagesRepository,
   UrlInfosRepository,
 } from 'src/messages/messages.repository';
-import { UsersRepository } from 'src/users/users.repository';
+import {
+  UserNcpInfoRepository,
+  UsersRepository,
+} from 'src/users/users.repository';
 import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
 import {
   UrlResultsRepository,
@@ -31,6 +34,7 @@ export class ResultsService {
   private logger = new Logger('ResultsService');
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messagesService: MessagesService,
     private readonly messagesRepository: MessagesRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
@@ -45,6 +49,10 @@ export class ResultsService {
   async ncpResult(messageId: number, email: string): Promise<any> {
     const message = await this.messagesRepository.findOneByMessageId(messageId);
     const user = await this.usersRepository.findOneByEmail(email);
+
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      user.userId,
+    );
 
     if (!message || !user) {
       throw new BadRequestException('messageId or email is wrong');
@@ -62,9 +70,9 @@ export class ResultsService {
       const now = Date.now().toString();
       const headers = {
         'x-ncp-apigw-timestamp': now,
-        'x-ncp-iam-access-key': user.accessKey,
+        'x-ncp-iam-access-key': userNcpInfo.accessKey,
         'x-ncp-apigw-signature-v2': await this.makeSignature(
-          user,
+          userNcpInfo,
           requestId,
           now,
         ),
@@ -72,7 +80,7 @@ export class ResultsService {
 
       try {
         const response = await axios.get(
-          `https://sens.apigw.ntruss.com/sms/v2/services/${user.serviceId}/messages?requestId=${requestId}`,
+          `https://sens.apigw.ntruss.com/sms/v2/services/${userNcpInfo.serviceId}/messages?requestId=${requestId}`,
           { headers },
         );
 
@@ -156,21 +164,21 @@ export class ResultsService {
     return statisticsArray;
   }
 
-  async makeSignature(user, requestId, timestamp) {
+  async makeSignature(userNcpInfo, requestId, timestamp) {
     const message = [];
-    const hmac = crypto.createHmac('sha256', user.secretKey);
+    const hmac = crypto.createHmac('sha256', userNcpInfo.secretKey);
     const space = ' ';
     const newLine = '\n';
     const method = 'GET';
     message.push(method);
     message.push(space);
     message.push(
-      `/sms/v2/services/${user.serviceId}/messages?requestId=${requestId}`,
+      `/sms/v2/services/${userNcpInfo.serviceId}/messages?requestId=${requestId}`,
     );
     message.push(newLine);
     message.push(timestamp);
     message.push(newLine);
-    message.push(user.accessKey);
+    message.push(userNcpInfo.accessKey);
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();

@@ -13,6 +13,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
+import { CreatePhonebookDto } from '../dto/create-phonebook.dto';
 
 @Controller('users')
 export class UsersController {
@@ -156,7 +157,7 @@ export class UsersController {
 
   //   const user = await this.usersService.checkUserInfo(email);
 
-  //   return this.usersService.createPhonebook(createPhonebookDto);
+  //   return this.usersService.createPhonebook(user, createPhonebookDto);
   // }
 
   // @Get('/allContacts')

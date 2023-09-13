@@ -7,7 +7,10 @@ import {
   NcpResultsRepository,
   UrlResultsRepository,
 } from './results.repository';
-import { UsersRepository } from 'src/users/users.repository';
+import {
+  UsersRepository,
+  UserNcpInfoRepository,
+} from 'src/users/users.repository';
 import {
   MessageGroupRepo,
   MessagesRepository,
@@ -26,6 +29,7 @@ import { MessagesService } from 'src/messages/service/messages.service';
     ResultsService,
     MessagesService,
     UsersRepository,
+    UserNcpInfoRepository,
     NcpResultsRepository,
     UrlResultsRepository,
     MessagesRepository,

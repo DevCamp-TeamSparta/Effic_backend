@@ -6,16 +6,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { UsersRepository } from '../users.repository';
+import { UserNcpInfoRepository, UsersRepository } from '../users.repository';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { User } from '../user.entity';
 import * as jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../../config/jwt.config';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly userNcpInfoRepository: UserNcpInfoRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -153,7 +155,8 @@ export class UsersService {
     if (user) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     } else {
-      await this.usersRepository.createUser(newUser);
+      const user = await this.usersRepository.createUser(newUser);
+      await this.userNcpInfoRepository.saveNcpInfo(user, newUser);
     }
   }
 
@@ -161,7 +164,7 @@ export class UsersService {
   async updateUser(
     email: string,
     accessToken: string,
-    updateUserDto: Partial<User>,
+    updateUserDto: UpdateUserDto,
   ) {
     const user = await this.usersRepository.findOneByEmail(email);
 
@@ -173,11 +176,35 @@ export class UsersService {
 
     Object.assign(user, updateUserDto);
 
-    if (updateUserDto.email) {
-      throw new HttpException('Cannot change email', HttpStatus.BAD_REQUEST);
+    if (updateUserDto.advertiseNumber) {
+      await this.userNcpInfoRepository.updateNcpInfo(
+        user.userId,
+        updateUserDto,
+      );
     }
 
-    return await this.usersRepository.updateUser(user.userId, updateUserDto);
+    if (updateUserDto.hostnumber) {
+      await this.usersRepository.updateUser(user.userId, updateUserDto);
+      await this.userNcpInfoRepository.updateNcpInfo(
+        user.userId,
+        updateUserDto,
+      );
+    }
+
+    if (updateUserDto.name || updateUserDto.advertisementOpt) {
+      await this.usersRepository.updateUser(user.userId, updateUserDto);
+    }
+
+    if (
+      updateUserDto.accessKey ||
+      updateUserDto.serviceId ||
+      updateUserDto.secretKey
+    ) {
+      await this.userNcpInfoRepository.updateNcpInfo(
+        user.userId,
+        updateUserDto,
+      );
+    }
   }
 
   async logout(user: User) {
@@ -197,4 +224,21 @@ export class UsersService {
   // 전화번호부는 유저가 삭제 및 수정할 수 있음
   // 주소록에는 각 전화번호부의 제목, id가 들어가야함
   // 주소록 id 1번은 각 전화번호부에서 이름과 전화번호를 가져오고, 중복된 값은 한번만 가져옴
+
+  // 전화번호부 생성
+  // async createPhonebook(userId: number, createPhonebookDto) {
+  //   const { title, name, phone, variableKey } = createPhonebookDto;
+  //   const user = await this.usersRepository.findOneByUserId(userId);
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+  //   const phonebook = {
+  //     title,
+  //     name,
+  //     phone,
+  //     variableKey,
+  //   };
+  //   user.phonebooks.push(phonebook);
+  //   await this.usersRepository.save(user);
+  // }
 }
