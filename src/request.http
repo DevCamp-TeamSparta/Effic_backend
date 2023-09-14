@@ -90,10 +90,9 @@ Get http://localhost:8000/results/default/ncp/23
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0MDUzNDEsImV4cCI6MTY5NDQ5MTc0MX0.EzZnKByWYN0jbb_mogFluYy3FjY_lvD2F0dXd1zsrws
 Content-Type: application/json
 
-### get url info
+### tly info
 ### test용입니다. 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/getUrlInfo
-Content-Type: application/json
+Get http://localhost:8000/results/tlyinfo
 
 
 ### create payment
@@ -145,6 +144,10 @@ Content-Type: application/json
   "bankName": "우리은행",
   "contactNumber": "010-3628-9823"
 }
+
+### tly info
+### test용입니다. 실제로 사용되지 않습니다.
+Get http://localhost:8000/results/tlyinfo
 
 ###test
 get https://api.effic.biz/users/me
