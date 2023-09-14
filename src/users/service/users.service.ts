@@ -213,99 +213,103 @@ export class UsersService {
   }
 
   // 마이페이지
-  async findUser(userId: number) {
-    return this.usersRepository.findOneByUserId(userId);
+  async findUserNcpInfo(userId: number) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    return userNcpInfo;
   }
 
   // 주소록 생성
-  async createPhonebook(userId: number, createPhonebookDto) {
-    const { title, member } = createPhonebookDto;
+  //   async createPhonebook(userId: number, createPhonebookDto) {
+  //     const { title, member } = createPhonebookDto;
 
-    const memberList = [];
-    for (let i = 0; i < member.length; i++) {
-      const Contact = await this.entityManager.findOne('AllContacts', {
-        where: {
-          userId: userId,
-          name: member[i].name,
-          number: member[i].number,
-        },
-      });
+  //     const memberList = [];
+  //     for (let i = 0; i < member.length; i++) {
+  //       const Contact = await this.entityManager.findOne('AllContacts', {
+  //         where: {
+  //           userId: userId,
+  //           name: member[i].name,
+  //           number: member[i].number,
+  //         },
+  //       });
 
-      if (!Contact) {
-        const AllContacts = this.entityManager.create('AllContacts', {
-          name: member[i].name,
-          number: member[i].number,
-          userId: userId,
-        });
+  //       if (!Contact) {
+  //         const AllContacts = this.entityManager.create('AllContacts', {
+  //           name: member[i].name,
+  //           number: member[i].number,
+  //           userId: userId,
+  //         });
 
-        await this.entityManager.save(AllContacts);
-        memberList.push(AllContacts.contactId);
-      } else {
-        memberList.push(Contact.contactId);
-      }
-    }
+  //         await this.entityManager.save(AllContacts);
+  //         memberList.push(AllContacts.contactId);
+  //       } else {
+  //         memberList.push(Contact.contactId);
+  //       }
+  //     }
 
-    const PhonebookList = this.entityManager.create('PhonebookList', {
-      title: title,
-      member: memberList,
-      userId: userId,
-    });
+  //     const PhonebookList = this.entityManager.create('PhonebookList', {
+  //       title: title,
+  //       member: memberList,
+  //       userId: userId,
+  //     });
 
-    await this.entityManager.save(PhonebookList);
+  //     await this.entityManager.save(PhonebookList);
 
-    return PhonebookList;
-  }
+  //     return PhonebookList;
+  //   }
 
-  // 주소록 수정 및 일부 삭제
-  async updatePhonebook(userId: number, phonebookId: number, updateDto) {
-    const { title, member } = updateDto;
+  //   // 주소록 수정 및 일부 삭제
+  //   async updatePhonebook(userId: number, phonebookId: number, updateDto) {
+  //     const { title, member } = updateDto;
 
-    const memberList = [];
-    for (let i = 0; i < member.length; i++) {
-      const Contact = await this.entityManager.findOne('AllContacts', {
-        where: {
-          userId: userId,
-          name: member[i].name,
-          number: member[i].number,
-        },
-      });
+  //     const memberList = [];
+  //     for (let i = 0; i < member.length; i++) {
+  //       const Contact = await this.entityManager.findOne('AllContacts', {
+  //         where: {
+  //           userId: userId,
+  //           name: member[i].name,
+  //           number: member[i].number,
+  //         },
+  //       });
 
-      if (!Contact) {
-        const AllContacts = this.entityManager.create('AllContacts', {
-          name: member[i].name,
-          number: member[i].number,
-          userId: userId,
-        });
+  //       if (!Contact) {
+  //         const AllContacts = this.entityManager.create('AllContacts', {
+  //           name: member[i].name,
+  //           number: member[i].number,
+  //           userId: userId,
+  //         });
 
-        await this.entityManager.save(AllContacts);
-        memberList.push(AllContacts.contactId);
-      } else {
-        memberList.push(Contact.contactId);
-      }
-    }
+  //         await this.entityManager.save(AllContacts);
+  //         memberList.push(AllContacts.contactId);
+  //       } else {
+  //         memberList.push(Contact.contactId);
+  //       }
+  //     }
 
-    const PhonebookList = await this.entityManager.findOne('PhonebookList', {
-      where: { phonebookId: phonebookId },
-    });
+  //     const PhonebookList = await this.entityManager.findOne('PhonebookList', {
+  //       where: { phonebookId: phonebookId },
+  //     });
 
-    if (!PhonebookList) {
-      throw new NotFoundException('Phonebook not found');
-    }
+  //     if (!PhonebookList) {
+  //       throw new NotFoundException('Phonebook not found');
+  //     }
 
-    PhonebookList.title = title;
-    PhonebookList.member = memberList;
+  //     PhonebookList.title = title;
+  //     PhonebookList.members = memberList;
 
-    await this.entityManager.save(PhonebookList);
+  //     await this.entityManager.save(PhonebookList);
 
-    return PhonebookList;
-  }
+  //     return PhonebookList;
+  //   }
 
-  // 전체 주소록 조회
-  async findAllContacts(userId: number) {
-    const AllContacts = await this.entityManager.find('AllContacts', {
-      where: { userId: userId },
-    });
+  //   // 전체 주소록 조회
+  //   async findAllContacts(userId: number) {
+  //     const AllContacts = await this.entityManager.find('AllContacts', {
+  //       where: { userId: userId },
+  //     });
 
-    return AllContacts;
-  }
+  //     return AllContacts;
+  //   }
 }

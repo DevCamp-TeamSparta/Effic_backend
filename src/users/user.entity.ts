@@ -94,7 +94,7 @@ export class PhonebookList extends BaseEntity {
   title: string;
 
   @Column({ type: 'varchar', nullable: false })
-  member: string;
+  members: string;
 
   @Column({ type: 'int', nullable: false })
   userId: number;

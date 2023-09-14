@@ -132,7 +132,14 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    return user;
+
+    const userNcpInfo = await this.usersService.findUserNcpInfo(user.userId);
+
+    if (userNcpInfo) {
+      return { user, userNcpInfo };
+    } else {
+      return { user };
+    }
   }
 
   // 한명의 유저가 여러개의 전화번호부를 가질 수 있음
@@ -153,41 +160,41 @@ export class UsersController {
   // contactId: 3, name: '김철희', number: '01099889788', userId: 1
   // PhonebookList db에 저장되는 구성 예시
   // phonebookId: 1, title: Total, member: [phonebookId1, phonebookId2, phonebookId3], userId: 1
-  // phonebookId: 2, title: '점심식사 초청 명단', member: [phonebookId1, phonebookId2], userId: 1
-  // phonebookId: 3, title: '저녁식사 초청 명단', member: [phonebookId2, phonebookId3], userId: 1
-  @Post('/phonebook')
-  async createPhonebook(
-    @Body() createPhonebookDto: CreatePhonebookDto,
-    @Headers('Authorization') authorization: string,
-  ) {
-    this.logger.verbose('Create phonebook');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    return this.usersService.createPhonebook(user.userId, createPhonebookDto);
-  }
+  // phonebookId: 2, title: '점심식사 초청 명단', members: [phonebookId1, phonebookId2], userId: 1
+  // phonebookId: 3, title: '저녁식사 초청 명단', members: [phonebookId2, phonebookId3], userId: 1
+  // @Post('/phonebook')
+  // async createPhonebook(
+  //   @Body() createPhonebookDto: CreatePhonebookDto,
+  //   @Headers('Authorization') authorization: string,
+  // ) {
+  //   this.logger.verbose('Create phonebook');
+  //   const accessToken = authorization.split(' ')[1];
+  //   const decodedAccessToken: any = jwt.decode(accessToken);
+  //   const email = decodedAccessToken.email;
+  //   const user = await this.usersService.checkUserInfo(email);
+  //   return this.usersService.createPhonebook(user.userId, createPhonebookDto);
+  // }
 
-  @Patch('/phonebook')
-  async updatePhonebook(
-    @Body() createPhonebookDto: CreatePhonebookDto,
-    @Headers('Authorization') authorization: string,
-  ) {
-    this.logger.verbose('Update phonebook');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    return this.usersService.updatePhonebook(user.userId, createPhonebookDto);
-  }
+  // @Patch('/phonebook')
+  // async updatePhonebook(
+  //   @Body() createPhonebookDto: CreatePhonebookDto,
+  //   @Headers('Authorization') authorization: string,
+  // ) {
+  //   this.logger.verbose('Update phonebook');
+  //   const accessToken = authorization.split(' ')[1];
+  //   const decodedAccessToken: any = jwt.decode(accessToken);
+  //   const email = decodedAccessToken.email;
+  //   const user = await this.usersService.checkUserInfo(email);
+  //   return this.usersService.updatePhonebook(user.userId, createPhonebookDto);
+  // }
 
-  @Get('/AllContacts')
-  async findAllContacts(@Headers('Authorization') authorization: string) {
-    this.logger.verbose('Find all contacts');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    return this.usersService.findAllContacts(user.userId);
-  }
+  // @Get('/AllContacts')
+  // async findAllContacts(@Headers('Authorization') authorization: string) {
+  //   this.logger.verbose('Find all contacts');
+  //   const accessToken = authorization.split(' ')[1];
+  //   const decodedAccessToken: any = jwt.decode(accessToken);
+  //   const email = decodedAccessToken.email;
+  //   const user = await this.usersService.checkUserInfo(email);
+  //   return this.usersService.findAllContacts(user.userId);
+  // }
 }
