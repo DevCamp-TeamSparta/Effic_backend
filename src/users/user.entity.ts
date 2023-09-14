@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
@@ -93,13 +94,28 @@ export class PhonebookList extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   title: string;
 
-  @Column({ type: 'varchar', nullable: false })
-  members: string;
+  @Column({ array: true, nullable: true, type: 'int', default: [] })
+  members: Array<number>;
+
+  @Column({
+    type: 'timestamptz',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Column({
+    type: 'timestamptz',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   @Column({ type: 'int', nullable: false })
   userId: number;
 
   @ManyToOne(() => User, (user) => user.phonebookList)
+  @JoinColumn({ name: 'userId' })
   user: User;
 }
 
