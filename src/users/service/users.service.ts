@@ -213,8 +213,12 @@ export class UsersService {
   }
 
   // 마이페이지
-  async findUser(userId: number) {
-    return this.usersRepository.findOneByUserId(userId);
+  async findUserNcpInfo(userId: number) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    return userNcpInfo;
   }
 
   // 한명의 유저가 여러개의 전화번호부를 가질 수 있음

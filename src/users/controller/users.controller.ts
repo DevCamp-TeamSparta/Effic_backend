@@ -132,7 +132,27 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException('User not found!');
     }
-    return user;
+
+    const userNcpInfo = await this.usersService.findUserNcpInfo(user.userId);
+
+    if (userNcpInfo) {
+      const userInfo = {
+        userId: user.userId,
+        email: user.email,
+        name: user.name,
+        hostnumber: user.hostnumber,
+        advertisementOpt: user.advertisementOpt,
+        advertiseNumber: userNcpInfo.advertiseNumber,
+        accessKey: userNcpInfo.accessKey,
+        serviceId: userNcpInfo.serviceId,
+        secretKey: userNcpInfo.secretKey,
+        point: user.point,
+        money: user.money,
+      };
+      return userInfo;
+    } else {
+      return { user };
+    }
   }
 
   // 한명의 유저가 여러개의 전화번호부를 가질 수 있음
