@@ -24,13 +24,13 @@ Content-Type: application/json
 
 ### update User-info
 Patch http://localhost:8000/users/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoiY2xvM0BzcGFydGEuY29tIiwiaWF0IjoxNjkzMzg4NTk3LCJleHAiOjE2OTM0NzQ5OTd9.Gb7okqJIgwjQVd2MRmuUwle2h0jntllfzLMYp-gKOcQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk0NTk2ODgxLCJleHAiOjE2OTQ2ODMyODF9.Q2y91DtvtO-iXnBleP_ui9YF42rg7hv-1kntw0Dw38c
 Content-Type: application/json
 
 {
-    "hostnumber": ["01036289827"],
+    "hostnumber": ["15228016"],
     "advertiseNumber": ["0801111112"],
-    "name": "clo2"
+    "name": "clo"
 }
 
 ### logout
@@ -146,6 +146,6 @@ Content-Type: application/json
   "contactNumber": "010-3628-9823"
 }
 
-###test
-get https://api.effic.biz/users/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0ODI4NTMsImV4cCI6MTY5NDU2OTI1M30.VbRHK7ATGGfFjFub1KNklXlJ6KhWXXHzGxbOjsakOAU
+### 마이페이지
+Get http://localhost:8000/users/me
+Authorization: Bearer

@@ -5,13 +5,9 @@ export class CreatePhonebookDto {
   @IsNotEmpty()
   title: string;
 
-  @IsString()
-  @IsOptional()
-  name: string;
-
-  @IsString()
+  @IsArray()
   @IsNotEmpty()
-  phone: string;
+  member: string[];
 
   @IsArray()
   @IsOptional()

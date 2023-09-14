@@ -143,34 +143,51 @@ export class UsersController {
   // 주소록에는 각 전화번호부의 제목, id가 들어가야함
   // 주소록 id 1번은 각 전화번호부에서 이름과 전화번호를 가져오고, 중복된 값은 한번만 가져옴
 
-  // @Post('/phonebook')
-  // async createPhonebook(
-  //   @Body() createPhonebookDto: CreatePhonebookDto,
-  //   @Headers('Authorization') authorization: string,
-  // ) {
-  //   this.logger.verbose('User create phonebook');
+  // 전화번호부 생성
+  // 전화번호부의 구성 예시
+  // title: '점심식사 초청 명단', [{name: '김철수', number: '01012345678'}, {name: '김영희', number: '01087654321'}]
+  // title: '저녁식사 초청 명단', [{name: '김철희', number: '01099889788'}, {name: '김영희', number: '01087654321'}]
+  // AllContacts db에 저장되는 구성 예시
+  // contactId: 1, name: '김철수', number: '01012345678', userId: 1
+  // contactId: 2, name: '김영희', number: '01087654321', userId: 1
+  // contactId: 3, name: '김철희', number: '01099889788', userId: 1
+  // PhonebookList db에 저장되는 구성 예시
+  // phonebookId: 1, title: Total, member: [phonebookId1, phonebookId2, phonebookId3], userId: 1
+  // phonebookId: 2, title: '점심식사 초청 명단', member: [phonebookId1, phonebookId2], userId: 1
+  // phonebookId: 3, title: '저녁식사 초청 명단', member: [phonebookId2, phonebookId3], userId: 1
+  @Post('/phonebook')
+  async createPhonebook(
+    @Body() createPhonebookDto: CreatePhonebookDto,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Create phonebook');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+    const user = await this.usersService.checkUserInfo(email);
+    return this.usersService.createPhonebook(user.userId, createPhonebookDto);
+  }
 
-  //   const accessToken = authorization.split(' ')[1];
-  //   const decodedAccessToken: any = jwt.decode(accessToken);
+  @Patch('/phonebook')
+  async updatePhonebook(
+    @Body() createPhonebookDto: CreatePhonebookDto,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Update phonebook');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+    const user = await this.usersService.checkUserInfo(email);
+    return this.usersService.updatePhonebook(user.userId, createPhonebookDto);
+  }
 
-  //   const email = decodedAccessToken.email;
-
-  //   const user = await this.usersService.checkUserInfo(email);
-
-  //   return this.usersService.createPhonebook(user, createPhonebookDto);
-  // }
-
-  // @Get('/allContacts')
-  // async findAllContacts(@Headers('Authorization') authorization: string) {
-  //   this.logger.verbose('User all contacts');
-
-  //   const accessToken = authorization.split(' ')[1];
-  //   const decodedAccessToken: any = jwt.decode(accessToken);
-
-  //   const email = decodedAccessToken.email;
-
-  //   const user = await this.usersService.checkUserInfo(email);
-
-  //   return this.usersService.findAllContacts();
-  // }
+  @Get('/AllContacts')
+  async findAllContacts(@Headers('Authorization') authorization: string) {
+    this.logger.verbose('Find all contacts');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+    const user = await this.usersService.checkUserInfo(email);
+    return this.usersService.findAllContacts(user.userId);
+  }
 }

@@ -4,6 +4,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
@@ -53,6 +54,11 @@ export class User extends BaseEntity {
     cascade: true,
   })
   urlResults: UrlResult[];
+
+  @OneToMany(() => PhonebookList, (phonebookList) => phonebookList.user, {
+    cascade: true,
+  })
+  phonebookList: PhonebookList[];
 }
 
 @Entity()
@@ -74,6 +80,39 @@ export class UserNcpInfo extends BaseEntity {
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+}
+
+@Entity()
+export class PhonebookList extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  phonebookId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  title: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  member: string;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.phonebookList)
+  user: User;
+}
+
+@Entity()
+export class AllContacts extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  contactId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  name: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  number: string;
 
   @Column({ type: 'int', nullable: false })
   userId: number;
