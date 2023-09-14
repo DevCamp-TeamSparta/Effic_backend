@@ -136,7 +136,20 @@ export class UsersController {
     const userNcpInfo = await this.usersService.findUserNcpInfo(user.userId);
 
     if (userNcpInfo) {
-      return { user, userNcpInfo };
+      const userInfo = {
+        userId: user.userId,
+        email: user.email,
+        name: user.name,
+        hostnumber: user.hostnumber,
+        advertisementOpt: user.advertisementOpt,
+        advertiseNumber: userNcpInfo.advertiseNumber,
+        accessKey: userNcpInfo.accessKey,
+        serviceId: userNcpInfo.serviceId,
+        secretKey: userNcpInfo.secretKey,
+        point: user.point,
+        money: user.money,
+      };
+      return userInfo;
     } else {
       return { user };
     }
