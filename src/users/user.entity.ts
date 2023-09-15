@@ -8,6 +8,7 @@ import {
 import { Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
 import { NcpResult, UrlResult } from '../results/result.entity';
+import { PhonebookList } from 'src/phonebook/phonebook.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -53,6 +54,11 @@ export class User extends BaseEntity {
     cascade: true,
   })
   urlResults: UrlResult[];
+
+  @OneToMany(() => PhonebookList, (phonebookList) => phonebookList.user, {
+    cascade: true,
+  })
+  phonebookList: PhonebookList[];
 }
 
 @Entity()
