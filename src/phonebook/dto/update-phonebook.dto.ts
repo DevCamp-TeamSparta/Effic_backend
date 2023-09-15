@@ -8,4 +8,8 @@ export class UpdatePhonebookDto {
   @IsString()
   @IsOptional()
   number: string;
+
+  @IsString()
+  @IsOptional()
+  title: string;
 }

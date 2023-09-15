@@ -194,41 +194,59 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 
 # [
 #   {
+#     "phonebookId": 4,
+#     "title": "에픽 초청 명단",
+#     "membersAmount": 2,
+#     "createdAt": "2023-09-15T02:19:03.011Z",
+#     "updatedAt": "2023-09-15T02:19:03.011Z",
+#     "userId": 1
+#   },
+#   {
 #     "phonebookId": 1,
 #     "title": "점심식사 초청 명단",
-#     "members": [
-#       1
-#     ],
+#     "membersAmount": 1,
 #     "createdAt": "2023-09-14T08:14:35.553Z",
 #     "updatedAt": "2023-09-14T09:11:01.268Z",
 #     "userId": 1
 #   },
 #   {
 #     "phonebookId": 3,
-#     "title": "스파르타 초청 명단",
-#     "members": [
-#       4,
-#       2
-#     ],
+#     "title": "항해99 초청 명단",
+#     "membersAmount": 1,
 #     "createdAt": "2023-09-14T09:20:57.528Z",
-#     "updatedAt": "2023-09-14T09:20:57.533Z",
+#     "updatedAt": "2023-09-15T02:30:25.402Z",
 #     "userId": 1
 #   },
 #   {
 #     "phonebookId": 2,
-#     "title": "저녁식사 초청 명단",
-#     "members": [
-#       2,
-#       3
-#     ],
+#     "title": "정글 초청 명단",
+#     "membersAmount": 2,
 #     "createdAt": "2023-09-14T08:15:22.739Z",
-#     "updatedAt": "2023-09-14T09:21:28.217Z",
+#     "updatedAt": "2023-09-15T02:30:46.867Z",
 #     "userId": 1
 #   }
 # ]
 
+### 주소록 멤버 조회
+Get http://localhost:8000/phonebook/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+
+# [
+#   {
+#     "contactId": 2,
+#     "name": "김영희",
+#     "number": "01087654321"
+#   },
+#   {
+#     "contactId": 3,
+#     "name": "김철희",
+#     "number": "01099889786"
+#   }
+# ]
+
+
 ### 주소록 멤버 삭제
-Delete http://localhost:8000/phonebook/1/2
+Delete http://localhost:8000/phonebook/3/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 
 # {
@@ -239,5 +257,49 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #   ],
 #   "createdAt": "2023-09-14T08:14:35.553Z",
 #   "updatedAt": "2023-09-14T09:11:01.268Z",
+#   "userId": 1
+# }
+
+### 주소록 title 수정
+Patch http://localhost:8000/phonebook/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "title": "정글 초청 명단"
+}
+
+# {
+#   "phonebookId": 2,
+#   "title": "정글 초청 명단",
+#   "members": [
+#     2,
+#     3
+#   ],
+#   "createdAt": "2023-09-14T08:15:22.739Z",
+#   "updatedAt": "2023-09-15T02:30:46.867Z",
+#   "userId": 1
+# }
+
+### 주소록 멤버 추가
+Post http://localhost:8000/phonebook/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "addMembers": [{"name": "권용재", "number": "01099889783"}, {"name": "방민석", "number": "01099998887"}, {"name": "김영희", "number": "01087654321"}]
+}
+
+# {
+#   "phonebookId": 4,
+#   "title": "에픽 초청 명단",
+#   "members": [
+#     5,
+#     2,
+#     10,
+#     11
+#   ],
+#   "createdAt": "2023-09-15T02:19:03.011Z",
+#   "updatedAt": "2023-09-15T03:24:48.852Z",
 #   "userId": 1
 # }

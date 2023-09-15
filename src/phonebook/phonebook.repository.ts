@@ -15,6 +15,10 @@ export class PhonebookListRepository extends Repository<PhonebookList> {
   async findOneByPhonebookIdAndUserId(phonebookId, userId) {
     return await this.findOne({ where: { phonebookId, userId } });
   }
+
+  async findAllByUserId(userId) {
+    return await this.find({ where: { userId } });
+  }
 }
 
 @Injectable()

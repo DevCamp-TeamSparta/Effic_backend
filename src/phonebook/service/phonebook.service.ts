@@ -126,17 +126,65 @@ export class PhonebookService {
 
   // 주소록 목록 조회
   async findphonebookList(userId: number) {
-    const PhonebookList = await this.entityManager.find('PhonebookList', {
-      where: {
-        userId: userId,
-      },
-    });
+    const PhonebookList = await this.phonebookListRepository.findAllByUserId(
+      userId,
+    );
 
-    return PhonebookList;
+    if (!PhonebookList) {
+      throw new HttpException('Phonebook not found', HttpStatus.NOT_FOUND);
+    }
+
+    const result = [];
+    for (let i = 0; i < PhonebookList.length; i++) {
+      const members = PhonebookList[i].members.length;
+      const phonebook = {
+        phonebookId: PhonebookList[i].phonebookId,
+        title: PhonebookList[i].title,
+        membersAmount: members,
+        createdAt: PhonebookList[i].createdAt,
+        updatedAt: PhonebookList[i].updatedAt,
+        userId: PhonebookList[i].userId,
+      };
+      result.push(phonebook);
+    }
+
+    return result;
+  }
+
+  // 주소록 멤버 조회
+  async findPhonebookMember(userId: number, phonebookId: number) {
+    const Phonebook =
+      await this.phonebookListRepository.findOneByPhonebookIdAndUserId(
+        phonebookId,
+        userId,
+      );
+
+    if (!Phonebook) {
+      throw new HttpException('Phonebook not found', HttpStatus.NOT_FOUND);
+    }
+
+    const result = [];
+    for (let i = 0; i < Phonebook.members.length; i++) {
+      const Contact = await this.allContactsRepository.findOneByContactId(
+        Phonebook.members[i],
+      );
+      const member = {
+        contactId: Contact.contactId,
+        name: Contact.name,
+        number: Contact.number,
+      };
+      result.push(member);
+    }
+
+    return result;
   }
 
   // 주소록 멤버 삭제
-  async deletePhonebookMember(userId: number, phonebookId: number, contactId) {
+  async deletePhonebookMember(
+    userId: number,
+    phonebookId: number,
+    contactId: number,
+  ) {
     const Phonebook =
       await this.phonebookListRepository.findOneByPhonebookIdAndUserId(
         phonebookId,
@@ -165,5 +213,82 @@ export class PhonebookService {
     const renewPhonebook = await this.entityManager.save(Phonebook);
 
     return renewPhonebook;
+  }
+
+  // 주소록 title 수정
+  async updatePhonebookTitle(
+    userId: number,
+    phonebookId: number,
+    title: string,
+  ) {
+    const Phonebook =
+      await this.phonebookListRepository.findOneByPhonebookIdAndUserId(
+        phonebookId,
+        userId,
+      );
+
+    if (!Phonebook) {
+      throw new HttpException('Phonebook not found', HttpStatus.NOT_FOUND);
+    }
+
+    Phonebook.title = title;
+    Phonebook.updatedAt = new Date();
+
+    await this.entityManager.save(Phonebook);
+
+    return Phonebook;
+  }
+
+  // 주소록 멤버 추가
+  async addPhonebookMember(
+    userId: number,
+    phonebookId: number,
+    addPhonebookMemberDto,
+  ) {
+    const Phonebook =
+      await this.phonebookListRepository.findOneByPhonebookIdAndUserId(
+        phonebookId,
+        userId,
+      );
+
+    if (!Phonebook) {
+      throw new HttpException('Phonebook not found', HttpStatus.NOT_FOUND);
+    }
+
+    const { addMembers } = addPhonebookMemberDto;
+
+    const memberList = [];
+    for (let i = 0; i < addMembers.length; i++) {
+      const Contact =
+        await this.allContactsRepository.findOneByUserIdAndNameAndPhoneNumber(
+          userId,
+          addMembers[i].name,
+          addMembers[i].number,
+        );
+
+      if (!Contact) {
+        const newContact = new AllContacts();
+        newContact.name = addMembers[i].name;
+        newContact.number = addMembers[i].number;
+        newContact.userId = userId;
+
+        await this.entityManager.save(newContact);
+        memberList.push(newContact.contactId);
+      } else {
+        memberList.push(Contact.contactId);
+      }
+    }
+
+    const newMemberList = Phonebook.members.concat(memberList);
+    const uniqueMemberList = newMemberList.filter(
+      (item, index) => newMemberList.indexOf(item) === index,
+    );
+
+    Phonebook.members = uniqueMemberList;
+    Phonebook.updatedAt = new Date();
+
+    await this.entityManager.save(Phonebook);
+
+    return Phonebook;
   }
 }
