@@ -68,6 +68,9 @@ export class Message extends BaseEntity {
   @ManyToOne(() => MessageGroup, (group) => group.messages)
   @JoinColumn({ name: 'messageGroupId' })
   messageGroup: Promise<MessageGroup>;
+
+  @OneToMany(() => ALLReceiverList, (receiver) => receiver.message)
+  allReceiverList: ALLReceiverList[];
 }
 
 @Entity()
@@ -156,4 +159,33 @@ export class UrlInfo extends BaseEntity {
     foreignKeyConstraintName: 'firstShortenId',
   })
   tlyUrlInfo: TlyUrlInfo;
+}
+
+@Entity()
+export class ALLReceiverList extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  receiverId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  name: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  number: string;
+
+  @Column({ type: 'timestamptz', nullable: false })
+  sentAt: Date;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.allReceiverList)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ type: 'int', nullable: true })
+  messageId: number;
+
+  @ManyToOne(() => Message, (message) => message.allReceiverList)
+  @JoinColumn({ name: 'messageId' })
+  message: Message;
 }

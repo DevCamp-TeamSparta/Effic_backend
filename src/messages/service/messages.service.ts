@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, All } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import {
@@ -9,7 +9,7 @@ import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
 import { shortIoConfig, tlyConfig } from 'config/short-io.config';
-import { Message, TlyUrlInfo } from '../message.entity';
+import { Message, TlyUrlInfo, ALLReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { UrlInfo } from '../message.entity';
@@ -394,7 +394,7 @@ export class MessagesService {
     return 'success';
   }
 
-  // hostnumbercheck 메세지
+  // hostnumbercheck 메세지 보내기
   async checkHostNumberMessage(checkHostNumberDto) {
     const body = {
       type: 'LMS',
@@ -478,6 +478,7 @@ export class MessagesService {
     let takeAbMessageInfo;
     // A, B 메세지 보내기
     for (let i = 0; i < 3; i++) {
+      // A 메세지 보내기 + 저장
       if (i < 1) {
         const requestIdList: string[] = [];
         const receiverList = aTestReceiver;
@@ -586,5 +587,19 @@ export class MessagesService {
   catch(error) {
     console.log(error);
     throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+  }
+
+  // AllRecieverList에 저장
+  async saveAllReceiverList(receiverList, userId, messageId, now) {
+    // receiverList를 돌면서 그 안의 member의 이름과 번호를 AllReceiverList 테이블에 저장
+    for (let i = 0; i < receiverList.length; i++) {
+      const allReceiverList = new ALLReceiverList();
+      allReceiverList.name = receiverList[i].name;
+      allReceiverList.number = receiverList[i].phone;
+      allReceiverList.userId = userId;
+      allReceiverList.messageId = messageId;
+      allReceiverList.sentAt = now;
+      await this.entityManager.save(allReceiverList);
+    }
   }
 }

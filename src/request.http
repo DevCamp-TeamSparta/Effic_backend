@@ -155,9 +155,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "title": "
-    
-     초청 명단",
+    "title": "에픽 초청 명단",
     "members": [{"name": "권용재", "number": "01099889783"}, {"name": "김영희", "number": "01087654321"}]
 }
 
@@ -235,14 +233,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 
 # [
 #   {
-#     "contactId": 2,
-#     "name": "김영희",
-#     "number": "01087654321"
-#   },
-#   {
-#     "contactId": 3,
-#     "name": "김철희",
-#     "number": "01099889786"
+#     "phonebookId": 2,
+#     "title": "정글 초청 명단",
+#     "createdAt": "2023-09-14T08:15:22.739Z",
+#     "updatedAt": "2023-09-15T02:30:46.867Z",
+#     "userId": 1,
+#     "memberInfo": [
+#       {
+#         "contactId": 2,
+#         "name": "김영희",
+#         "number": "01087654321"
+#       },
+#       {
+#         "contactId": 3,
+#         "name": "김철희",
+#         "number": "01099889786"
+#       }
+#     ]
 #   }
 # ]
 

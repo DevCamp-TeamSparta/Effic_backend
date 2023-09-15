@@ -6,6 +6,7 @@ import {
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { AllContacts } from '../phonebook.entity';
+import { title } from 'process';
 
 @Injectable()
 export class PhonebookService {
@@ -162,6 +163,7 @@ export class PhonebookService {
     }
 
     const result = [];
+    const memberInfo = [];
     for (let i = 0; i < Phonebook.members.length; i++) {
       const Contact = await this.allContactsRepository.findOneByContactId(
         Phonebook.members[i],
@@ -171,9 +173,16 @@ export class PhonebookService {
         name: Contact.name,
         number: Contact.number,
       };
-      result.push(member);
+      memberInfo.push(member);
     }
-
+    result.push({
+      phonebookId: Phonebook.phonebookId,
+      title: Phonebook.title,
+      createdAt: Phonebook.createdAt,
+      updatedAt: Phonebook.updatedAt,
+      userId: Phonebook.userId,
+      memberInfo: memberInfo,
+    });
     return result;
   }
 
