@@ -14,6 +14,7 @@ export class MessagesController {
   private logger = new Logger('MessagesController');
   constructor(private messagesService: MessagesService) {}
 
+  // 기본메세지 보내기
   @Post('/default')
   async defaultMessage(
     @Body(new DefaultMessageValidationPipe())
@@ -34,6 +35,7 @@ export class MessagesController {
     return { ...messageId };
   }
 
+  // ab 메세지 보내기
   @Post('/abtest')
   async abTestMessage(
     @Body(new abTestMessageValidationPipe())
@@ -58,6 +60,7 @@ export class MessagesController {
     };
   }
 
+  // 테스트 메세지 보내기
   @Post('/test')
   async testMessage(
     @Body(new TestMessageValidationPipe())
@@ -79,6 +82,7 @@ export class MessagesController {
     return { message };
   }
 
+  // 발신번호 확인
   @Post('/checkhostnumber')
   async checkHostNumber(@Body() checkHostNumberDto: CheckHostNumberDto) {
     this.logger.verbose('Check host number');
@@ -90,6 +94,7 @@ export class MessagesController {
     return { message };
   }
 
+  // 그룹 리스트 가져오기
   @Get('/group')
   async getGroupList(@Headers('Authorization') authorization: string) {
     const accessToken = authorization.split(' ')[1];
@@ -100,4 +105,7 @@ export class MessagesController {
 
     return { groupList };
   }
+
+  // 3일 이내 수신자 리스트 가져오기
+  //
 }
