@@ -46,7 +46,7 @@ export class AllContacts extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   contactId: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   name: string;
 
   @Column({ type: 'varchar', nullable: false })
