@@ -19,7 +19,6 @@ export class PhonebookService {
   async createPhonebook(userId: number, createPhonebookDto) {
     const { title, members } = createPhonebookDto;
 
-    // 같은 title이 있으면 에러
     const Phonebook = await this.entityManager.findOne('PhonebookList', {
       where: {
         userId: userId,
@@ -34,7 +33,6 @@ export class PhonebookService {
       );
     }
 
-    // 이미 멤버가 있는지 확인
     const memberList = [];
     for (let i = 0; i < members.length; i++) {
       const Contact =
