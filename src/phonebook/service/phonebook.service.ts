@@ -174,15 +174,14 @@ export class PhonebookService {
       };
       memberInfoList.push(member);
     }
-    result.push({
+    return {
       phonebookId: Phonebook.phonebookId,
       title: Phonebook.title,
       createdAt: Phonebook.createdAt,
       updatedAt: Phonebook.updatedAt,
       userId: Phonebook.userId,
-      memberInfo: memberInfoList,
-    });
-    return result;
+      memberInfoList: memberInfoList,
+    };
   }
 
   // 주소록 멤버 삭제
