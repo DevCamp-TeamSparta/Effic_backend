@@ -5,8 +5,6 @@ import {
   NotFoundException,
   Post,
   Patch,
-  Param,
-  Delete,
   Headers,
   Logger,
 } from '@nestjs/common';
@@ -15,8 +13,6 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
-import { CreatePhonebookDto } from '../dto/create-phonebook.dto';
-import { UpdatePhonebookDto } from '../dto/update-phonebook.dto';
 
 @Controller('users')
 export class UsersController {
@@ -156,70 +152,5 @@ export class UsersController {
     } else {
       return { user };
     }
-  }
-
-  // 주소록 생성
-  @Post('/phonebook')
-  async createPhonebook(
-    @Body() createPhonebookDto: CreatePhonebookDto,
-    @Headers('Authorization') authorization: string,
-  ): Promise<object> {
-    this.logger.verbose('Create phonebook');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    return this.usersService.createPhonebook(user.userId, createPhonebookDto);
-  }
-
-  // 주소록 멤버 수정
-  @Patch('/phonebook/:phonebookId/:contactId')
-  async updatePhonebook(
-    @Body() updatePhonebookDto: UpdatePhonebookDto,
-    @Headers('Authorization') authorization: string,
-    @Param('phonebookId') phonebookId: number,
-    @Param('contactId') contactId: number,
-  ): Promise<object> {
-    this.logger.verbose('Update phonebook');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    return this.usersService.updatePhonebook(
-      user.userId,
-      phonebookId,
-      contactId,
-      updatePhonebookDto,
-    );
-  }
-
-  // 주소록 목록 조회
-  @Get('/AllContacts')
-  async findphonebookList(@Headers('Authorization') authorization: string) {
-    this.logger.verbose('Find all contacts');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    return this.usersService.findphonebookList(user.userId);
-  }
-
-  // 주소록 멤버 삭제
-  @Delete('/phonebook/:phonebookId/:contactId')
-  async deletePhonebookMember(
-    @Headers('Authorization') authorization: string,
-    @Param('phonebookId') phonebookId: number,
-    @Param('contactId') contactId: number,
-  ): Promise<object> {
-    this.logger.verbose('Delete phonebook member');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    return this.usersService.deletePhonebookMember(
-      user.userId,
-      phonebookId,
-      contactId,
-    );
   }
 }

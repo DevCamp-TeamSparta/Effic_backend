@@ -4,12 +4,11 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToMany,
-  ManyToOne,
-  JoinColumn,
 } from 'typeorm';
 import { Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
 import { NcpResult, UrlResult } from '../results/result.entity';
+import { PhonebookList } from 'src/phonebook/phonebook.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -81,54 +80,6 @@ export class UserNcpInfo extends BaseEntity {
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
-
-  @Column({ type: 'int', nullable: false })
-  userId: number;
-}
-
-@Entity()
-export class PhonebookList extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'int' })
-  phonebookId: number;
-
-  @Column({ type: 'varchar', nullable: false })
-  title: string;
-
-  @Column({ array: true, nullable: true, type: 'int', default: [] })
-  members: Array<number>;
-
-  @Column({
-    type: 'timestamptz',
-    nullable: false,
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @Column({
-    type: 'timestamptz',
-    nullable: false,
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
-
-  @Column({ type: 'int', nullable: false })
-  userId: number;
-
-  @ManyToOne(() => User, (user) => user.phonebookList)
-  @JoinColumn({ name: 'userId' })
-  user: User;
-}
-
-@Entity()
-export class AllContacts extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'int' })
-  contactId: number;
-
-  @Column({ type: 'varchar', nullable: false })
-  name: string;
-
-  @Column({ type: 'varchar', nullable: false })
-  number: string;
 
   @Column({ type: 'int', nullable: false })
   userId: number;

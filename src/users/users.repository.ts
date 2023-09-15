@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AllContacts, User, UserNcpInfo, PhonebookList } from './user.entity';
+import { User, UserNcpInfo } from './user.entity';
 import { Repository, DataSource } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -106,39 +106,5 @@ export class UserNcpInfoRepository extends Repository<UserNcpInfo> {
       }
     }
     return await this.save(user);
-  }
-}
-
-@Injectable()
-export class AllContactsRepository extends Repository<AllContacts> {
-  constructor(private datasource: DataSource) {
-    super(AllContacts, datasource.createEntityManager());
-  }
-  async findOneByUserIdAndNameAndPhoneNumber(userId, name, number) {
-    return await this.findOne({
-      where: {
-        userId: userId,
-        name: name,
-        number: number,
-      },
-    });
-  }
-
-  async findOneByContactId(contactId) {
-    return await this.findOne({ where: { contactId } });
-  }
-}
-
-@Injectable()
-export class PhonebookListRepository extends Repository<PhonebookList> {
-  constructor(private datasource: DataSource) {
-    super(PhonebookList, datasource.createEntityManager());
-  }
-  async findOneByPhonebookId(phonebookId) {
-    return await this.findOne({ where: { phonebookId } });
-  }
-
-  async findOneByPhonebookIdAndUserId(phonebookId, userId) {
-    return await this.findOne({ where: { phonebookId, userId } });
   }
 }
