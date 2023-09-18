@@ -69,7 +69,9 @@ export class Message extends BaseEntity {
   @JoinColumn({ name: 'messageGroupId' })
   messageGroup: Promise<MessageGroup>;
 
-  @OneToMany(() => ALLReceiverList, (receiver) => receiver.message)
+  @OneToMany(() => ALLReceiverList, (receiver) => receiver.message, {
+    cascade: true,
+  })
   allReceiverList: ALLReceiverList[];
 }
 
@@ -78,7 +80,9 @@ export class MessageGroup extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @OneToMany(() => Message, (message) => message.messageGroup)
+  @OneToMany(() => Message, (message) => message.messageGroup, {
+    cascade: true,
+  })
   messages: Message[];
 
   @Column({ type: 'int', nullable: false })
