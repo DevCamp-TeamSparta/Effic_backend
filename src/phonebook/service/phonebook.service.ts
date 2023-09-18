@@ -278,4 +278,25 @@ export class PhonebookService {
 
     return Phonebook;
   }
+
+  // 주소록 삭제
+  async deletePhonebook(userId: number, phonebookId: number) {
+    const Phonebook =
+      await this.phonebookListRepository.findOneByPhonebookIdAndUserId(
+        phonebookId,
+        userId,
+      );
+
+    if (!Phonebook) {
+      throw new HttpException('Phonebook not found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.entityManager.delete('PhonebookList', {
+      phonebookId: phonebookId,
+    });
+
+    return {
+      message: 'Phonebook deleted successfully',
+    };
+  }
 }

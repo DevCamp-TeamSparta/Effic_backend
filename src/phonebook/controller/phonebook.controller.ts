@@ -143,4 +143,18 @@ export class PhonebookController {
       addPhonebookMemberDto,
     );
   }
+
+  // 주소록 삭제
+  @Delete('/:phonebookId')
+  async deletePhonebook(
+    @Headers('Authorization') authorization: string,
+    @Param('phonebookId') phonebookId: number,
+  ): Promise<object> {
+    this.logger.verbose('Delete phonebook');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+    const user = await this.usersService.checkUserInfo(email);
+    return this.phonebookService.deletePhonebook(user.userId, phonebookId);
+  }
 }
