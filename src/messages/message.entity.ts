@@ -71,10 +71,10 @@ export class Message extends BaseEntity {
   @JoinColumn({ name: 'messageGroupId' })
   messageGroup: Promise<MessageGroup>;
 
-  @OneToMany(() => ALLReceiverList, (receiver) => receiver.message, {
+  @OneToMany(() => AllReceiverList, (receiver) => receiver.message, {
     cascade: true,
   })
-  allReceiverList: ALLReceiverList[];
+  allReceiverList: AllReceiverList[];
 }
 
 @Entity()
@@ -167,7 +167,7 @@ export class UrlInfo extends BaseEntity {
 }
 
 @Entity()
-export class ALLReceiverList extends BaseEntity {
+export class AllReceiverList extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   receiverId: number;
 

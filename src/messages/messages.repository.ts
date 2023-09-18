@@ -4,6 +4,7 @@ import {
   MessageContent,
   MessageGroup,
   UrlInfo,
+  AllReceiverList,
 } from './message.entity';
 import { Repository, DataSource } from 'typeorm';
 
@@ -104,5 +105,20 @@ export class MessageGroupRepo extends Repository<MessageGroup> {
     const messageGroup = new MessageGroup();
     messageGroup.userId = userId;
     return await this.save(messageGroup);
+  }
+}
+
+@Injectable()
+export class AllReceiverRepository extends Repository<AllReceiverList> {
+  constructor(private datasource: DataSource) {
+    super(AllReceiverList, datasource.createEntityManager());
+  }
+
+  async findAllByUserIdAndSentAt(userId: number, threeDaysAgoDate) {
+    return await this.createQueryBuilder('receiver')
+      .leftJoinAndSelect('receiver.message', 'message')
+      .where('receiver.userId = :userId', { userId })
+      .andWhere('message.sentAt > :threeDaysAgoDate', { threeDaysAgoDate })
+      .getMany();
   }
 }

@@ -54,4 +54,18 @@ export class AllContacts extends BaseEntity {
 
   @Column({ type: 'int', nullable: false })
   userId: number;
+
+  @Column({
+    type: 'timestamptz',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Column({
+    type: 'timestamptz',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 }

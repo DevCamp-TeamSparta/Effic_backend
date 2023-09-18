@@ -9,11 +9,12 @@ import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
 import { shortIoConfig, tlyConfig } from 'config/short-io.config';
-import { Message, TlyUrlInfo, ALLReceiverList } from '../message.entity';
+import { Message, TlyUrlInfo, AllReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { UrlInfo } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
+import { AllReceiverRepository } from '../messages.repository';
 import { UsedPayments } from 'src/results/result.entity';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class MessagesService {
     private readonly usersRepository: UsersRepository,
     private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
+    private readonly allReceiverRepository: AllReceiverRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -606,7 +608,7 @@ export class MessagesService {
   // AllRecieverList에 저장
   async saveAllReceiverList(receiverList, userId, messageGroupId, now) {
     for (let i = 0; i < receiverList.length; i++) {
-      const allReceiverList = new ALLReceiverList();
+      const allReceiverList = new AllReceiverList();
       allReceiverList.name = receiverList[i].name;
       allReceiverList.number = receiverList[i].phone;
       allReceiverList.userId = userId;
@@ -619,21 +621,30 @@ export class MessagesService {
   // 3일 이내 수신자 필터링
   async filterReceiver(email, filterReceiverDto) {
     const user = await this.usersRepository.findOneByEmail(email);
+
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    const threeDaysAgoDate = threeDaysAgo.toISOString().slice(0, 10);
 
-    const receiverList = await this.entityManager
-      .createQueryBuilder(ALLReceiverList, 'receiverList')
-      .where('receiverList.userId = :userId', { userId: user.userId })
-      .andWhere('receiverList.sentAt > :threeDaysAgo', { threeDaysAgo })
-      .getMany();
+    console.log(threeDaysAgoDate);
 
-    const receiverNumberList = receiverList.map((receiver) => receiver.number);
+    const allReceiverList =
+      await this.allReceiverRepository.findAllByUserIdAndSentAt(
+        user.userId,
+        threeDaysAgoDate,
+      );
 
-    const filteredReceiverList = filterReceiverDto.filter(
-      (number) => !receiverNumberList.includes(number),
+    console.log(allReceiverList);
+
+    // filterReceiverDto의 수신자 리스트와 allReceiverList의 수신자 리스트를 비교하여
+    // allReceiverList에 없는 수신자 리스트를 리턴
+    // filterReceiverDto의 예시 : "receiverList": ["01799998888", "01999989889", "01899989278"]
+
+    const filterReceiverList = filterReceiverDto.receiverList;
+    const result = filterReceiverList.filter(
+      (x) => !allReceiverList.some((y) => y.number === x),
     );
 
-    return filteredReceiverList;
+    return { result };
   }
 }

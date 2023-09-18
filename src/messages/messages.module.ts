@@ -12,6 +12,7 @@ import {
   MessagesContentRepository,
   UrlInfosRepository,
   MessageGroupRepo,
+  AllReceiverRepository,
 } from './messages.repository';
 import { ResultsService } from 'src/results/service/results.service';
 import { UrlResultsRepository } from 'src/results/results.repository';
@@ -33,6 +34,7 @@ import { NcpResultsRepository } from 'src/results/results.repository';
     NcpResultsRepository,
     MessagesContentRepository,
     MessageGroupRepo,
+    AllReceiverRepository,
   ],
   exports: [
     MessagesService,
@@ -40,6 +42,7 @@ import { NcpResultsRepository } from 'src/results/results.repository';
     UrlInfosRepository,
     MessagesContentRepository,
     MessageGroupRepo,
+    AllReceiverRepository,
   ],
 })
 export class MessageModule {}

@@ -47,6 +47,7 @@ export class PhonebookService {
         newContact.name = members[i].name;
         newContact.number = members[i].number;
         newContact.userId = userId;
+        newContact.createdAt = new Date();
 
         await this.entityManager.save(newContact);
         memberList.push(newContact.contactId);
@@ -89,10 +90,13 @@ export class PhonebookService {
     if (name && number) {
       Contact.name = name;
       Contact.number = number;
+      Contact.updatedAt = new Date();
     } else if (name) {
       Contact.name = name;
+      Contact.updatedAt = new Date();
     } else if (number) {
       Contact.number = number;
+      Contact.updatedAt = new Date();
     } else {
       throw new HttpException(
         'Name or number is not provided',
@@ -258,6 +262,7 @@ export class PhonebookService {
         newContact.name = addMembers[i].name;
         newContact.number = addMembers[i].number;
         newContact.userId = userId;
+        newContact.createdAt = new Date();
 
         await this.entityManager.save(newContact);
         memberList.push(newContact.contactId);

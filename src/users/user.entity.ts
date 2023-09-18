@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
 } from 'typeorm';
-import { ALLReceiverList, Message } from '../messages/message.entity';
+import { AllReceiverList, Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
 import { NcpResult, UrlResult } from '../results/result.entity';
 import { PhonebookList } from 'src/phonebook/phonebook.entity';
@@ -60,10 +60,10 @@ export class User extends BaseEntity {
   })
   phonebookList: PhonebookList[];
 
-  @OneToMany(() => ALLReceiverList, (allReceiverList) => allReceiverList.user, {
+  @OneToMany(() => AllReceiverList, (allReceiverList) => allReceiverList.user, {
     cascade: true,
   })
-  allReceiverList: ALLReceiverList[];
+  allReceiverList: AllReceiverList[];
 }
 
 @Entity()
