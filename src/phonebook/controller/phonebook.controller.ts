@@ -42,11 +42,10 @@ export class PhonebookController {
   }
 
   // 주소록 멤버 수정
-  @Patch('/:phonebookId/:contactId')
+  @Patch('/:contactId')
   async updatePhonebook(
     @Body() updatePhonebookDto: UpdatePhonebookDto,
     @Headers('Authorization') authorization: string,
-    @Param('phonebookId') phonebookId: number,
     @Param('contactId') contactId: number,
   ): Promise<object> {
     this.logger.verbose('Update phonebook');
@@ -56,7 +55,6 @@ export class PhonebookController {
     const user = await this.usersService.checkUserInfo(email);
     return this.phonebookService.updatePhonebook(
       user.userId,
-      phonebookId,
       contactId,
       updatePhonebookDto,
     );

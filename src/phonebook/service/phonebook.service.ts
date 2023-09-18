@@ -68,12 +68,7 @@ export class PhonebookService {
   }
 
   // 주소록 멤버 수정
-  async updatePhonebook(
-    userId: number,
-    phonebookId: number,
-    contactId: number,
-    updatePhonebookDto,
-  ) {
+  async updatePhonebook(userId: number, contactId: number, updatePhonebookDto) {
     const contact = await this.entityManager.findOne('AllContacts', {
       where: {
         contactId: contactId,
@@ -83,14 +78,6 @@ export class PhonebookService {
 
     if (!contact) {
       throw new HttpException('Contact not found', HttpStatus.NOT_FOUND);
-    }
-
-    const Phonebook = await this.phonebookListRepository.findOneByPhonebookId(
-      phonebookId,
-    );
-
-    if (!Phonebook) {
-      throw new HttpException('Phonebook not found', HttpStatus.NOT_FOUND);
     }
 
     const { name, number } = updatePhonebookDto;
@@ -114,10 +101,6 @@ export class PhonebookService {
     }
 
     await this.entityManager.save(Contact);
-
-    Phonebook.updatedAt = new Date();
-
-    await this.entityManager.save(Phonebook);
 
     return Contact;
   }
