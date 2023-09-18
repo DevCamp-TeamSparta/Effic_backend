@@ -183,9 +183,9 @@ export class ALLReceiverList extends BaseEntity {
   user: User;
 
   @Column({ type: 'int', nullable: true })
-  messageId: number;
+  messageGroupId: number;
 
   @ManyToOne(() => Message, (message) => message.allReceiverList)
-  @JoinColumn({ name: 'messageId' })
+  @JoinColumn({ name: 'messageGroupId' })
   message: Message;
 }

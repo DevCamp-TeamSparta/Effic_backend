@@ -106,6 +106,21 @@ export class MessagesController {
     return { groupList };
   }
 
-  // 3일 이내 수신자 리스트 가져오기
-  //
+  // 3일 이내 수신자 필터링
+  // @Post('/filter')
+  // async filterReceiver(
+  //   @Body() filterReceiverDto: FilterReceiverDto,
+  //   @Headers('Authorization') authorization: string,
+  // ) {
+  //   const accessToken = authorization.split(' ')[1];
+  //   const decodedAccessToken: any = jwt.decode(accessToken);
+
+  //   const email = decodedAccessToken.email;
+  //   const filterReceiver = await this.messagesService.filterReceiver(
+  //     email,
+  //     filterReceiverDto,
+  //   );
+
+  //   return { filterReceiver };
+  // }
 }

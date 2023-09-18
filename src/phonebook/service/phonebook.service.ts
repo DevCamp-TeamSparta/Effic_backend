@@ -161,7 +161,6 @@ export class PhonebookService {
       throw new HttpException('Phonebook not found', HttpStatus.NOT_FOUND);
     }
 
-    const result = [];
     const memberInfoList = [];
     for (let i = 0; i < Phonebook.members.length; i++) {
       const Contact = await this.allContactsRepository.findOneByContactId(
