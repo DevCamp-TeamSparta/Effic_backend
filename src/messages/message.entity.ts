@@ -75,12 +75,6 @@ export class Message extends BaseEntity {
     cascade: true,
   })
   allReceiverList: ALLReceiverList[];
-
-  @OneToOne(() => MessageContent, (messageContent) => messageContent.message, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'messageId' })
-  messageContent: MessageContent;
 }
 
 @Entity()
@@ -127,9 +121,7 @@ export class MessageContent extends BaseEntity {
   @Column('json', { default: [] })
   remainReceiverList: Record<string, any>;
 
-  @OneToOne(() => Message, (message) => message.messageContent, {
-    onDelete: 'CASCADE',
-  })
+  @OneToOne(() => Message)
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
@@ -150,14 +142,7 @@ export class TlyUrlInfo extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: false, primary: true })
   firstShortenId: string;
-
-  @OneToOne(() => UrlInfo, (urlInfo) => urlInfo.tlyUrlInfo, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'idString' })
-  urlInfo: UrlInfo;
 }
-
 @Entity()
 export class UrlInfo extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
@@ -172,9 +157,7 @@ export class UrlInfo extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   idString: string;
 
-  @OneToOne(() => TlyUrlInfo, (tlyUrlInfo) => tlyUrlInfo.urlInfo, {
-    cascade: true,
-  })
+  @OneToOne(() => TlyUrlInfo)
   @JoinColumn({
     name: 'idString',
     referencedColumnName: 'firstShortenId',
