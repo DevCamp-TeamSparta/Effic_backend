@@ -626,25 +626,17 @@ export class MessagesService {
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
     const threeDaysAgoDate = threeDaysAgo.toISOString().slice(0, 10);
 
-    console.log(threeDaysAgoDate);
-
     const allReceiverList =
       await this.allReceiverRepository.findAllByUserIdAndSentAt(
         user.userId,
         threeDaysAgoDate,
       );
 
-    console.log(allReceiverList);
-
-    // filterReceiverDto의 수신자 리스트와 allReceiverList의 수신자 리스트를 비교하여
-    // allReceiverList에 없는 수신자 리스트를 리턴
-    // filterReceiverDto의 예시 : "receiverList": ["01799998888", "01999989889", "01899989278"]
-
     const filterReceiverList = filterReceiverDto.receiverList;
     const result = filterReceiverList.filter(
       (x) => !allReceiverList.some((y) => y.number === x),
     );
 
-    return { result };
+    return result;
   }
 }

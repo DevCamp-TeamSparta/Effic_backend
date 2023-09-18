@@ -115,10 +115,11 @@ export class AllReceiverRepository extends Repository<AllReceiverList> {
   }
 
   async findAllByUserIdAndSentAt(userId: number, threeDaysAgoDate) {
-    return await this.createQueryBuilder('receiver')
-      .leftJoinAndSelect('receiver.message', 'message')
-      .where('receiver.userId = :userId', { userId })
-      .andWhere('message.sentAt > :threeDaysAgoDate', { threeDaysAgoDate })
+    return await this.createQueryBuilder('allReceiver')
+      .where('allReceiver.userId = :userId', { userId })
+      .andWhere('allReceiver.sentAt > :threeDaysAgoDate', {
+        threeDaysAgoDate,
+      })
       .getMany();
   }
 }

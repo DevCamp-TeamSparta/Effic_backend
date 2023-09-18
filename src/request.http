@@ -155,7 +155,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "title": "에픽 초청 명단",
+    "title": "점심 초청 명단",
     "members": [{"name": "권용재", "number": "01099889783"}, {"name": "김영희", "number": "01087654321"}]
 }
 
@@ -172,13 +172,13 @@ Content-Type: application/json
 # }
 
 ### 주소록 멤버 수정
-Patch http://localhost:8000/phonebook/members/5
+Patch http://localhost:8000/phonebook/members/14
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 Content-Type: application/json
 
 {
-    "name": "권용지지",
-    "number": "0109988978"
+    "name": "김영철",
+    "number": "01087654320"
 }
 
 # {
@@ -321,5 +321,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "recieverList": ["01799998888", "01999989889", "01899989278"]
+    "receiverList": ["01799998888", "01999989889", "01899989278"]
 }
+
+# {
+#   "filterReceiver": [
+#     "01799998888",
+#     "01999989889"
+#   ]
+# }
