@@ -12,8 +12,9 @@ import {
 import { PhonebookService } from '../service/phonebook.service';
 import * as jwt from 'jsonwebtoken';
 import { CreatePhonebookDto } from '../dto/create-phonebook.dto';
-import { UpdatePhonebookDto } from '../dto/update-phonebook.dto';
+import { UpdateMembersDto } from '../dto/update-members.dto';
 import { AddPhonebookMemberDto } from '../dto/add-phonebook-member.dto';
+import { UpdatePhonebookDto } from '../dto/update-phonebook.dto';
 import { UsersService } from 'src/users/service/users.service';
 
 @Controller('phonebook')
@@ -42,9 +43,9 @@ export class PhonebookController {
   }
 
   // 주소록 멤버 수정
-  @Patch('/:contactId')
+  @Patch('/members/:contactId')
   async updatePhonebook(
-    @Body() updatePhonebookDto: UpdatePhonebookDto,
+    @Body() updateMembersDto: UpdateMembersDto,
     @Headers('Authorization') authorization: string,
     @Param('contactId') contactId: number,
   ): Promise<object> {
@@ -56,7 +57,7 @@ export class PhonebookController {
     return this.phonebookService.updatePhonebook(
       user.userId,
       contactId,
-      updatePhonebookDto,
+      updateMembersDto,
     );
   }
 
