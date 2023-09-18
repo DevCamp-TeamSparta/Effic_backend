@@ -48,7 +48,7 @@ export class Message extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(() => User, (user) => user.messages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
@@ -65,11 +65,15 @@ export class Message extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   messageGroupId: number;
 
-  @ManyToOne(() => MessageGroup, (group) => group.messages)
+  @ManyToOne(() => MessageGroup, (group) => group.messages, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'messageGroupId' })
   messageGroup: Promise<MessageGroup>;
 
-  @OneToMany(() => ALLReceiverList, (receiver) => receiver.message)
+  @OneToMany(() => ALLReceiverList, (receiver) => receiver.message, {
+    cascade: true,
+  })
   allReceiverList: ALLReceiverList[];
 }
 
@@ -78,7 +82,9 @@ export class MessageGroup extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @OneToMany(() => Message, (message) => message.messageGroup)
+  @OneToMany(() => Message, (message) => message.messageGroup, {
+    cascade: true,
+  })
   messages: Message[];
 
   @Column({ type: 'int', nullable: false })
@@ -137,7 +143,6 @@ export class TlyUrlInfo extends BaseEntity {
   @Column({ type: 'varchar', nullable: false, primary: true })
   firstShortenId: string;
 }
-
 @Entity()
 export class UrlInfo extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
@@ -178,14 +183,18 @@ export class ALLReceiverList extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.allReceiverList)
+  @ManyToOne(() => User, (user) => user.allReceiverList, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column({ type: 'int', nullable: true })
-  messageId: number;
+  messageGroupId: number;
 
-  @ManyToOne(() => Message, (message) => message.allReceiverList)
-  @JoinColumn({ name: 'messageId' })
+  @ManyToOne(() => Message, (message) => message.allReceiverList, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'messageGroupId' })
   message: Message;
 }

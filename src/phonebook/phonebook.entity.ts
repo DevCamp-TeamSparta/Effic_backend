@@ -36,7 +36,7 @@ export class PhonebookList extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.phonebookList)
+  @ManyToOne(() => User, (user) => user.phonebookList, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }

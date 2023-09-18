@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus, All } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import {
@@ -109,6 +109,13 @@ export class MessagesService {
     );
 
     await this.deductedUserMoney(user, receiverPhones, saveMessageInfo);
+
+    await this.saveAllReceiverList(
+      defaultMessageDto.receiverList,
+      user.userId,
+      saveMessageInfo.messageGroupId,
+      new Date(),
+    );
 
     return {
       messageId: saveMessageInfo.messageId,
@@ -580,6 +587,13 @@ export class MessagesService {
     // 유저 금액 차감
     await this.deductedUserMoney(user, receiverPhones, takeAbMessageInfo);
 
+    await this.saveAllReceiverList(
+      abTestMessageDto.receiverList,
+      user.userId,
+      result.id,
+      new Date(),
+    );
+
     return {
       messageGroupId: result.id,
     };
@@ -590,16 +604,19 @@ export class MessagesService {
   }
 
   // AllRecieverList에 저장
-  async saveAllReceiverList(receiverList, userId, messageId, now) {
-    // receiverList를 돌면서 그 안의 member의 이름과 번호를 AllReceiverList 테이블에 저장
+  async saveAllReceiverList(receiverList, userId, messageGroupId, now) {
     for (let i = 0; i < receiverList.length; i++) {
       const allReceiverList = new ALLReceiverList();
       allReceiverList.name = receiverList[i].name;
       allReceiverList.number = receiverList[i].phone;
       allReceiverList.userId = userId;
-      allReceiverList.messageId = messageId;
+      allReceiverList.messageGroupId = messageGroupId;
       allReceiverList.sentAt = now;
       await this.entityManager.save(allReceiverList);
     }
   }
+
+  // 3일 이내 수신자 필터링
+  // 문자를 전송할 때, 필터링 버튼을 누르면 유저가 3일 이내에 문자를 발신하여 문자를 수신한 사람들을 필터링 할 수 있습니다.
+  // async filterReceiver(email, filterReceiverDto) {}
 }

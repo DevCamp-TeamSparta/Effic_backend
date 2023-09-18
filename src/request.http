@@ -172,13 +172,13 @@ Content-Type: application/json
 # }
 
 ### 주소록 멤버 수정
-Patch http://localhost:8000/phonebook/2/5
+Patch http://localhost:8000/phonebook/5
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 Content-Type: application/json
 
 {
-    "name": "권용수",
-    "number": "01099889786"
+    "name": "권용지지",
+    "number": "0109988978"
 }
 
 # {
@@ -231,27 +231,25 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Get http://localhost:8000/phonebook/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 
-# [
-#   {
-#     "phonebookId": 2,
-#     "title": "정글 초청 명단",
-#     "createdAt": "2023-09-14T08:15:22.739Z",
-#     "updatedAt": "2023-09-15T02:30:46.867Z",
-#     "userId": 1,
-#     "memberInfo": [
-#       {
-#         "contactId": 2,
-#         "name": "김영희",
-#         "number": "01087654321"
-#       },
-#       {
-#         "contactId": 3,
-#         "name": "김철희",
-#         "number": "01099889786"
-#       }
-#     ]
-#   }
-# ]
+# {
+#   "phonebookId": 2,
+#   "title": "정글 초청 명단",
+#   "createdAt": "2023-09-14T08:15:22.739Z",
+#   "updatedAt": "2023-09-15T02:30:46.867Z",
+#   "userId": 1,
+#   "memberInfoList": [
+#     {
+#       "contactId": 2,
+#       "name": "김영희",
+#       "number": "01087654321"
+#     },
+#     {
+#       "contactId": 3,
+#       "name": "김철희",
+#       "number": "01099889786"
+#     }
+#   ]
+# }
 
 
 ### 주소록 멤버 삭제
