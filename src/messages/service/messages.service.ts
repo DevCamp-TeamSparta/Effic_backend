@@ -617,6 +617,27 @@ export class MessagesService {
   }
 
   // 3일 이내 수신자 필터링
-  // 문자를 전송할 때, 필터링 버튼을 누르면 유저가 3일 이내에 문자를 발신하여 문자를 수신한 사람들을 필터링 할 수 있습니다.
-  // async filterReceiver(email, filterReceiverDto) {}
+  // 문자를 전송할 때, 유저가 3일 이내에 문자를 발신하여 문자를 수신한 사람들을 필터링
+  // 정확한 시간을 적용한 3일이 아닌, 문자를 받지 못한 날이 3일인 사람들을 필터링 하는 것
+  // 필터링한 사람들은 현재 유저가 문자를 보내려고 하는 수신자 리스트에서 제외
+  async filterReceiver(email, filterReceiverDto) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    // 유저가 3일 이내에 문자를 발신하여 문자를 수신한 사람들을 필터링
+    const filterReceiverList = await this.entityManager.query(
+      `SELECT * FROM all_receiver_list WHERE userId = ${
+        user.userId
+      } AND sentAt > '${threeDaysAgo.toISOString()}'`,
+    );
+    // 필터링한 사람들은 현재 유저가 문자를 보내려고 하는 수신자 리스트에서 제외
+    const receiverList = filterReceiverDto.number;
+    const filteredReceiverList = receiverList.filter(
+      (number) =>
+        !filterReceiverList.some(
+          (filterReceiver) => filterReceiver.number === number,
+        ),
+    );
+    return filteredReceiverList;
+  }
 }

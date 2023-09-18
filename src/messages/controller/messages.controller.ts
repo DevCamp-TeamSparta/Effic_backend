@@ -7,6 +7,7 @@ import { abTestMessageValidationPipe } from '../pipe/abTest-body-validation-pipe
 import { TestMessageValidationPipe } from '../pipe/test-body-validation';
 import { TestMessageDto } from '../dto/test-message.dto';
 import { CheckHostNumberDto } from '../dto/check-number.dto';
+import { FilterReceiverDto } from '../dto/filter-receiver.dto';
 import * as jwt from 'jsonwebtoken';
 
 @Controller('messages')
@@ -107,20 +108,20 @@ export class MessagesController {
   }
 
   // 3일 이내 수신자 필터링
-  // @Post('/filter')
-  // async filterReceiver(
-  //   @Body() filterReceiverDto: FilterReceiverDto,
-  //   @Headers('Authorization') authorization: string,
-  // ) {
-  //   const accessToken = authorization.split(' ')[1];
-  //   const decodedAccessToken: any = jwt.decode(accessToken);
+  @Post('/filter')
+  async filterReceiver(
+    @Body() filterReceiverDto: FilterReceiverDto,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
 
-  //   const email = decodedAccessToken.email;
-  //   const filterReceiver = await this.messagesService.filterReceiver(
-  //     email,
-  //     filterReceiverDto,
-  //   );
+    const email = decodedAccessToken.email;
+    const filterReceiver = await this.messagesService.filterReceiver(
+      email,
+      filterReceiverDto,
+    );
 
-  //   return { filterReceiver };
-  // }
+    return { filterReceiver };
+  }
 }
