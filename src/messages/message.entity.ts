@@ -48,7 +48,7 @@ export class Message extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(() => User, (user) => user.messages, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
@@ -65,7 +65,9 @@ export class Message extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   messageGroupId: number;
 
-  @ManyToOne(() => MessageGroup, (group) => group.messages)
+  @ManyToOne(() => MessageGroup, (group) => group.messages, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'messageGroupId' })
   messageGroup: Promise<MessageGroup>;
 
@@ -73,6 +75,12 @@ export class Message extends BaseEntity {
     cascade: true,
   })
   allReceiverList: ALLReceiverList[];
+
+  @OneToOne(() => MessageContent, (messageContent) => messageContent.message, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'messageId' })
+  messageContent: MessageContent;
 }
 
 @Entity()
@@ -119,7 +127,9 @@ export class MessageContent extends BaseEntity {
   @Column('json', { default: [] })
   remainReceiverList: Record<string, any>;
 
-  @OneToOne(() => Message)
+  @OneToOne(() => Message, (message) => message.messageContent, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
@@ -140,6 +150,12 @@ export class TlyUrlInfo extends BaseEntity {
 
   @Column({ type: 'varchar', nullable: false, primary: true })
   firstShortenId: string;
+
+  @OneToOne(() => UrlInfo, (urlInfo) => urlInfo.tlyUrlInfo, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'idString' })
+  urlInfo: UrlInfo;
 }
 
 @Entity()
@@ -156,7 +172,9 @@ export class UrlInfo extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   idString: string;
 
-  @OneToOne(() => TlyUrlInfo)
+  @OneToOne(() => TlyUrlInfo, (tlyUrlInfo) => tlyUrlInfo.urlInfo, {
+    cascade: true,
+  })
   @JoinColumn({
     name: 'idString',
     referencedColumnName: 'firstShortenId',
@@ -182,14 +200,18 @@ export class ALLReceiverList extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.allReceiverList)
+  @ManyToOne(() => User, (user) => user.allReceiverList, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column({ type: 'int', nullable: true })
   messageGroupId: number;
 
-  @ManyToOne(() => Message, (message) => message.allReceiverList)
+  @ManyToOne(() => Message, (message) => message.allReceiverList, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'messageGroupId' })
   message: Message;
 }
