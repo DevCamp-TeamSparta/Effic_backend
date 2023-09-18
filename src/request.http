@@ -310,3 +310,7 @@ Content-Type: application/json
 #   "updatedAt": "2023-09-15T03:24:48.852Z",
 #   "userId": 1
 # }
+
+### 주소록 삭제
+DELETE http://localhost:8000/phonebook/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
