@@ -89,10 +89,10 @@ export class ResultsController {
   }
 
   //test용입니다. 실제로 사용되지 않습니다.
-  @Get('/tlyinfo/:messageId')
-  async tlyInfo(@Param('messageId') messageId: number) {
+  @Get('/tlyinfo')
+  async tlyInfo() {
     this.logger.verbose('TLY info');
-    const isString = 'https://t.ly/DRA9f';
+    const isString = 'https://t.ly/gc_V9';
     return await this.resultsService.tlyInfo(isString);
   }
 }

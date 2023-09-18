@@ -628,6 +628,7 @@ export class ResultsService {
       );
       const totalClicks = tlyResponse.data.clicks || 0;
       const humanClicks = tlyResponse.data.unique_clicks || 0;
+      console.log(tlyResponse.data);
       return { totalClicks, humanClicks };
     } catch (error) {
       console.error(error);
