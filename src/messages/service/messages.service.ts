@@ -619,7 +619,7 @@ export class MessagesService {
   }
 
   // 3일 이내 수신자 필터링
-  async filterReceiver(email, filterReceiverDto) {
+  async filterReceivers(email, filterReceiverDto) {
     const user = await this.usersRepository.findOneByEmail(email);
 
     const threeDaysAgo = new Date();

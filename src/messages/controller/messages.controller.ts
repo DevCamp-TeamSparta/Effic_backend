@@ -117,7 +117,7 @@ export class MessagesController {
     const decodedAccessToken: any = jwt.decode(accessToken);
 
     const email = decodedAccessToken.email;
-    const filterReceiver = await this.messagesService.filterReceiver(
+    const filterReceiver = await this.messagesService.filterReceivers(
       email,
       filterReceiverDto,
     );

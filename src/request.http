@@ -325,7 +325,7 @@ Content-Type: application/json
 }
 
 # {
-#   "filterReceiver": [
+#   "filterReceivers": [
 #     "01799998888",
 #     "01999989889"
 #   ]
