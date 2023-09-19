@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ResultsModule } from './results/results.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PhonebookModule } from './phonebook/phonebook.module';
+import { AuthGuard } from './auth.guard';
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import { ScheduleModule } from '@nestjs/schedule';
     PaymentsModule,
     ResultsModule,
     ScheduleModule.forRoot(),
+    PhonebookModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthGuard],
 })
 export class AppModule {}

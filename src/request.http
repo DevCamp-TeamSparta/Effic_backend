@@ -92,7 +92,7 @@ Content-Type: application/json
 
 ### tly info
 ### test용입니다. 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/tlyinfo
+Get http://localhost:8000/results/tlyinfo/1
 
 
 ### create payment
@@ -116,10 +116,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "messageInfoList": [{"type": "A", "title": "Effic is the best!-A", "content": "A test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.naver.com"]},{"type": "B", "title": "Effic is the best!-B", "content": "B test message입니다. \n메세지를 받은 #{name}님! \n현재 #{name}님의 등급은#{grade}입니다. \n더 많은 물품을 보시고 싶으시면 아래의 url을 눌러주세요. \nhttps://www.google.com https://www.daum.net", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.daum.net"]}],
+    "messageInfoList": [{"type": "A", "title": "Effic is the best!-A", "content": "A test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com", "advertiseInfo": true, "urlList": ["https://www.google.com","https://www.naver.com"]},{"type": "B", "title": "Effic is the best!-B", "content": "B test message입니다. \n메세지를 받은 #{name}님! \n현재 #{name}님의 등급은#{grade}입니다. \n더 많은 물품을 보시고 싶으시면 아래의 url을 눌러주세요. \nhttps://www.google.com https://www.daum.net", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.daum.net"]}],
     "urlForResult": "https://www.google.com",
     "hostnumber": "15228016",
-    "receiverList": [{"phone": "01036289823", "name": "clo", "grade": "A"},{"phone": "01036289823", "name": "clo2", "grade": "B"},{"phone": "01036289823", "name": "clo3", "grade": "A"},{"phone": "01036289823", "name": "clo4", "grade": "C"},{"phone": "01036289823", "name": "clo5", "grade": "B"},{"phone": "01036289823", "name": "clo6", "grade": "D"}]
+    "receiverList": [{"phone": "01036289823", "name": "clo", "grade": "A"},{"phone": "01936289823", "name": "clo2", "grade": "B"},{"phone": "01836289823", "name": "clo3", "grade": "A"},{"phone": "01736289823", "name": "clo4", "grade": "C"},{"phone": "01636289823", "name": "clo5", "grade": "B"},{"phone": "01536289823", "name": "clo6", "grade": "D"},{"phone": "01899989278", "name": "clo7", "grade": "B"},{"phone": "01899989279", "name": "clo8", "grade": "B"},{"phone": "01899989288", "name": "clo9", "grade": "B"},{"phone": "01899989458", "name": "clo10", "grade": "B"}]
 }
 
 ### money - 사용 금액 내역 (userId)
@@ -145,10 +145,188 @@ Content-Type: application/json
   "contactNumber": "010-3628-9823"
 }
 
-### tly info
-### test용입니다. 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/tlyinfo
+### 마이페이지
+Get http://localhost:8000/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NjEyNTMsImV4cCI6MTY5NDc0NzY1M30.YX7YetIVtrok4smc52lLpw4m2mgqlMjv-r7ien6yEq0
 
-###test
-get https://api.effic.biz/users/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0ODI4NTMsImV4cCI6MTY5NDU2OTI1M30.VbRHK7ATGGfFjFub1KNklXlJ6KhWXXHzGxbOjsakOAU
+### 주소록 생성
+Post http://localhost:8000/phonebook
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "title": "아침 초청 명단",
+    "members": [{"name": "김민수", "number": "01099889781"}, {"name": "김영석", "number": "01099889781"}]
+}
+
+# {
+#   "title": "스파르타 초청 명단",
+#   "members": [
+#     4,
+#     2
+#   ],
+#   "createdAt": "2023-09-14T09:20:57.528Z",
+#   "userId": 1,
+#   "phonebookId": 3,
+#   "updatedAt": "2023-09-14T09:20:57.533Z"
+# }
+
+### 주소록 멤버 수정
+Patch http://localhost:8000/phonebook/members/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "name": "김영철",
+    "number": "01087654320"
+}
+
+# {
+#   "contactId": 3,
+#   "name": "김철희",
+#   "number": "01099889786",
+#   "userId": 1
+# }
+
+### 주소록 목록 조회
+GET http://localhost:8000/phonebook/Allcontacts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+
+# [
+#   {
+#     "phonebookId": 1,
+#     "title": "점심식사 초청 명단",
+#     "membersAmount": 1,
+#     "createdAt": "2023-09-14T08:14:35.553Z",
+#     "updatedAt": "2023-09-14T09:11:01.268Z",
+#     "userId": 1
+#   },
+#   {
+#     "phonebookId": 3,
+#     "title": "항해99 초청 명단",
+#     "membersAmount": 1,
+#     "createdAt": "2023-09-14T09:20:57.528Z",
+#     "updatedAt": "2023-09-15T02:30:25.402Z",
+#     "userId": 1
+#   },
+#   {
+#     "phonebookId": 2,
+#     "title": "정글 초청 명단",
+#     "membersAmount": 2,
+#     "createdAt": "2023-09-14T08:15:22.739Z",
+#     "updatedAt": "2023-09-15T02:30:46.867Z",
+#     "userId": 1
+#   },
+#   {
+#     "phonebookId": 4,
+#     "title": "에픽 초청 명단",
+#     "membersAmount": 4,
+#     "createdAt": "2023-09-15T02:19:03.011Z",
+#     "updatedAt": "2023-09-15T03:24:48.852Z",
+#     "userId": 1
+#   }
+# ]
+
+### 주소록 멤버 조회
+Get http://localhost:8000/phonebook/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+
+# {
+#   "phonebookId": 2,
+#   "title": "정글 초청 명단",
+#   "createdAt": "2023-09-14T08:15:22.739Z",
+#   "updatedAt": "2023-09-15T02:30:46.867Z",
+#   "userId": 1,
+#   "memberInfoList": [
+#     {
+#       "contactId": 2,
+#       "name": "김영희",
+#       "number": "01087654321"
+#     },
+#     {
+#       "contactId": 3,
+#       "name": "김철희",
+#       "number": "01099889786"
+#     }
+#   ]
+# }
+
+### 주소록 멤버 삭제
+Delete http://localhost:8000/phonebook/3/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+
+# {
+#   "phonebookId": 1,
+#   "title": "점심식사 초청 명단",
+#   "members": [
+#     1
+#   ],
+#   "createdAt": "2023-09-14T08:14:35.553Z",
+#   "updatedAt": "2023-09-14T09:11:01.268Z",
+#   "userId": 1
+# }
+
+### 주소록 title 수정
+Patch http://localhost:8000/phonebook/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "title": "정글 초청 명단"
+}
+
+# {
+#   "phonebookId": 2,
+#   "title": "정글 초청 명단",
+#   "members": [
+#     2,
+#     3
+#   ],
+#   "createdAt": "2023-09-14T08:15:22.739Z",
+#   "updatedAt": "2023-09-15T02:30:46.867Z",
+#   "userId": 1
+# }
+
+### 주소록 멤버 추가
+Post http://localhost:8000/phonebook/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "addMembers": [{"name": "권용재", "number": "01099889783"}, {"name": "방민석", "number": "01099998887"}, {"name": "김영희", "number": "01087654321"}]
+}
+
+# {
+#   "phonebookId": 4,
+#   "title": "에픽 초청 명단",
+#   "members": [
+#     5,
+#     2,
+#     10,
+#     11
+#   ],
+#   "createdAt": "2023-09-15T02:19:03.011Z",
+#   "updatedAt": "2023-09-15T03:24:48.852Z",
+#   "userId": 1
+# }
+
+### 주소록 삭제
+DELETE http://localhost:8000/phonebook/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+
+### 광고성 문자 수신자 필터링
+Post http://localhost:8000/messages/filter
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "receiverList": ["01799998888", "01999989889", "01899989278"],
+    "day": 1
+}
+
+# {
+#   "filteredReceivers": [
+#     "01799998888",
+#     "01999989889"
+#   ]
+# }

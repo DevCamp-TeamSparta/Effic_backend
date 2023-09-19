@@ -36,11 +36,13 @@ export class NcpResult extends BaseEntity {
   })
   createdAt: Date;
 
-  @ManyToOne(() => Message, (message) => message.ncpResults)
+  @ManyToOne(() => Message, (message) => message.ncpResults, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
-  @ManyToOne(() => User, (user) => user.ncpResults)
+  @ManyToOne(() => User, (user) => user.ncpResults, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }
@@ -68,11 +70,13 @@ export class UrlResult extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @ManyToOne(() => Message, (message) => message.urlResults)
+  @ManyToOne(() => Message, (message) => message.urlResults, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'messageId' })
   message: Message;
 
-  @ManyToOne(() => User, (user) => user.urlResults)
+  @ManyToOne(() => User, (user) => user.urlResults, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }
@@ -110,7 +114,7 @@ export class UsedPayments extends BaseEntity {
   @Column({ type: 'int', nullable: false, default: 0 })
   messageGroupId: number;
 
-  @ManyToOne(() => User, (user) => user.urlResults)
+  @ManyToOne(() => User, (user) => user.urlResults, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }

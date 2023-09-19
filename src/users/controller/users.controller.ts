@@ -13,7 +13,7 @@ import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
-import { CreatePhonebookDto } from '../dto/create-phonebook.dto';
+import { AuthGuard } from 'src/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -154,43 +154,4 @@ export class UsersController {
       return { user };
     }
   }
-
-  // 한명의 유저가 여러개의 전화번호부를 가질 수 있음
-  // 전화번호부는 유저가 생성할 수 있음
-  // 각 전화번호부에는 제목, 이름, 전화번호, id가 들어가야함
-  // 각 전화번호부에는 중복된 이름/전화번호가 들어갈 수 없음
-  // 전화번호부는 유저가 삭제 및 수정할 수 있음
-  // 주소록에는 각 전화번호부의 제목, id가 들어가야함
-  // 주소록 id 1번은 각 전화번호부에서 이름과 전화번호를 가져오고, 중복된 값은 한번만 가져옴
-
-  // @Post('/phonebook')
-  // async createPhonebook(
-  //   @Body() createPhonebookDto: CreatePhonebookDto,
-  //   @Headers('Authorization') authorization: string,
-  // ) {
-  //   this.logger.verbose('User create phonebook');
-
-  //   const accessToken = authorization.split(' ')[1];
-  //   const decodedAccessToken: any = jwt.decode(accessToken);
-
-  //   const email = decodedAccessToken.email;
-
-  //   const user = await this.usersService.checkUserInfo(email);
-
-  //   return this.usersService.createPhonebook(user, createPhonebookDto);
-  // }
-
-  // @Get('/allContacts')
-  // async findAllContacts(@Headers('Authorization') authorization: string) {
-  //   this.logger.verbose('User all contacts');
-
-  //   const accessToken = authorization.split(' ')[1];
-  //   const decodedAccessToken: any = jwt.decode(accessToken);
-
-  //   const email = decodedAccessToken.email;
-
-  //   const user = await this.usersService.checkUserInfo(email);
-
-  //   return this.usersService.findAllContacts();
-  // }
 }
