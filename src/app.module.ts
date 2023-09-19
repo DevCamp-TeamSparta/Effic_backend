@@ -9,6 +9,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { ResultsModule } from './results/results.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PhonebookModule } from './phonebook/phonebook.module';
+import { AuthGuard } from './auth.guard';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { PhonebookModule } from './phonebook/phonebook.module';
     PhonebookModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthGuard],
 })
 export class AppModule {}

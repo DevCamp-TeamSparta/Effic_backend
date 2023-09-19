@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Logger, Headers, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Logger,
+  Headers,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { MessagesService } from '../service/messages.service';
 import { DefaultMessageDto } from '../dto/default-message.dto';
 import { DefaultMessageValidationPipe } from '../pipe/defualt-body-validation-pipe';
@@ -9,8 +17,10 @@ import { TestMessageDto } from '../dto/test-message.dto';
 import { CheckHostNumberDto } from '../dto/check-number.dto';
 import { FilterReceiverDto } from '../dto/filter-receiver.dto';
 import * as jwt from 'jsonwebtoken';
+import { AuthGuard } from 'src/auth.guard';
 
 @Controller('messages')
+@UseGuards(AuthGuard)
 export class MessagesController {
   private logger = new Logger('MessagesController');
   constructor(private messagesService: MessagesService) {}
