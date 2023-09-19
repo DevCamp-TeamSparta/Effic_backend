@@ -26,11 +26,10 @@ export class AllContactsRepository extends Repository<AllContacts> {
   constructor(private datasource: DataSource) {
     super(AllContacts, datasource.createEntityManager());
   }
-  async findOneByUserIdAndNameAndPhoneNumber(userId, name, number) {
+  async findOneByUserIdAndPhoneNumber(userId, number) {
     return await this.findOne({
       where: {
         userId: userId,
-        name: name,
         number: number,
       },
     });

@@ -16,6 +16,8 @@ import { UpdateMembersDto } from '../dto/update-members.dto';
 import { AddPhonebookMemberDto } from '../dto/add-phonebook-member.dto';
 import { UpdatePhonebookDto } from '../dto/update-phonebook.dto';
 import { UsersService } from 'src/users/service/users.service';
+import { MemberValidatonPipe } from '../pipe/create-member-validation-pipe';
+import { AddMemberValidatonPipe } from '../pipe/add-member-validation-pipe';
 
 @Controller('phonebook')
 export class PhonebookController {
@@ -28,7 +30,7 @@ export class PhonebookController {
   // 주소록 생성
   @Post()
   async createPhonebook(
-    @Body() createPhonebookDto: CreatePhonebookDto,
+    @Body(new MemberValidatonPipe()) createPhonebookDto: CreatePhonebookDto,
     @Headers('Authorization') authorization: string,
   ): Promise<object> {
     this.logger.verbose('Create phonebook');
@@ -130,7 +132,8 @@ export class PhonebookController {
   async addPhonebookMember(
     @Headers('Authorization') authorization: string,
     @Param('phonebookId') phonebookId: number,
-    @Body() addPhonebookMemberDto: AddPhonebookMemberDto,
+    @Body(new AddMemberValidatonPipe())
+    addPhonebookMemberDto: AddPhonebookMemberDto,
   ) {
     this.logger.verbose('Add phonebook member');
     const accessToken = authorization.split(' ')[1];

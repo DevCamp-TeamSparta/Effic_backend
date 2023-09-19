@@ -36,9 +36,8 @@ export class PhonebookService {
     const memberList = [];
     for (let i = 0; i < members.length; i++) {
       const Contact =
-        await this.allContactsRepository.findOneByUserIdAndNameAndPhoneNumber(
+        await this.allContactsRepository.findOneByUserIdAndPhoneNumber(
           userId,
-          members[i].name,
           members[i].number,
         );
 
@@ -251,9 +250,8 @@ export class PhonebookService {
     const memberList = [];
     for (let i = 0; i < addMembers.length; i++) {
       const Contact =
-        await this.allContactsRepository.findOneByUserIdAndNameAndPhoneNumber(
+        await this.allContactsRepository.findOneByUserIdAndPhoneNumber(
           userId,
-          addMembers[i].name,
           addMembers[i].number,
         );
 

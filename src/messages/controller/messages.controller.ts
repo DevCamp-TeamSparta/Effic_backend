@@ -117,7 +117,7 @@ export class MessagesController {
     return { groupList };
   }
 
-  // 3일 이내 수신자 필터링
+  // 3일 이내 광고성 문자 수신자 필터링
   @Post('/filter')
   async filterReceiver(
     @Body() filterReceiverDto: FilterReceiverDto,
