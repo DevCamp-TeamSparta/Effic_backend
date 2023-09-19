@@ -41,7 +41,7 @@ export class Payment extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.payments)
+  @ManyToOne(() => User, (user) => user.payments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }
@@ -76,7 +76,7 @@ export class Refund extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.payments)
+  @ManyToOne(() => User, (user) => user.payments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 }

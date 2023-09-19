@@ -9,11 +9,12 @@ import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
 import { shortIoConfig, tlyConfig } from 'config/short-io.config';
-import { Message, TlyUrlInfo } from '../message.entity';
+import { Message, TlyUrlInfo, AdvertiseReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { UrlInfo } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
+import { AdvertiseReceiverListRepository } from '../messages.repository';
 import { UsedPayments } from 'src/results/result.entity';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class MessagesService {
     private readonly usersRepository: UsersRepository,
     private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
+    private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -109,6 +111,15 @@ export class MessagesService {
     );
 
     await this.deductedUserMoney(user, receiverPhones, saveMessageInfo);
+
+    if (defaultMessageDto.advertiseInfo === true) {
+      await this.saveAdvertiseReceiverList(
+        defaultMessageDto.receiverList,
+        user.userId,
+        saveMessageInfo.messageGroupId,
+        new Date(),
+      );
+    }
 
     return {
       messageId: saveMessageInfo.messageId,
@@ -394,7 +405,7 @@ export class MessagesService {
     return 'success';
   }
 
-  // hostnumbercheck 메세지
+  // hostnumbercheck 메세지 보내기
   async checkHostNumberMessage(checkHostNumberDto) {
     const body = {
       type: 'LMS',
@@ -478,6 +489,7 @@ export class MessagesService {
     let takeAbMessageInfo;
     // A, B 메세지 보내기
     for (let i = 0; i < 3; i++) {
+      // A 메세지 보내기 + 저장
       if (i < 1) {
         const requestIdList: string[] = [];
         const receiverList = aTestReceiver;
@@ -579,6 +591,22 @@ export class MessagesService {
     // 유저 금액 차감
     await this.deductedUserMoney(user, receiverPhones, takeAbMessageInfo);
 
+    if (abTestMessageDto.messageInfoList[0].advertiseInfo === true) {
+      await this.saveAdvertiseReceiverList(
+        abTestMessageDto.receiverList,
+        user.userId,
+        result.id,
+        new Date(),
+      );
+    } else if (abTestMessageDto.messageInfoList[1].advertiseInfo === true) {
+      await this.saveAdvertiseReceiverList(
+        abTestMessageDto.receiverList,
+        user.userId,
+        result.id,
+        new Date(),
+      );
+    }
+
     return {
       messageGroupId: result.id,
     };
@@ -586,5 +614,40 @@ export class MessagesService {
   catch(error) {
     console.log(error);
     throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
+  }
+
+  // AdvertiseReceiverList 저장
+  async saveAdvertiseReceiverList(receiverList, userId, messageGroupId, now) {
+    for (let i = 0; i < receiverList.length; i++) {
+      const allReceiverList = new AdvertiseReceiverList();
+      allReceiverList.number = receiverList[i].phone;
+      allReceiverList.userId = userId;
+      allReceiverList.messageGroupId = messageGroupId;
+      allReceiverList.sentAt = now;
+      await this.entityManager.save(allReceiverList);
+    }
+  }
+
+  // 광고성 문자 수신자 필터링
+  async filteredReceivers(email, filterReceiverDto) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    const settingDay = filterReceiverDto.day;
+
+    const DaysAgo = new Date();
+    DaysAgo.setDate(DaysAgo.getDate() - settingDay);
+    const DaysAgoDate = DaysAgo.toISOString().slice(0, 10);
+
+    const allReceiverList =
+      await this.advertiseReceiverListRepository.findAllByUserIdAndSentAt(
+        user.userId,
+        DaysAgoDate,
+      );
+
+    const filterReceiverList = filterReceiverDto.receiverList;
+    const result = filterReceiverList.filter(
+      (x) => !allReceiverList.some((y) => y.number === x),
+    );
+
+    return result;
   }
 }

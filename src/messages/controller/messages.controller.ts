@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Logger, Headers, Get } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Logger,
+  Headers,
+  Get,
+  UseGuards,
+} from '@nestjs/common';
 import { MessagesService } from '../service/messages.service';
 import { DefaultMessageDto } from '../dto/default-message.dto';
 import { DefaultMessageValidationPipe } from '../pipe/defualt-body-validation-pipe';
@@ -7,13 +15,17 @@ import { abTestMessageValidationPipe } from '../pipe/abTest-body-validation-pipe
 import { TestMessageValidationPipe } from '../pipe/test-body-validation';
 import { TestMessageDto } from '../dto/test-message.dto';
 import { CheckHostNumberDto } from '../dto/check-number.dto';
+import { FilterReceiverDto } from '../dto/filter-receiver.dto';
 import * as jwt from 'jsonwebtoken';
+import { AuthGuard } from 'src/auth.guard';
 
 @Controller('messages')
+@UseGuards(AuthGuard)
 export class MessagesController {
   private logger = new Logger('MessagesController');
   constructor(private messagesService: MessagesService) {}
 
+  // 기본메세지 보내기
   @Post('/default')
   async defaultMessage(
     @Body(new DefaultMessageValidationPipe())
@@ -34,6 +46,7 @@ export class MessagesController {
     return { ...messageId };
   }
 
+  // ab 메세지 보내기
   @Post('/abtest')
   async abTestMessage(
     @Body(new abTestMessageValidationPipe())
@@ -58,6 +71,7 @@ export class MessagesController {
     };
   }
 
+  // 테스트 메세지 보내기
   @Post('/test')
   async testMessage(
     @Body(new TestMessageValidationPipe())
@@ -79,6 +93,7 @@ export class MessagesController {
     return { message };
   }
 
+  // 발신번호 확인
   @Post('/checkhostnumber')
   async checkHostNumber(@Body() checkHostNumberDto: CheckHostNumberDto) {
     this.logger.verbose('Check host number');
@@ -90,6 +105,7 @@ export class MessagesController {
     return { message };
   }
 
+  // 그룹 리스트 가져오기
   @Get('/group')
   async getGroupList(@Headers('Authorization') authorization: string) {
     const accessToken = authorization.split(' ')[1];
@@ -99,5 +115,23 @@ export class MessagesController {
     const groupList = await this.messagesService.getGroupList(email);
 
     return { groupList };
+  }
+
+  // 광고성 문자 수신자 필터링
+  @Post('/filter')
+  async filterReceiver(
+    @Body() filterReceiverDto: FilterReceiverDto,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+    const filteredReceivers = await this.messagesService.filteredReceivers(
+      email,
+      filterReceiverDto,
+    );
+
+    return { filteredReceivers };
   }
 }
