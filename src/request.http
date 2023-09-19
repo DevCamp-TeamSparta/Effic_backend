@@ -321,7 +321,7 @@ Content-Type: application/json
 
 {
     "receiverList": ["01799998888", "01999989889", "01899989278"],
-    "day": 2
+    "day": 1
 }
 
 # {

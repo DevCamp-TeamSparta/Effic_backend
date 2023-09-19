@@ -620,7 +620,6 @@ export class MessagesService {
   async saveAdvertiseReceiverList(receiverList, userId, messageGroupId, now) {
     for (let i = 0; i < receiverList.length; i++) {
       const allReceiverList = new AdvertiseReceiverList();
-      allReceiverList.name = receiverList[i].name;
       allReceiverList.number = receiverList[i].phone;
       allReceiverList.userId = userId;
       allReceiverList.messageGroupId = messageGroupId;

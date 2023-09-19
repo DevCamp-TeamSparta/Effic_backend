@@ -172,9 +172,6 @@ export class AdvertiseReceiverList extends BaseEntity {
   receiverId: number;
 
   @Column({ type: 'varchar', nullable: false })
-  name: string;
-
-  @Column({ type: 'varchar', nullable: false })
   number: string;
 
   @Column({ type: 'timestamptz', nullable: false })
