@@ -321,11 +321,11 @@ Content-Type: application/json
 
 {
     "receiverList": ["01799998888", "01999989889", "01899989278"],
-    "day": 1
+    "day": 2
 }
 
 # {
-#   "filterReceivers": [
+#   "filteredReceivers": [
 #     "01799998888",
 #     "01999989889"
 #   ]
