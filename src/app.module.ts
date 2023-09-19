@@ -10,6 +10,7 @@ import { ResultsModule } from './results/results.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PhonebookModule } from './phonebook/phonebook.module';
 import { AuthGuard } from './auth.guard';
+import { BizmessageModule } from './bizmessage/bizmessage.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AuthGuard } from './auth.guard';
     ResultsModule,
     ScheduleModule.forRoot(),
     PhonebookModule,
+    BizmessageModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],
