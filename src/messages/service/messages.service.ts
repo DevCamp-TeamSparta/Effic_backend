@@ -629,18 +629,19 @@ export class MessagesService {
     }
   }
 
-  // 3일 이내 광고성 문자 수신자 필터링
-  async filterReceivers(email, filterReceiverDto) {
+  // 광고성 문자 수신자 필터링
+  async filteredReceivers(email, filterReceiverDto) {
     const user = await this.usersRepository.findOneByEmail(email);
+    const settingDay = filterReceiverDto.day;
 
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    const threeDaysAgoDate = threeDaysAgo.toISOString().slice(0, 10);
+    const DaysAgo = new Date();
+    DaysAgo.setDate(DaysAgo.getDate() - settingDay);
+    const DaysAgoDate = DaysAgo.toISOString().slice(0, 10);
 
     const allReceiverList =
       await this.advertiseReceiverListRepository.findAllByUserIdAndSentAt(
         user.userId,
-        threeDaysAgoDate,
+        DaysAgoDate,
       );
 
     const filterReceiverList = filterReceiverDto.receiverList;

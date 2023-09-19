@@ -116,7 +116,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "messageInfoList": [{"type": "A", "title": "Effic is the best!-A", "content": "A test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.naver.com"]},{"type": "B", "title": "Effic is the best!-B", "content": "B test message입니다. \n메세지를 받은 #{name}님! \n현재 #{name}님의 등급은#{grade}입니다. \n더 많은 물품을 보시고 싶으시면 아래의 url을 눌러주세요. \nhttps://www.google.com https://www.daum.net", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.daum.net"]}],
+    "messageInfoList": [{"type": "A", "title": "Effic is the best!-A", "content": "A test message입니다. \n안녕하세요 #{name}님! \n#{phone} 번호 맞으시죠? \n아래의 url을 눌러 마음에 드는 것이 있다면 속으로만 생각해주세요. \nhttps://www.google.com https://www.naver.com", "advertiseInfo": true, "urlList": ["https://www.google.com","https://www.naver.com"]},{"type": "B", "title": "Effic is the best!-B", "content": "B test message입니다. \n메세지를 받은 #{name}님! \n현재 #{name}님의 등급은#{grade}입니다. \n더 많은 물품을 보시고 싶으시면 아래의 url을 눌러주세요. \nhttps://www.google.com https://www.daum.net", "advertiseInfo": false, "urlList": ["https://www.google.com","https://www.daum.net"]}],
     "urlForResult": "https://www.google.com",
     "hostnumber": "15228016",
     "receiverList": [{"phone": "01036289823", "name": "clo", "grade": "A"},{"phone": "01936289823", "name": "clo2", "grade": "B"},{"phone": "01836289823", "name": "clo3", "grade": "A"},{"phone": "01736289823", "name": "clo4", "grade": "C"},{"phone": "01636289823", "name": "clo5", "grade": "B"},{"phone": "01536289823", "name": "clo6", "grade": "D"},{"phone": "01899989278", "name": "clo7", "grade": "B"},{"phone": "01899989279", "name": "clo8", "grade": "B"},{"phone": "01899989288", "name": "clo9", "grade": "B"},{"phone": "01899989458", "name": "clo10", "grade": "B"}]
@@ -155,8 +155,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "title": "점심 초청 명단",
-    "members": [{"name": "권용재", "number": "01099889783"}, {"name": "김영희", "number": "01087654321"}]
+    "title": "아침 초청 명단",
+    "members": [{"name": "김민수", "number": "01099889781"}, {"name": "김영석", "number": "01099889781"}]
 }
 
 # {
@@ -251,7 +251,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #   ]
 # }
 
-
 ### 주소록 멤버 삭제
 Delete http://localhost:8000/phonebook/3/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
@@ -315,13 +314,14 @@ Content-Type: application/json
 DELETE http://localhost:8000/phonebook/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 
-### 3일 이내 수신자 필터링
+### 광고성 문자 수신자 필터링
 Post http://localhost:8000/messages/filter
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 Content-Type: application/json
 
 {
-    "receiverList": ["01799998888", "01999989889", "01899989278"]
+    "receiverList": ["01799998888", "01999989889", "01899989278"],
+    "day": 1
 }
 
 # {

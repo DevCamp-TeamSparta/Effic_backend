@@ -117,7 +117,7 @@ export class MessagesController {
     return { groupList };
   }
 
-  // 3일 이내 광고성 문자 수신자 필터링
+  // 광고성 문자 수신자 필터링
   @Post('/filter')
   async filterReceiver(
     @Body() filterReceiverDto: FilterReceiverDto,
@@ -127,11 +127,11 @@ export class MessagesController {
     const decodedAccessToken: any = jwt.decode(accessToken);
 
     const email = decodedAccessToken.email;
-    const filterReceiver = await this.messagesService.filterReceivers(
+    const filteredReceivers = await this.messagesService.filteredReceivers(
       email,
       filterReceiverDto,
     );
 
-    return { filterReceiver };
+    return { filteredReceivers };
   }
 }
