@@ -616,7 +616,7 @@ export class MessagesService {
     throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);
   }
 
-  // AllRecieverList에 저장
+  // AdvertiseReceiverList 저장
   async saveAdvertiseReceiverList(receiverList, userId, messageGroupId, now) {
     for (let i = 0; i < receiverList.length; i++) {
       const allReceiverList = new AdvertiseReceiverList();
