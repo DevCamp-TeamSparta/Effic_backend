@@ -4,7 +4,7 @@ import {
   MessageContent,
   MessageGroup,
   UrlInfo,
-  AllReceiverList,
+  AdvertiseReceiverList,
 } from './message.entity';
 import { Repository, DataSource } from 'typeorm';
 
@@ -109,9 +109,9 @@ export class MessageGroupRepo extends Repository<MessageGroup> {
 }
 
 @Injectable()
-export class AllReceiverRepository extends Repository<AllReceiverList> {
+export class AdvertiseReceiverListRepository extends Repository<AdvertiseReceiverList> {
   constructor(private datasource: DataSource) {
-    super(AllReceiverList, datasource.createEntityManager());
+    super(AdvertiseReceiverList, datasource.createEntityManager());
   }
 
   async findAllByUserIdAndSentAt(userId: number, threeDaysAgoDate) {

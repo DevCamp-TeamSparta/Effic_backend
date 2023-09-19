@@ -9,12 +9,12 @@ import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
 import { shortIoConfig, tlyConfig } from 'config/short-io.config';
-import { Message, TlyUrlInfo, AllReceiverList } from '../message.entity';
+import { Message, TlyUrlInfo, AdvertiseReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { UrlInfo } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
-import { AllReceiverRepository } from '../messages.repository';
+import { AdvertiseReceiverListRepository } from '../messages.repository';
 import { UsedPayments } from 'src/results/result.entity';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class MessagesService {
     private readonly usersRepository: UsersRepository,
     private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
-    private readonly allReceiverRepository: AllReceiverRepository,
+    private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -112,12 +112,14 @@ export class MessagesService {
 
     await this.deductedUserMoney(user, receiverPhones, saveMessageInfo);
 
-    await this.saveAllReceiverList(
-      defaultMessageDto.receiverList,
-      user.userId,
-      saveMessageInfo.messageGroupId,
-      new Date(),
-    );
+    if (defaultMessageDto.advertiseInfo === true) {
+      await this.saveAdvertiseReceiverList(
+        defaultMessageDto.receiverList,
+        user.userId,
+        saveMessageInfo.messageGroupId,
+        new Date(),
+      );
+    }
 
     return {
       messageId: saveMessageInfo.messageId,
@@ -589,12 +591,21 @@ export class MessagesService {
     // 유저 금액 차감
     await this.deductedUserMoney(user, receiverPhones, takeAbMessageInfo);
 
-    await this.saveAllReceiverList(
-      abTestMessageDto.receiverList,
-      user.userId,
-      result.id,
-      new Date(),
-    );
+    if (abTestMessageDto.messageInfoList[0].advertiseInfo === true) {
+      await this.saveAdvertiseReceiverList(
+        abTestMessageDto.receiverList,
+        user.userId,
+        result.id,
+        new Date(),
+      );
+    } else if (abTestMessageDto.messageInfoList[1].advertiseInfo === true) {
+      await this.saveAdvertiseReceiverList(
+        abTestMessageDto.receiverList,
+        user.userId,
+        result.id,
+        new Date(),
+      );
+    }
 
     return {
       messageGroupId: result.id,
@@ -606,9 +617,9 @@ export class MessagesService {
   }
 
   // AllRecieverList에 저장
-  async saveAllReceiverList(receiverList, userId, messageGroupId, now) {
+  async saveAdvertiseReceiverList(receiverList, userId, messageGroupId, now) {
     for (let i = 0; i < receiverList.length; i++) {
-      const allReceiverList = new AllReceiverList();
+      const allReceiverList = new AdvertiseReceiverList();
       allReceiverList.name = receiverList[i].name;
       allReceiverList.number = receiverList[i].phone;
       allReceiverList.userId = userId;
@@ -627,7 +638,7 @@ export class MessagesService {
     const threeDaysAgoDate = threeDaysAgo.toISOString().slice(0, 10);
 
     const allReceiverList =
-      await this.allReceiverRepository.findAllByUserIdAndSentAt(
+      await this.advertiseReceiverListRepository.findAllByUserIdAndSentAt(
         user.userId,
         threeDaysAgoDate,
       );

@@ -16,7 +16,7 @@ import {
   MessagesRepository,
   UrlInfosRepository,
   MessagesContentRepository,
-  AllReceiverRepository,
+  AdvertiseReceiverListRepository,
 } from 'src/messages/messages.repository';
 import { TlyUrlInfo, UrlInfo } from 'src/messages/message.entity';
 import { MessagesService } from 'src/messages/service/messages.service';
@@ -37,7 +37,7 @@ import { MessagesService } from 'src/messages/service/messages.service';
     MessageGroupRepo,
     UrlInfosRepository,
     MessagesContentRepository,
-    AllReceiverRepository,
+    AdvertiseReceiverListRepository,
   ],
   exports: [ResultsService, NcpResultsRepository, UrlResultsRepository],
 })

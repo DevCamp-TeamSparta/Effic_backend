@@ -71,10 +71,10 @@ export class Message extends BaseEntity {
   @JoinColumn({ name: 'messageGroupId' })
   messageGroup: Promise<MessageGroup>;
 
-  @OneToMany(() => AllReceiverList, (receiver) => receiver.message, {
+  @OneToMany(() => AdvertiseReceiverList, (receiver) => receiver.message, {
     cascade: true,
   })
-  allReceiverList: AllReceiverList[];
+  allReceiverList: AdvertiseReceiverList[];
 }
 
 @Entity()
@@ -167,7 +167,7 @@ export class UrlInfo extends BaseEntity {
 }
 
 @Entity()
-export class AllReceiverList extends BaseEntity {
+export class AdvertiseReceiverList extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   receiverId: number;
 
@@ -183,7 +183,7 @@ export class AllReceiverList extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 
-  @ManyToOne(() => User, (user) => user.allReceiverList, {
+  @ManyToOne(() => User, (user) => user.advertiseReceiverList, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'userId' })
