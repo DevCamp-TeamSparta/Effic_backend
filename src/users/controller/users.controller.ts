@@ -12,6 +12,7 @@ import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
+import { UpdateBizserviceIdDto } from '../dto/update-bizserviceId.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
 import { AuthGuard } from 'src/auth.guard';
@@ -191,5 +192,28 @@ export class UsersController {
     }
 
     return await this.usersService.findHostnumberDetail(user.userId);
+  }
+
+  // bizmessage serviceId 입력
+  @Patch('/me/bizserviceid')
+  async updateBizserviceId(
+    @Headers('Authorization') authorization: string,
+    @Body() updateBizserviceIdDto: UpdateBizserviceIdDto,
+  ) {
+    this.logger.verbose('User bizserviceId update');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
+    return await this.usersService.updateBizserviceId(
+      user.userId,
+      updateBizserviceIdDto,
+    );
   }
 }

@@ -39,7 +39,10 @@ export class BizmessageService {
     return { requestIdList }; // 수정되어야할 부분
   }
 
-  async makeBody() {}
+  async makeBody() {
+    const shortenedUrls = [];
+    const idStrings = [];
+  }
 
   // 이미지 업로드
   //   async uploadImage(userId) {

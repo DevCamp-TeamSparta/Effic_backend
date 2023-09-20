@@ -321,4 +321,29 @@ export class UsersService {
 
     return userNcpInfo;
   }
+
+  // bizmessage serviceId 입력
+  async updateBizserviceId(userId: number, updateBizserviceIdDto) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    if (!userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (userNcpInfo.bizServiceId !== '') {
+      throw new HttpException(
+        'BizServiceId is already provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userNcpInfo.bizServiceId = null;
+    userNcpInfo.bizServiceId = updateBizserviceIdDto.bizServiceId;
+
+    await this.userNcpInfoRepository.save(userNcpInfo);
+
+    return userNcpInfo;
+  }
 }

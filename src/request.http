@@ -86,7 +86,7 @@ Content-Type: application/json
 
 ### dafault message result - ncp 
 ### test용입니다 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/default/ncp/2
+Get http://localhost:8000/results/default/ncp/3
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0MDUzNDEsImV4cCI6MTY5NDQ5MTc0MX0.EzZnKByWYN0jbb_mogFluYy3FjY_lvD2F0dXd1zsrws
 Content-Type: application/json
 
@@ -155,8 +155,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "title": "아침 초청 명단",
-    "members": [{"name": "김민수", "number": "01099889781"}, {"name": "김영석", "number": "01099889781"}]
+    "title": "항해 초청 명단",
+    "members": [{"name": "김민수", "number": "01099889782"}, {"name": "김영석", "number": "01099889781"}]
 }
 
 # {
@@ -228,7 +228,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # ]
 
 ### 주소록 멤버 조회
-Get http://localhost:8000/phonebook/2
+Get http://localhost:8000/phonebook/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 
 # {
@@ -267,7 +267,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # }
 
 ### 주소록 title 수정
-Patch http://localhost:8000/phonebook/2
+Patch http://localhost:8000/phonebook/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 Content-Type: application/json
 
@@ -288,7 +288,7 @@ Content-Type: application/json
 # }
 
 ### 주소록 멤버 추가
-Post http://localhost:8000/phonebook/4
+Post http://localhost:8000/phonebook/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 Content-Type: application/json
 
@@ -386,3 +386,29 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #     "userId": 1
 #   }
 # ]
+
+### bizmessage serviceId 입력
+Patch http://localhost:8000/users/me/bizserviceid
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub"
+}
+
+# {
+#   "userInfoNcpId": 1,
+#   "accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
+#   "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
+#   "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub",
+#   "secretKey": "x5zzaAzozM5h0k36cROO6LEuUMyRqP0di1eWXHJu",
+#   "advertiseNumber": [
+#     "0801111112"
+#   ],
+#   "hostnumber": [
+#     "15228016",
+#     "01036289823",
+#     "01011111113"
+#   ],
+#   "userId": 1
+# }
