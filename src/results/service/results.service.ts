@@ -24,10 +24,10 @@ import { MessagesService } from 'src/messages/service/messages.service';
 import { EntityManager } from 'typeorm';
 import axios from 'axios';
 import * as crypto from 'crypto';
-import { tlyConfig } from 'config/short-io.config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
 import { MessageContent } from 'src/messages/message.entity';
+import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 
 @Injectable()
 export class ResultsService {
@@ -42,6 +42,7 @@ export class ResultsService {
     private readonly ncpResultsRepository: NcpResultsRepository,
     private readonly urlInfosRepository: UrlInfosRepository,
     private readonly messagesContentRepository: MessagesContentRepository,
+    private readonly shorturlService: ShorturlService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -115,35 +116,12 @@ export class ResultsService {
     const statisticsArray = [];
 
     for (const idString of message.idString) {
-      statisticsArray.push({ ...(await this.getResult(idString)), idString });
+      statisticsArray.push({
+        ...(await this.shorturlService.getShorturlResult(idString)),
+        idString,
+      });
     }
     return statisticsArray;
-  }
-
-  async getResult(idString: string) {
-    try {
-      const urlInfo = await this.urlInfosRepository.findOneByIdString(idString);
-      if (!urlInfo) {
-        throw new BadRequestException('idString is wrong');
-      }
-      const tlyResponse = await axios.get(
-        'https://t.ly/api/v1/link/stats?short_url=' +
-          urlInfo.tlyUrlInfo.shortenUrl,
-        {
-          headers: {
-            Authorization: 'Bearer ' + tlyConfig.secretKey,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
-      );
-      const totalClicks = tlyResponse.data.clicks || 0;
-      const humanClicks = tlyResponse.data.unique_clicks || 0;
-      return { totalClicks, humanClicks };
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException();
-    }
   }
 
   // 단축 url A/B 비교 결과
@@ -156,7 +134,9 @@ export class ResultsService {
     const statisticsArray = [];
 
     try {
-      statisticsArray.push(await this.getResult(message.urlForResult));
+      statisticsArray.push(
+        await this.shorturlService.getShorturlResult(message.urlForResult),
+      );
     } catch (error) {
       console.log(error);
       throw error;
@@ -611,27 +591,6 @@ export class ResultsService {
           error,
         );
       }
-    }
-  }
-
-  async tlyInfo(idString: string) {
-    try {
-      const tlyResponse = await axios.get(
-        'https://t.ly/api/v1/link/stats?short_url=' + idString,
-        {
-          headers: {
-            Authorization: 'Bearer ' + tlyConfig.secretKey,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
-      );
-      const totalClicks = tlyResponse.data.clicks || 0;
-      const humanClicks = tlyResponse.data.unique_clicks || 0;
-      return { totalClicks, humanClicks };
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException();
     }
   }
 }

@@ -87,12 +87,4 @@ export class ResultsController {
     this.logger.verbose('Default message ncp result');
     return await this.resultsService.ncpResult(messageId, headerEmail);
   }
-
-  //test용입니다. 실제로 사용되지 않습니다.
-  @Get('/tlyinfo/:messageId')
-  async tlyInfo(@Param('messageId') messageId: number) {
-    this.logger.verbose('TLY info');
-    const isString = 'https://t.ly/DRA9f';
-    return await this.resultsService.tlyInfo(isString);
-  }
 }

@@ -9,8 +9,6 @@ import { UsersService } from '../../users/service/users.service';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import * as crypto from 'crypto';
 import axios from 'axios';
-import got from 'got';
-import { shortIoConfig, tlyConfig } from 'config/short-io.config';
 import { Message, AdvertiseReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
@@ -124,68 +122,6 @@ export class MessagesService {
       messageGroupId: saveMessageInfo.messageGroupId,
     };
   }
-
-  // 단축 URL 생성
-  // async makeShortenUrl(url: string) {
-  //   // TODO: t.ly로 단축 & DB에 저장
-  //   const token = tlyConfig.secretKey;
-  //   const tlyResponse = await got<{
-  //     short_url: string;
-  //     long_url: string;
-  //     short_id: string;
-  //   }>({
-  //     method: 'POST',
-  //     url: 'https://t.ly/api/v1/link/shorten',
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //     json: {
-  //       long_url: url,
-  //     },
-  //     responseType: 'json',
-  //   });
-
-  //   return got<{
-  //     shortURL: string;
-  //     idString: string;
-  //     originalURL: string;
-  //   }>({
-  //     method: 'POST',
-  //     url: 'https://api.short.io/links',
-  //     headers: {
-  //       authorization: shortIoConfig.secretKey,
-  //     },
-  //     json: {
-  //       originalURL: tlyResponse.body.short_url,
-  //       domain: 'effi.kr',
-  //       allowDuplicates: true,
-  //     },
-  //     responseType: 'json',
-  //   })
-  //     .then((response) => {
-  //       const tlyUrlInfo = new TlyUrlInfo();
-  //       tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
-  //       tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
-  //       tlyUrlInfo.idString = tlyResponse.body.short_id;
-  //       tlyUrlInfo.firstShortenId = response.body.idString;
-
-  //       const urlInfo = new UrlInfo();
-  //       urlInfo.originalUrl = tlyResponse.body.long_url;
-  //       urlInfo.shortenUrl = response.body.shortURL;
-  //       urlInfo.idString = response.body.idString;
-
-  //       this.entityManager.transaction(async (transactionalEntityManager) => {
-  //         await transactionalEntityManager.save(tlyUrlInfo);
-  //         await transactionalEntityManager.save(urlInfo);
-  //       });
-
-  //       return response.body;
-  //     })
-  //     .catch((e) => {
-  //       console.error('shorten fail', e.response.body);
-  //       throw new HttpException(e.response.body, HttpStatus.BAD_REQUEST);
-  //     });
-  // }
 
   async makeBody(user, messageInfoList, messageDto, receiverList) {
     const shortenedUrls = [];
