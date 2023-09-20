@@ -330,3 +330,59 @@ Content-Type: application/json
 #     "01999989889"
 #   ]
 # }
+
+### 발신번호 수정
+Patch http://localhost:8000/users/me/hostnumber
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "userId": 1,
+    "hostnumberwithmemo": [{"hostnumber":"15228016","memo": "스파르타"}, {"hostnumber":"01036289823","memo": ""}, {"hostnumber":"01011111113","memo": "항해"}]
+}
+
+# [
+#   {
+#     "hostnumberDetailId": 1,
+#     "hostnumber": "15228016",
+#     "memo": "스파르타",
+#     "userId": 1
+#   },
+#   {
+#     "hostnumberDetailId": 2,
+#     "hostnumber": "01036289823",
+#     "memo": "",
+#     "userId": 1
+#   },
+#   {
+#     "hostnumberDetailId": 3,
+#     "hostnumber": "01011111113",
+#     "memo": "항해",
+#     "userId": 1
+#   }
+# ]
+
+### 발신번호와 메모 정보 가져오기
+Get http://localhost:8000/users/hostnumberdetail
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+
+# [
+#   {
+#     "hostnumberDetailId": 16,
+#     "hostnumber": "15228016",
+#     "memo": "스파르타",
+#     "userId": 1
+#   },
+#   {
+#     "hostnumberDetailId": 17,
+#     "hostnumber": "01036289823",
+#     "memo": "",
+#     "userId": 1
+#   },
+#   {
+#     "hostnumberDetailId": 18,
+#     "hostnumber": "01011111113",
+#     "memo": "항해",
+#     "userId": 1
+#   }
+# ]

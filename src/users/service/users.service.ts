@@ -244,6 +244,13 @@ export class UsersService {
     await this.usersRepository.save(user);
     await this.userNcpInfoRepository.save(userNcpInfo);
 
+    const hostnumberDelete = await this.entityManager.find(HostnumberDetail, {
+      where: { userId },
+    });
+    if (hostnumberDelete) {
+      await this.entityManager.remove(hostnumberDelete);
+    }
+
     for (let i = 0; i < hostnumberwithmemo.length; i++) {
       const hostnumberDetail = new HostnumberDetail();
       hostnumberDetail.hostnumber = hostnumberwithmemo[i].hostnumber;
@@ -252,6 +259,15 @@ export class UsersService {
       await this.entityManager.save(hostnumberDetail);
     }
 
+    const hostnumberDetails = await this.entityManager.find(HostnumberDetail, {
+      where: { userId },
+    });
+
+    return hostnumberDetails;
+  }
+
+  // 발신번호와 메모 정보 가져오기
+  async findHostnumberDetail(userId: number) {
     const hostnumberDetails = await this.entityManager.find(HostnumberDetail, {
       where: { userId },
     });

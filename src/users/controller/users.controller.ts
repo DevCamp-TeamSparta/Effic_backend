@@ -154,8 +154,6 @@ export class UsersController {
     } else {
       return { user };
     }
-
-    // 추후 발신번호 수정 시 주석 풀고 사용할 코드
   }
 
   // 발신번호 수정
@@ -176,5 +174,22 @@ export class UsersController {
     }
 
     return await this.usersService.updateHostnumber(updateHostnumberDto);
+  }
+
+  // 발신번호와 메모 정보 가져오기
+  @Get('/hostnumberdetail')
+  async findHostnumberDetail(@Headers('Authorization') authorization: string) {
+    this.logger.verbose('User hostnumber info');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
+    return await this.usersService.findHostnumberDetail(user.userId);
   }
 }
