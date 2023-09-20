@@ -81,6 +81,9 @@ export class UserNcpInfo extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   serviceId: string;
 
+  @Column({ type: 'varchar', nullable: false, default: '' })
+  bizServiceId: string;
+
   @Column({ type: 'varchar', nullable: false })
   secretKey: string;
 

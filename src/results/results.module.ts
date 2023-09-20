@@ -20,6 +20,7 @@ import {
 } from 'src/messages/messages.repository';
 import { TlyUrlInfo, UrlInfo } from 'src/messages/message.entity';
 import { MessagesService } from 'src/messages/service/messages.service';
+import { UsersService } from 'src/users/service/users.service';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MessagesService } from 'src/messages/service/messages.service';
   providers: [
     ResultsService,
     MessagesService,
+    UsersService,
     UsersRepository,
     UserNcpInfoRepository,
     NcpResultsRepository,

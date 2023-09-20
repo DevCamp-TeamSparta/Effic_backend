@@ -17,6 +17,7 @@ import {
 import { ResultsService } from 'src/results/service/results.service';
 import { UrlResultsRepository } from 'src/results/results.repository';
 import { NcpResultsRepository } from 'src/results/results.repository';
+import { UsersService } from 'src/users/service/users.service';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { NcpResultsRepository } from 'src/results/results.repository';
     MessagesService,
     MessagesRepository,
     ResultsService,
+    UsersService,
     UsersRepository,
     UserNcpInfoRepository,
     UrlInfosRepository,

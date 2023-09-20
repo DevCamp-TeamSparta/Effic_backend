@@ -11,6 +11,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { PhonebookModule } from './phonebook/phonebook.module';
 import { AuthGuard } from './auth.guard';
 import { BizmessageModule } from './bizmessage/bizmessage.module';
+import { ShorturlModule } from './shorturl/shorturl.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { BizmessageModule } from './bizmessage/bizmessage.module';
     ScheduleModule.forRoot(),
     PhonebookModule,
     BizmessageModule,
+    ShorturlModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],

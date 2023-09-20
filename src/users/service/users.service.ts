@@ -208,6 +208,7 @@ export class UsersService {
     }
   }
 
+  // 로그아웃
   async logout(user: User) {
     user.refreshToken = null;
     await this.usersRepository.logout(user);
@@ -226,8 +227,6 @@ export class UsersService {
   async updateHostnumber(updateHostnumberDto: UpdateHostnumberDto) {
     const { userId, hostnumberwithmemo } = updateHostnumberDto;
     const hostnumber = hostnumberwithmemo.map((info) => info.hostnumber);
-
-    console.log(hostnumber);
 
     const user = await this.usersRepository.findOneByUserId(userId);
     const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
@@ -273,5 +272,53 @@ export class UsersService {
     });
 
     return hostnumberDetails;
+  }
+
+  // bizserviceId 존재유무 확인
+  async checkBizserviceId(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      user.userId,
+    );
+
+    if (!userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    const bizServiceId = userNcpInfo.bizServiceId;
+
+    if (bizServiceId === '') {
+      throw new HttpException(
+        'BizServiceId is not provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return { userId: user.userId, bizServiceId };
+  }
+
+  // 유저 금액 확인
+  async assertCheckUserMoney(userId: number, count: number) {
+    const user = await this.usersRepository.findOneByUserId(userId);
+
+    const totalMoney = user.point + user.money;
+
+    if (totalMoney < count * 3) {
+      const requiredPoints = count * 3 - totalMoney;
+      throw new HttpException(
+        `User does not have enough money. Please charge your money. need ${requiredPoints} points`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // 유저의 NcpInfo 가져오기
+  async findUserNcpInfoByUserId(userId: number) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    return userNcpInfo;
   }
 }

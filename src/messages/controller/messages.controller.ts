@@ -31,7 +31,7 @@ export class MessagesController {
     @Body(new DefaultMessageValidationPipe())
     defaultMessageDto: DefaultMessageDto,
     @Headers('Authorization') authorization: string,
-  ) {
+  ): Promise<object> {
     this.logger.verbose('Default message sending');
 
     const accessToken = authorization.split(' ')[1];

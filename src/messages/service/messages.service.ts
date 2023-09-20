@@ -5,6 +5,7 @@ import {
   UsersRepository,
   UserNcpInfoRepository,
 } from '../../users/users.repository';
+import { UsersService } from '../../users/service/users.service';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
@@ -21,6 +22,7 @@ import { UsedPayments } from 'src/results/result.entity';
 export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
+    private readonly usersService: UsersService,
     private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
     private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
@@ -73,15 +75,10 @@ export class MessagesService {
       (info) => info.phone,
     );
 
-    const totalMoney = user.money + user.point;
-
-    if (totalMoney < receiverPhones.length * 3) {
-      const requiredPoints = receiverPhones.length * 3 - totalMoney;
-      throw new HttpException(
-        `need more points: ${requiredPoints}`,
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    await this.usersService.assertCheckUserMoney(
+      user.userId,
+      receiverPhones.length,
+    );
 
     const requestIdList: string[] = [];
     const receiverList = defaultMessageDto.receiverList;
@@ -457,16 +454,11 @@ export class MessagesService {
       (info) => info.phone,
     );
 
-    // 유저 금액 확인 (보낼 수 있는지)
-    const totalMoney = user.money + user.point;
-
-    if (totalMoney < receiverPhones.length * 3) {
-      const requiredPoints = receiverPhones.length * 3 - totalMoney;
-      throw new HttpException(
-        `need more moneys: ${requiredPoints}`,
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    // 유저 금액 확인
+    await this.usersService.assertCheckUserMoney(
+      user.userId,
+      receiverPhones.length * 3,
+    );
 
     // 리시버를 3개로 나누기
     let testReceiverNumber = 0;
