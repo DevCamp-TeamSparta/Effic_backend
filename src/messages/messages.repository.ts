@@ -3,7 +3,6 @@ import {
   Message,
   MessageContent,
   MessageGroup,
-  UrlInfo,
   AdvertiseReceiverList,
 } from './message.entity';
 import { Repository, DataSource } from 'typeorm';
@@ -65,22 +64,6 @@ export class MessagesContentRepository extends Repository<MessageContent> {
     messageGroupId: number,
   ): Promise<MessageContent> {
     return await this.findOne({ where: { messageGroupId } });
-  }
-}
-
-@Injectable()
-export class UrlInfosRepository extends Repository<UrlInfo> {
-  constructor(private datasource: DataSource) {
-    super(UrlInfo, datasource.createEntityManager());
-  }
-
-  async findOneByIdString(idString: string): Promise<UrlInfo> {
-    return await this.findOne({
-      where: { idString },
-      relations: {
-        tlyUrlInfo: true,
-      },
-    });
   }
 }
 

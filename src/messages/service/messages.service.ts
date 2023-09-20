@@ -6,14 +6,14 @@ import {
   UserNcpInfoRepository,
 } from '../../users/users.repository';
 import { UsersService } from '../../users/service/users.service';
+import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import got from 'got';
 import { shortIoConfig, tlyConfig } from 'config/short-io.config';
-import { Message, TlyUrlInfo, AdvertiseReceiverList } from '../message.entity';
+import { Message, AdvertiseReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
-import { UrlInfo } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
 import { AdvertiseReceiverListRepository } from '../messages.repository';
 import { UsedPayments } from 'src/results/result.entity';
@@ -23,6 +23,7 @@ export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly usersService: UsersService,
+    private readonly shorturlService: ShorturlService,
     private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
     private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
@@ -125,66 +126,66 @@ export class MessagesService {
   }
 
   // 단축 URL 생성
-  async makeShortenUrl(url: string) {
-    // TODO: t.ly로 단축 & DB에 저장
-    const token = tlyConfig.secretKey;
-    const tlyResponse = await got<{
-      short_url: string;
-      long_url: string;
-      short_id: string;
-    }>({
-      method: 'POST',
-      url: 'https://t.ly/api/v1/link/shorten',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      json: {
-        long_url: url,
-      },
-      responseType: 'json',
-    });
+  // async makeShortenUrl(url: string) {
+  //   // TODO: t.ly로 단축 & DB에 저장
+  //   const token = tlyConfig.secretKey;
+  //   const tlyResponse = await got<{
+  //     short_url: string;
+  //     long_url: string;
+  //     short_id: string;
+  //   }>({
+  //     method: 'POST',
+  //     url: 'https://t.ly/api/v1/link/shorten',
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //     json: {
+  //       long_url: url,
+  //     },
+  //     responseType: 'json',
+  //   });
 
-    return got<{
-      shortURL: string;
-      idString: string;
-      originalURL: string;
-    }>({
-      method: 'POST',
-      url: 'https://api.short.io/links',
-      headers: {
-        authorization: shortIoConfig.secretKey,
-      },
-      json: {
-        originalURL: tlyResponse.body.short_url,
-        domain: 'effi.kr',
-        allowDuplicates: true,
-      },
-      responseType: 'json',
-    })
-      .then((response) => {
-        const tlyUrlInfo = new TlyUrlInfo();
-        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
-        tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
-        tlyUrlInfo.idString = tlyResponse.body.short_id;
-        tlyUrlInfo.firstShortenId = response.body.idString;
+  //   return got<{
+  //     shortURL: string;
+  //     idString: string;
+  //     originalURL: string;
+  //   }>({
+  //     method: 'POST',
+  //     url: 'https://api.short.io/links',
+  //     headers: {
+  //       authorization: shortIoConfig.secretKey,
+  //     },
+  //     json: {
+  //       originalURL: tlyResponse.body.short_url,
+  //       domain: 'effi.kr',
+  //       allowDuplicates: true,
+  //     },
+  //     responseType: 'json',
+  //   })
+  //     .then((response) => {
+  //       const tlyUrlInfo = new TlyUrlInfo();
+  //       tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
+  //       tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
+  //       tlyUrlInfo.idString = tlyResponse.body.short_id;
+  //       tlyUrlInfo.firstShortenId = response.body.idString;
 
-        const urlInfo = new UrlInfo();
-        urlInfo.originalUrl = tlyResponse.body.long_url;
-        urlInfo.shortenUrl = response.body.shortURL;
-        urlInfo.idString = response.body.idString;
+  //       const urlInfo = new UrlInfo();
+  //       urlInfo.originalUrl = tlyResponse.body.long_url;
+  //       urlInfo.shortenUrl = response.body.shortURL;
+  //       urlInfo.idString = response.body.idString;
 
-        this.entityManager.transaction(async (transactionalEntityManager) => {
-          await transactionalEntityManager.save(tlyUrlInfo);
-          await transactionalEntityManager.save(urlInfo);
-        });
+  //       this.entityManager.transaction(async (transactionalEntityManager) => {
+  //         await transactionalEntityManager.save(tlyUrlInfo);
+  //         await transactionalEntityManager.save(urlInfo);
+  //       });
 
-        return response.body;
-      })
-      .catch((e) => {
-        console.error('shorten fail', e.response.body);
-        throw new HttpException(e.response.body, HttpStatus.BAD_REQUEST);
-      });
-  }
+  //       return response.body;
+  //     })
+  //     .catch((e) => {
+  //       console.error('shorten fail', e.response.body);
+  //       throw new HttpException(e.response.body, HttpStatus.BAD_REQUEST);
+  //     });
+  // }
 
   async makeBody(user, messageInfoList, messageDto, receiverList) {
     const shortenedUrls = [];
@@ -195,7 +196,7 @@ export class MessagesService {
     );
 
     for (const url of messageInfoList.urlList) {
-      const response = await this.makeShortenUrl(url);
+      const response = await this.shorturlService.createShorturl(url);
       shortenedUrls.push(response.shortURL);
       idStrings.push(response.idString);
     }

@@ -8,7 +8,6 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import {
   MessageGroupRepo,
   MessagesRepository,
-  UrlInfosRepository,
 } from 'src/messages/messages.repository';
 import {
   UserNcpInfoRepository,
@@ -19,6 +18,7 @@ import {
   UrlResultsRepository,
   NcpResultsRepository,
 } from '../results.repository';
+import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { MessagesService } from 'src/messages/service/messages.service';
 import { EntityManager } from 'typeorm';
