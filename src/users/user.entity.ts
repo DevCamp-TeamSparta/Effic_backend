@@ -93,3 +93,18 @@ export class UserNcpInfo extends BaseEntity {
   @Column({ type: 'int', nullable: false })
   userId: number;
 }
+
+@Entity()
+export class HostnumberDetail extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  hostnumberDetailId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  hostnumber: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  memo: string;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+}

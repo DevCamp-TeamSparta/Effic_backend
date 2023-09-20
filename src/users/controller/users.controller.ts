@@ -11,6 +11,7 @@ import {
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
 import { AuthGuard } from 'src/auth.guard';
@@ -153,5 +154,27 @@ export class UsersController {
     } else {
       return { user };
     }
+
+    // 추후 발신번호 수정 시 주석 풀고 사용할 코드
+  }
+
+  // 발신번호 수정
+  @Patch('/me/hostnumber')
+  async updateHostnumber(
+    @Headers('Authorization') authorization: string,
+    @Body() updateHostnumberDto: UpdateHostnumberDto,
+  ): Promise<object> {
+    this.logger.verbose('User hostnumber update');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
+    if (user.userId !== updateHostnumberDto.userId) {
+      throw new NotFoundException('User not found!');
+    }
+
+    return await this.usersService.updateHostnumber(updateHostnumberDto);
   }
 }

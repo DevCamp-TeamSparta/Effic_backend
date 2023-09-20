@@ -8,10 +8,11 @@ import {
 import { EntityManager } from 'typeorm';
 import { UserNcpInfoRepository, UsersRepository } from '../users.repository';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { User } from '../user.entity';
+import { User, HostnumberDetail } from '../user.entity';
 import * as jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../../config/jwt.config';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
 
 @Injectable()
 export class UsersService {
@@ -219,5 +220,42 @@ export class UsersService {
     );
 
     return userNcpInfo;
+  }
+
+  // 발신번호 수정
+  async updateHostnumber(updateHostnumberDto: UpdateHostnumberDto) {
+    const { userId, hostnumberwithmemo } = updateHostnumberDto;
+    const hostnumber = hostnumberwithmemo.map((info) => info.hostnumber);
+
+    console.log(hostnumber);
+
+    const user = await this.usersRepository.findOneByUserId(userId);
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    if (!user || !userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.hostnumber = hostnumber;
+    userNcpInfo.hostnumber = hostnumber;
+
+    await this.usersRepository.save(user);
+    await this.userNcpInfoRepository.save(userNcpInfo);
+
+    for (let i = 0; i < hostnumberwithmemo.length; i++) {
+      const hostnumberDetail = new HostnumberDetail();
+      hostnumberDetail.hostnumber = hostnumberwithmemo[i].hostnumber;
+      hostnumberDetail.memo = hostnumberwithmemo[i].memo;
+      hostnumberDetail.userId = userId;
+      await this.entityManager.save(hostnumberDetail);
+    }
+
+    const hostnumberDetails = await this.entityManager.find(HostnumberDetail, {
+      where: { userId },
+    });
+
+    return hostnumberDetails;
   }
 }
