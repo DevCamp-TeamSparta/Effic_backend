@@ -1,27 +1,29 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import {
-  UsersRepository,
-  UserNcpInfoRepository,
-} from '../../users/users.repository';
+import { UsersRepository } from '../../users/users.repository';
+import { UsersService } from '../../users/service/users.service';
+import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import * as crypto from 'crypto';
 import axios from 'axios';
-import got from 'got';
-import { shortIoConfig, tlyConfig } from 'config/short-io.config';
-import { Message, TlyUrlInfo, AdvertiseReceiverList } from '../message.entity';
+import { Message, AdvertiseReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
-import { UrlInfo } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
 import { AdvertiseReceiverListRepository } from '../messages.repository';
 import { UsedPayments } from 'src/results/result.entity';
+import {
+  NCP_contentPrefix,
+  NCP_contentSuffix,
+  NCP_SMS_price,
+} from '../../../commons/constants';
 
 @Injectable()
 export class MessagesService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly userNcpInfoRepository: UserNcpInfoRepository,
+    private readonly usersService: UsersService,
+    private readonly shorturlService: ShorturlService,
     private readonly messageGroupRepo: MessageGroupRepo,
     private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -56,7 +58,7 @@ export class MessagesService {
     return content;
   }
 
-  createMessage(content: string, info: { [key: string]: string }) {
+  createMessageWithVariable(content: string, info: { [key: string]: string }) {
     Object.keys(info).forEach((key) => {
       const regex = new RegExp(`#{${key}}`, 'g');
       content = content.replace(regex, info[key]);
@@ -73,15 +75,10 @@ export class MessagesService {
       (info) => info.phone,
     );
 
-    const totalMoney = user.money + user.point;
-
-    if (totalMoney < receiverPhones.length * 3) {
-      const requiredPoints = receiverPhones.length * 3 - totalMoney;
-      throw new HttpException(
-        `need more points: ${requiredPoints}`,
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    await this.usersService.assertCheckUserMoney(
+      user.userId,
+      receiverPhones.length,
+    );
 
     const requestIdList: string[] = [];
     const receiverList = defaultMessageDto.receiverList;
@@ -127,78 +124,16 @@ export class MessagesService {
     };
   }
 
-  // 단축 URL 생성
-  async makeShortenUrl(url: string) {
-    // TODO: t.ly로 단축 & DB에 저장
-    const token = tlyConfig.secretKey;
-    const tlyResponse = await got<{
-      short_url: string;
-      long_url: string;
-      short_id: string;
-    }>({
-      method: 'POST',
-      url: 'https://t.ly/api/v1/link/shorten',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      json: {
-        long_url: url,
-      },
-      responseType: 'json',
-    });
-
-    return got<{
-      shortURL: string;
-      idString: string;
-      originalURL: string;
-    }>({
-      method: 'POST',
-      url: 'https://api.short.io/links',
-      headers: {
-        authorization: shortIoConfig.secretKey,
-      },
-      json: {
-        originalURL: tlyResponse.body.short_url,
-        domain: 'effi.kr',
-        allowDuplicates: true,
-      },
-      responseType: 'json',
-    })
-      .then((response) => {
-        const tlyUrlInfo = new TlyUrlInfo();
-        tlyUrlInfo.originalUrl = tlyResponse.body.long_url;
-        tlyUrlInfo.shortenUrl = tlyResponse.body.short_url;
-        tlyUrlInfo.idString = tlyResponse.body.short_id;
-        tlyUrlInfo.firstShortenId = response.body.idString;
-
-        const urlInfo = new UrlInfo();
-        urlInfo.originalUrl = tlyResponse.body.long_url;
-        urlInfo.shortenUrl = response.body.shortURL;
-        urlInfo.idString = response.body.idString;
-
-        this.entityManager.transaction(async (transactionalEntityManager) => {
-          await transactionalEntityManager.save(tlyUrlInfo);
-          await transactionalEntityManager.save(urlInfo);
-        });
-
-        return response.body;
-      })
-      .catch((e) => {
-        console.error('shorten fail', e.response.body);
-        throw new HttpException(e.response.body, HttpStatus.BAD_REQUEST);
-      });
-  }
-
   async makeBody(user, messageInfoList, messageDto, receiverList) {
     const shortenedUrls = [];
     const idStrings = [];
 
-    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+    const userNcpInfo = await this.usersService.findUserNcpInfoByUserId(
       user.userId,
     );
 
     for (const url of messageInfoList.urlList) {
-      const response = await this.makeShortenUrl(url);
+      const response = await this.shorturlService.createShorturl(url);
       shortenedUrls.push(response.shortURL);
       idStrings.push(response.idString);
     }
@@ -215,8 +150,8 @@ export class MessagesService {
     let contentSuffix = '';
 
     if (isAdvertisement) {
-      contentPrefix = '(광고)';
-      contentSuffix = `\n무료수신거부 ${userNcpInfo.advertiseNumber}`;
+      contentPrefix = NCP_contentPrefix;
+      contentSuffix = `${NCP_contentSuffix} ${userNcpInfo.advertiseNumber}`;
     }
 
     const body = {
@@ -228,7 +163,7 @@ export class MessagesService {
       content: messageInfoList.content,
       messages: receiverList.map((info) => ({
         to: info.phone,
-        content: `${contentPrefix} ${this.createMessage(
+        content: `${contentPrefix} ${this.createMessageWithVariable(
           newContent,
           info,
         )} ${contentSuffix}`,
@@ -369,7 +304,7 @@ export class MessagesService {
   // 유저금액 차감
   async deductedUserMoney(user, receiverPhones, saveMessageInfo) {
     const payment = new UsedPayments();
-    const deductionMoney = receiverPhones.length * 3;
+    const deductionMoney = receiverPhones.length * NCP_SMS_price;
     if (user.point >= deductionMoney) {
       user.point -= deductionMoney;
       payment.usedPoint = deductionMoney;
@@ -457,16 +392,11 @@ export class MessagesService {
       (info) => info.phone,
     );
 
-    // 유저 금액 확인 (보낼 수 있는지)
-    const totalMoney = user.money + user.point;
-
-    if (totalMoney < receiverPhones.length * 3) {
-      const requiredPoints = receiverPhones.length * 3 - totalMoney;
-      throw new HttpException(
-        `need more moneys: ${requiredPoints}`,
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    // 유저 금액 확인
+    await this.usersService.assertCheckUserMoney(
+      user.userId,
+      receiverPhones.length * 3,
+    );
 
     // 리시버를 3개로 나누기
     let testReceiverNumber = 0;

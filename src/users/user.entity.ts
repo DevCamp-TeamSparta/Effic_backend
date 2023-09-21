@@ -81,6 +81,9 @@ export class UserNcpInfo extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   serviceId: string;
 
+  @Column({ type: 'varchar', nullable: false, default: '' })
+  bizServiceId: string;
+
   @Column({ type: 'varchar', nullable: false })
   secretKey: string;
 
@@ -89,6 +92,21 @@ export class UserNcpInfo extends BaseEntity {
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+}
+
+@Entity()
+export class HostnumberDetail extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  hostnumberDetailId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  hostnumber: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  memo: string;
 
   @Column({ type: 'int', nullable: false })
   userId: number;

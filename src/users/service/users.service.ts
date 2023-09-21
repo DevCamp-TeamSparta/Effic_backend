@@ -8,10 +8,12 @@ import {
 import { EntityManager } from 'typeorm';
 import { UserNcpInfoRepository, UsersRepository } from '../users.repository';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { User } from '../user.entity';
+import { User, HostnumberDetail } from '../user.entity';
 import * as jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../../config/jwt.config';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
+import { NCP_SMS_price } from '../../../commons/constants';
 
 @Injectable()
 export class UsersService {
@@ -207,6 +209,7 @@ export class UsersService {
     }
   }
 
+  // 로그아웃
   async logout(user: User) {
     user.refreshToken = null;
     await this.usersRepository.logout(user);
@@ -217,6 +220,133 @@ export class UsersService {
     const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
       userId,
     );
+
+    return userNcpInfo;
+  }
+
+  // 발신번호 수정
+  async updateHostnumber(
+    userId: number,
+    updateHostnumberDto: UpdateHostnumberDto,
+  ) {
+    const { hostnumberwithmemo } = updateHostnumberDto;
+    const hostnumber = hostnumberwithmemo.map((info) => info.hostnumber);
+
+    const user = await this.usersRepository.findOneByUserId(userId);
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    if (!user || !userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.hostnumber = hostnumber;
+    userNcpInfo.hostnumber = hostnumber;
+
+    await this.usersRepository.save(user);
+    await this.userNcpInfoRepository.save(userNcpInfo);
+
+    const hostnumberDelete = await this.entityManager.find(HostnumberDetail, {
+      where: { userId },
+    });
+    if (hostnumberDelete) {
+      await this.entityManager.remove(hostnumberDelete);
+    }
+
+    for (let i = 0; i < hostnumberwithmemo.length; i++) {
+      const hostnumberDetail = new HostnumberDetail();
+      hostnumberDetail.hostnumber = hostnumberwithmemo[i].hostnumber;
+      hostnumberDetail.memo = hostnumberwithmemo[i].memo;
+      hostnumberDetail.userId = userId;
+      await this.entityManager.save(hostnumberDetail);
+    }
+
+    const hostnumberDetails = await this.entityManager.find(HostnumberDetail, {
+      where: { userId },
+    });
+
+    return hostnumberDetails;
+  }
+
+  // 발신번호와 메모 정보 가져오기
+  async findHostnumberDetail(userId: number) {
+    const hostnumberDetails = await this.entityManager.find(HostnumberDetail, {
+      where: { userId },
+    });
+
+    return hostnumberDetails;
+  }
+
+  // bizserviceId 존재유무 확인
+  async checkBizserviceId(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      user.userId,
+    );
+
+    if (!userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    const bizServiceId = userNcpInfo.bizServiceId;
+
+    if (bizServiceId === '') {
+      throw new HttpException(
+        'BizServiceId is not provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return { userId: user.userId, bizServiceId };
+  }
+
+  // 유저 금액 확인
+  async assertCheckUserMoney(userId: number, count: number) {
+    const user = await this.usersRepository.findOneByUserId(userId);
+
+    const totalMoney = user.point + user.money;
+
+    if (totalMoney < count * NCP_SMS_price) {
+      const requiredPoints = count * NCP_SMS_price - totalMoney;
+      throw new HttpException(
+        `User does not have enough money. Please charge your money. need ${requiredPoints} points`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  // 유저의 NcpInfo 가져오기
+  async findUserNcpInfoByUserId(userId: number) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    return userNcpInfo;
+  }
+
+  // bizmessage serviceId 입력
+  async updateBizserviceId(userId: number, updateBizserviceIdDto) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    if (!userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (userNcpInfo.bizServiceId !== '') {
+      throw new HttpException(
+        'BizServiceId is already provided',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    userNcpInfo.bizServiceId = null;
+    userNcpInfo.bizServiceId = updateBizserviceIdDto.bizServiceId;
+
+    await this.userNcpInfoRepository.save(userNcpInfo);
 
     return userNcpInfo;
   }

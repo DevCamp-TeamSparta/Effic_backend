@@ -10,13 +10,15 @@ import {
 import {
   MessagesRepository,
   MessagesContentRepository,
-  UrlInfosRepository,
   MessageGroupRepo,
   AdvertiseReceiverListRepository,
 } from './messages.repository';
 import { ResultsService } from 'src/results/service/results.service';
 import { UrlResultsRepository } from 'src/results/results.repository';
 import { NcpResultsRepository } from 'src/results/results.repository';
+import { UsersService } from 'src/users/service/users.service';
+import { ShorturlService } from 'src/shorturl/service/shorturl.service';
+import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 
 @Module({
   imports: [
@@ -27,19 +29,20 @@ import { NcpResultsRepository } from 'src/results/results.repository';
     MessagesService,
     MessagesRepository,
     ResultsService,
+    UsersService,
     UsersRepository,
     UserNcpInfoRepository,
-    UrlInfosRepository,
     UrlResultsRepository,
     NcpResultsRepository,
     MessagesContentRepository,
     MessageGroupRepo,
     AdvertiseReceiverListRepository,
+    ShorturlService,
+    UrlInfosRepository,
   ],
   exports: [
     MessagesService,
     MessagesRepository,
-    UrlInfosRepository,
     MessagesContentRepository,
     MessageGroupRepo,
     AdvertiseReceiverListRepository,

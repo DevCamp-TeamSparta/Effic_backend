@@ -11,6 +11,8 @@ import {
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
+import { UpdateBizserviceIdDto } from '../dto/update-bizserviceId.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
 import { AuthGuard } from 'src/auth.guard';
@@ -153,5 +155,64 @@ export class UsersController {
     } else {
       return { user };
     }
+  }
+
+  // 발신번호 수정
+  @Patch('/me/hostnumber')
+  async updateHostnumber(
+    @Headers('Authorization') authorization: string,
+    @Body() updateHostnumberDto: UpdateHostnumberDto,
+  ): Promise<object> {
+    this.logger.verbose('User hostnumber update');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
+    return await this.usersService.updateHostnumber(
+      user.userId,
+      updateHostnumberDto,
+    );
+  }
+
+  // 발신번호와 메모 정보 가져오기
+  @Get('/hostnumberdetail')
+  async findHostnumberDetail(@Headers('Authorization') authorization: string) {
+    this.logger.verbose('User hostnumber info');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
+    return await this.usersService.findHostnumberDetail(user.userId);
+  }
+
+  // bizmessage serviceId 입력
+  @Patch('/me/bizserviceid')
+  async updateBizserviceId(
+    @Headers('Authorization') authorization: string,
+    @Body() updateBizserviceIdDto: UpdateBizserviceIdDto,
+  ) {
+    this.logger.verbose('User bizserviceId update');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
+    return await this.usersService.updateBizserviceId(
+      user.userId,
+      updateBizserviceIdDto,
+    );
   }
 }

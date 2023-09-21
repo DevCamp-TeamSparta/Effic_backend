@@ -14,30 +14,31 @@ import {
 import {
   MessageGroupRepo,
   MessagesRepository,
-  UrlInfosRepository,
   MessagesContentRepository,
   AdvertiseReceiverListRepository,
 } from 'src/messages/messages.repository';
-import { TlyUrlInfo, UrlInfo } from 'src/messages/message.entity';
 import { MessagesService } from 'src/messages/service/messages.service';
+import { UsersService } from 'src/users/service/users.service';
+import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
+import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([NcpResult, UrlResult, UrlInfo, TlyUrlInfo]),
-  ],
+  imports: [TypeOrmModule.forFeature([NcpResult, UrlResult])],
   controllers: [ResultsController],
   providers: [
     ResultsService,
     MessagesService,
+    UsersService,
     UsersRepository,
     UserNcpInfoRepository,
     NcpResultsRepository,
     UrlResultsRepository,
     MessagesRepository,
     MessageGroupRepo,
-    UrlInfosRepository,
     MessagesContentRepository,
     AdvertiseReceiverListRepository,
+    UrlInfosRepository,
+    ShorturlService,
   ],
   exports: [ResultsService, NcpResultsRepository, UrlResultsRepository],
 })
