@@ -170,11 +170,10 @@ export class UsersController {
 
     const user = await this.usersService.checkUserInfo(email);
 
-    if (user.userId !== updateHostnumberDto.userId) {
-      throw new NotFoundException('User not found!');
-    }
-
-    return await this.usersService.updateHostnumber(updateHostnumberDto);
+    return await this.usersService.updateHostnumber(
+      user.userId,
+      updateHostnumberDto,
+    );
   }
 
   // 발신번호와 메모 정보 가져오기

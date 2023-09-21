@@ -225,8 +225,11 @@ export class UsersService {
   }
 
   // 발신번호 수정
-  async updateHostnumber(updateHostnumberDto: UpdateHostnumberDto) {
-    const { userId, hostnumberwithmemo } = updateHostnumberDto;
+  async updateHostnumber(
+    userId: number,
+    updateHostnumberDto: UpdateHostnumberDto,
+  ) {
+    const { hostnumberwithmemo } = updateHostnumberDto;
     const hostnumber = hostnumberwithmemo.map((info) => info.hostnumber);
 
     const user = await this.usersRepository.findOneByUserId(userId);

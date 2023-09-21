@@ -14,12 +14,19 @@ export class DefaultBizmessageDto {
   }>;
 
   @IsArray()
+  @IsOptional()
+  imageInfo?: Array<{
+    imageId: string;
+    imageLink: string;
+  }>;
+
+  @IsArray()
   @IsNotEmpty()
   receiverList: string[];
 
   @IsArray()
   @IsOptional()
-  buttonList?: string[];
+  buttonInfo?: string[];
 
   @IsOptional()
   @IsString()

@@ -39,16 +39,12 @@ export class BizmessageService {
         ),
       };
 
-      //   const booleanIsWide = imageUploadDto.isWide ? 'true' : 'false';
-
       let booleanIsWide;
       if (imageUploadDto.isWide === 'true') {
         booleanIsWide = 'true';
       } else {
         booleanIsWide = 'false';
       }
-      console.log(imageUploadDto.isWide);
-      console.log(booleanIsWide);
 
       const form = new FormData();
       form.append(
@@ -159,11 +155,13 @@ export class BizmessageService {
           newContent,
           info,
         )} ${contentSuffix}`,
-        ...(messageDto.buttonList ? { buttons: messageDto.buttonList } : {}),
-        // image: {
-        //   imageId: ,
-        //   imageLink: ,
-        // },
+        ...(messageDto.buttonList ? { buttons: messageDto.buttonInfo } : {}),
+        ...(messageDto.imageInfo
+          ? {
+              imageId: messageDto.imageInfo.imageId,
+              imageLink: messageDto.imageInfo.imageLink,
+            }
+          : {}),
       })),
       ...(messageDto.reservetime
         ? {
