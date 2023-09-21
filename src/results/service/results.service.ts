@@ -593,26 +593,4 @@ export class ResultsService {
       }
     }
   }
-
-  async tlyInfo(idString: string) {
-    try {
-      const tlyResponse = await axios.get(
-        'https://t.ly/api/v1/link/stats?short_url=' + idString,
-        {
-          headers: {
-            Authorization: 'Bearer ' + tlyConfig.secretKey,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        },
-      );
-      const totalClicks = tlyResponse.data.clicks || 0;
-      const humanClicks = tlyResponse.data.unique_clicks || 0;
-      console.log(tlyResponse.data);
-      return { totalClicks, humanClicks };
-    } catch (error) {
-      console.error(error);
-      throw new InternalServerErrorException();
-    }
-  }
 }
