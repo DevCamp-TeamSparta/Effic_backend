@@ -419,7 +419,7 @@ Post http://localhost:8000/bizmessage/image
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 
 # isWide값과, imageFile을 form-data로 보내주세요.
-# 예) isWide: false, imageFile: image.png
+# 예) isWide: false(string으로 보내주세요!), imageFile: image.png
 
 # {
 #   "imageId": "8ae5c21c8ab116a0018ab5c4b02a0018",
@@ -428,3 +428,4 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #   "isWide": false,
 #   "createTime": "2023-09-21T12:24:40.874"
 # }
+
