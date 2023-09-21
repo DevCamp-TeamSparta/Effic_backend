@@ -115,6 +115,16 @@ export class BizmessageService {
       requestIdList.push();
     }
 
+    // imageInfo가 있으면 이미지 url을 단축시켜서 저장
+
+    // buttonInfo가 있으면 버튼 url을 단축시켜서 저장
+
+    // db에 bizmessageinfo 저장
+
+    // 금액 차감
+
+    // 피로도 관리
+
     return { requestIdList }; // 수정되어야할 부분
   }
 
@@ -149,7 +159,7 @@ export class BizmessageService {
     const body = {
       plusFriendId: messageDto.plusFriendId,
       messages: receiverList.map((info) => ({
-        idAd: isAd,
+        idAd: messageDto.bizMessageInfoList.isAd,
         to: info.phone,
         content: `${contentPrefix} ${this.createMessageWithVariable(
           newContent,
@@ -171,6 +181,8 @@ export class BizmessageService {
         : {}),
     };
 
+    console.log(body);
+
     let headers;
     try {
       const now = Date.now().toString();
@@ -187,7 +199,10 @@ export class BizmessageService {
       );
       return { body, response, idStrings, shortenedUrls };
     } catch (error) {
-      throw new HttpException(error.response.data, error.response.status);
+      if (error.response) {
+        throw new HttpException(error.response.data, error.response.status);
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -222,11 +237,15 @@ export class BizmessageService {
     const method = 'POST';
     message.push(method);
     message.push(space);
-    message.push(`friendtalk/v2/services/${userNcpInfo.bizServiceId}/messages`);
+    message.push(
+      `/friendtalk/v2/services/${userNcpInfo.bizServiceId}/messages`,
+    );
     message.push(newLine);
     message.push(timestamp);
     message.push(newLine);
     message.push(userNcpInfo.accessKey);
+
+    console.log(userNcpInfo);
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();

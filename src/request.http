@@ -429,3 +429,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #   "createTime": "2023-09-21T12:24:40.874"
 # }
 
+### 친구톡 - 기본
+Post http://localhost:8000/bizmessage/default
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
+Content-Type: application/json
+
+{
+    "plusFriendId": "@스파르타코딩클럽",
+    "bizMessageInfoList": {"content": "기본 친구톡 테스트", "isAd": false, "urlList": ["https://www.google.com","https://www.naver.com"]},
+    "receiverList": [{"phone": "01036289823", "name": "clo"}]
+}
+
