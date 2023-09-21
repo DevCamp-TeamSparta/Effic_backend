@@ -1,8 +1,18 @@
-import { Controller, Logger, Post, Headers, Body } from '@nestjs/common';
+import {
+  Controller,
+  Logger,
+  Post,
+  Headers,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { BizmessageService } from '../service/bizmessage.service';
 import { DefaultBizmessageDto } from '../dto/default-bizmessage.dto';
+import { ImageUploadDto } from '../dto/image-upload.dto';
 import * as jwt from 'jsonwebtoken';
 import { UsersService } from 'src/users/service/users.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('bizmessage')
 export class BizmessageController {
@@ -11,6 +21,30 @@ export class BizmessageController {
     private bizmessageService: BizmessageService,
     private readonly usersService: UsersService,
   ) {}
+
+  // NCP에 이미지 업로드
+  @Post('/image')
+  @UseInterceptors(FileInterceptor('imageFile'))
+  async uploadImage(
+    @Headers('Authorization') authorization: string,
+    @Body() imageUploadDto: ImageUploadDto,
+    @UploadedFile() file,
+  ) {
+    this.logger.verbose('Image uploading');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkBizserviceId(email);
+
+    return await this.bizmessageService.uploadImage(
+      user.userId,
+      file,
+      imageUploadDto,
+    );
+  }
 
   // 기본 친구톡 보내기
   @Post('/default')
@@ -25,22 +59,22 @@ export class BizmessageController {
 
     const email = decodedAccessToken.email;
 
-    const result = await this.usersService.checkBizserviceId(email);
+    const user = await this.usersService.checkBizserviceId(email);
 
     return await this.bizmessageService.sendDefaultBizmessage(
-      result.userId,
+      user.userId,
       defaultBizmessageDto,
     );
   }
 
   // ab 친구톡 보내기
-  @Post('/abtest')
-  async sendAbTestBizmessage(@Headers('Authorization') authorization: string) {
-    this.logger.verbose('AB test bizmessage sending');
+  // @Post('/abtest')
+  // async sendAbTestBizmessage(@Headers('Authorization') authorization: string) {
+  //   this.logger.verbose('AB test bizmessage sending');
 
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
+  //   const accessToken = authorization.split(' ')[1];
+  //   const decodedAccessToken: any = jwt.decode(accessToken);
 
-    const email = decodedAccessToken.email;
-  }
+  //   const email = decodedAccessToken.email;
+  // }
 }

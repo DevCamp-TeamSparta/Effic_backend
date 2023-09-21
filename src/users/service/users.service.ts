@@ -13,6 +13,7 @@ import * as jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../../config/jwt.config';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
+import { NCP_SMS_price } from '../../../commons/constants';
 
 @Injectable()
 export class UsersService {
@@ -304,8 +305,8 @@ export class UsersService {
 
     const totalMoney = user.point + user.money;
 
-    if (totalMoney < count * 3) {
-      const requiredPoints = count * 3 - totalMoney;
+    if (totalMoney < count * NCP_SMS_price) {
+      const requiredPoints = count * NCP_SMS_price - totalMoney;
       throw new HttpException(
         `User does not have enough money. Please charge your money. need ${requiredPoints} points`,
         HttpStatus.BAD_REQUEST,

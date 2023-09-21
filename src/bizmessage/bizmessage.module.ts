@@ -9,6 +9,8 @@ import {
   UserNcpInfoRepository,
   UsersRepository,
 } from 'src/users/users.repository';
+import { ShorturlService } from 'src/shorturl/service/shorturl.service';
+import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Bizmessage])],
@@ -19,6 +21,8 @@ import {
     UsersService,
     UsersRepository,
     UserNcpInfoRepository,
+    ShorturlService,
+    UrlInfosRepository,
   ],
   exports: [BizmessageService, BizmessageRepository],
 })

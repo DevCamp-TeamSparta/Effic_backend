@@ -1,10 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import {
-  UsersRepository,
-  UserNcpInfoRepository,
-} from '../../users/users.repository';
+import { UsersRepository } from '../../users/users.repository';
 import { UsersService } from '../../users/service/users.service';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import * as crypto from 'crypto';
@@ -15,6 +12,11 @@ import { MessageContent } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
 import { AdvertiseReceiverListRepository } from '../messages.repository';
 import { UsedPayments } from 'src/results/result.entity';
+import {
+  NCP_contentPrefix,
+  NCP_contentSuffix,
+  NCP_SMS_price,
+} from '../../../commons/constants';
 
 @Injectable()
 export class MessagesService {
@@ -22,7 +24,6 @@ export class MessagesService {
     private readonly usersRepository: UsersRepository,
     private readonly usersService: UsersService,
     private readonly shorturlService: ShorturlService,
-    private readonly userNcpInfoRepository: UserNcpInfoRepository,
     private readonly messageGroupRepo: MessageGroupRepo,
     private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -57,7 +58,7 @@ export class MessagesService {
     return content;
   }
 
-  createMessage(content: string, info: { [key: string]: string }) {
+  createMessageWithVariable(content: string, info: { [key: string]: string }) {
     Object.keys(info).forEach((key) => {
       const regex = new RegExp(`#{${key}}`, 'g');
       content = content.replace(regex, info[key]);
@@ -127,7 +128,7 @@ export class MessagesService {
     const shortenedUrls = [];
     const idStrings = [];
 
-    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+    const userNcpInfo = await this.usersService.findUserNcpInfoByUserId(
       user.userId,
     );
 
@@ -149,8 +150,8 @@ export class MessagesService {
     let contentSuffix = '';
 
     if (isAdvertisement) {
-      contentPrefix = '(광고)';
-      contentSuffix = `\n무료수신거부 ${userNcpInfo.advertiseNumber}`;
+      contentPrefix = NCP_contentPrefix;
+      contentSuffix = `${NCP_contentSuffix} ${userNcpInfo.advertiseNumber}`;
     }
 
     const body = {
@@ -162,7 +163,7 @@ export class MessagesService {
       content: messageInfoList.content,
       messages: receiverList.map((info) => ({
         to: info.phone,
-        content: `${contentPrefix} ${this.createMessage(
+        content: `${contentPrefix} ${this.createMessageWithVariable(
           newContent,
           info,
         )} ${contentSuffix}`,
@@ -303,7 +304,7 @@ export class MessagesService {
   // 유저금액 차감
   async deductedUserMoney(user, receiverPhones, saveMessageInfo) {
     const payment = new UsedPayments();
-    const deductionMoney = receiverPhones.length * 3;
+    const deductionMoney = receiverPhones.length * NCP_SMS_price;
     if (user.point >= deductionMoney) {
       user.point -= deductionMoney;
       payment.usedPoint = deductionMoney;
