@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { AdvertiseReceiverList, Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
-import { NcpResult, UrlResult } from '../results/result.entity';
+import { NcpResult, UrlResult } from '../results/entity/result.entity';
 import { PhonebookList } from 'src/phonebook/phonebook.entity';
 
 @Entity()

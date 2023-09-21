@@ -13,11 +13,11 @@ import {
   UserNcpInfoRepository,
   UsersRepository,
 } from 'src/users/users.repository';
-import { NcpResult, UrlResult, UsedPayments } from '../result.entity';
+import { NcpResult, UrlResult, UsedPayments } from '../entity/result.entity';
 import {
   UrlResultsRepository,
   NcpResultsRepository,
-} from '../results.repository';
+} from '../repository/results.repository';
 import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { MessagesService } from 'src/messages/service/messages.service';

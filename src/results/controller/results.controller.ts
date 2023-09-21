@@ -9,11 +9,15 @@ import {
 } from '@nestjs/common';
 import { ResultsService } from '../service/results.service';
 import * as jwt from 'jsonwebtoken';
+import { BizmessageResultsService } from '../service/biz-results.service';
 
 @Controller('results')
 export class ResultsController {
   private logger = new Logger('ResultsController');
-  constructor(private resultsService: ResultsService) {}
+  constructor(
+    private readonly resultsService: ResultsService,
+    private readonly bizmessageResultsService: BizmessageResultsService,
+  ) {}
 
   @Get('/group')
   async getAllMessageGroupResult(
@@ -87,4 +91,6 @@ export class ResultsController {
     this.logger.verbose('Default message ncp result');
     return await this.resultsService.ncpResult(messageId, headerEmail);
   }
+
+  // 친구톡 결과조회
 }

@@ -14,8 +14,8 @@ import {
   AdvertiseReceiverListRepository,
 } from './messages.repository';
 import { ResultsService } from 'src/results/service/results.service';
-import { UrlResultsRepository } from 'src/results/results.repository';
-import { NcpResultsRepository } from 'src/results/results.repository';
+import { UrlResultsRepository } from 'src/results/repository/results.repository';
+import { NcpResultsRepository } from 'src/results/repository/results.repository';
 import { UsersService } from 'src/users/service/users.service';
 import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';

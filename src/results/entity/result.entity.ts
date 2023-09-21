@@ -6,8 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Message } from '../messages/message.entity';
-import { User } from '../users/user.entity';
+import { Message } from '../../messages/message.entity';
+import { User } from '../../users/user.entity';
 
 @Entity()
 export class NcpResult extends BaseEntity {

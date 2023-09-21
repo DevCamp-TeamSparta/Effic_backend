@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { ResultsController } from './controller/results.controller';
 import { ResultsService } from './service/results.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { NcpResult, UrlResult } from './result.entity';
+import { NcpResult, UrlResult } from './entity/result.entity';
 import {
   NcpResultsRepository,
   UrlResultsRepository,
-} from './results.repository';
+} from './repository/results.repository';
 import {
   UsersRepository,
   UserNcpInfoRepository,
@@ -21,6 +21,8 @@ import { MessagesService } from 'src/messages/service/messages.service';
 import { UsersService } from 'src/users/service/users.service';
 import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 import { ShorturlService } from 'src/shorturl/service/shorturl.service';
+import { BizmessageResultsService } from './service/biz-results.service';
+import { BizmessageNcpResultsRepository } from './repository/biz-result.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([NcpResult, UrlResult])],
@@ -33,6 +35,8 @@ import { ShorturlService } from 'src/shorturl/service/shorturl.service';
     UserNcpInfoRepository,
     NcpResultsRepository,
     UrlResultsRepository,
+    BizmessageResultsService,
+    BizmessageNcpResultsRepository,
     MessagesRepository,
     MessageGroupRepo,
     MessagesContentRepository,
@@ -40,6 +44,12 @@ import { ShorturlService } from 'src/shorturl/service/shorturl.service';
     UrlInfosRepository,
     ShorturlService,
   ],
-  exports: [ResultsService, NcpResultsRepository, UrlResultsRepository],
+  exports: [
+    ResultsService,
+    NcpResultsRepository,
+    UrlResultsRepository,
+    BizmessageResultsService,
+    BizmessageNcpResultsRepository,
+  ],
 })
 export class ResultsModule {}

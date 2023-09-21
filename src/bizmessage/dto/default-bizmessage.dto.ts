@@ -19,19 +19,22 @@ export class DefaultBizmessageDto {
     urlList: string[];
   }>;
 
-  @IsArray()
+  @IsObject()
   @IsOptional()
   imageInfo?: Array<{
     imageId: string;
     imageLink: string;
-    imageUrl: string;
   }>;
+
+  @IsString()
+  @IsNotEmpty()
+  urlForResult: string;
 
   @IsArray()
   @IsNotEmpty()
   receiverList: string[];
 
-  @IsArray()
+  @IsObject()
   @IsOptional()
   buttonInfo?: string[];
 

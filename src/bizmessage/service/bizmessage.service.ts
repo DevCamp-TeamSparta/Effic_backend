@@ -10,7 +10,6 @@ import {
 } from '../../../commons/constants';
 import axios from 'axios';
 import * as crypto from 'crypto';
-import { UserNcpInfo } from 'src/users/user.entity';
 
 @Injectable()
 export class BizmessageService {
@@ -112,10 +111,8 @@ export class BizmessageService {
         receiverListForSend,
       );
       takeBody = body;
-      requestIdList.push();
+      requestIdList.push(body.response.data.requestId);
     }
-
-    // imageInfo가 있으면 이미지 url을 단축시켜서 저장
 
     // buttonInfo가 있으면 버튼 url을 단축시켜서 저장
 
@@ -156,6 +153,13 @@ export class BizmessageService {
       bizMessageInfoList.content,
     );
 
+    let linktype = '';
+    if (messageDto.buttonInfo.type === 'WL') {
+      linktype = 'linkMobile: messageDto.buttonInfo.buttonlink';
+    } else {
+      linktype = 'linkPc: messageDto.buttonInfo.buttonlink';
+    }
+
     const body = {
       plusFriendId: messageDto.plusFriendId,
       messages: receiverList.map((info) => ({
@@ -165,11 +169,23 @@ export class BizmessageService {
           newContent,
           info,
         )} ${contentSuffix}`,
-        ...(messageDto.buttonList ? { buttons: messageDto.buttonInfo } : {}),
+        ...(messageDto.buttonInfo
+          ? {
+              buttons: [
+                {
+                  type: messageDto.buttonInfo.type,
+                  name: messageDto.buttonInfo.name,
+                  linktype,
+                },
+              ],
+            }
+          : {}),
         ...(messageDto.imageInfo
           ? {
-              imageId: messageDto.imageInfo.imageId,
-              imageLink: messageDto.imageInfo.imageLink,
+              image: {
+                imageId: messageDto.imageInfo.imageId,
+                imageLink: messageDto.imageInfo.imageLink,
+              },
             }
           : {}),
       })),
@@ -190,7 +206,7 @@ export class BizmessageService {
         'Content-Type': 'application/json; charset=utf-8',
         'x-ncp-apigw-timestamp': now,
         'x-ncp-iam-access-key': userNcpInfo.accessKey,
-        'x-ncp-apigw-signature-v2': await this.makeSignature(UserNcpInfo, now),
+        'x-ncp-apigw-signature-v2': await this.makeSignature(userNcpInfo, now),
       };
       const response = await axios.post(
         `https://sens.apigw.ntruss.com/friendtalk/v2/services/${userNcpInfo.bizServiceId}/messages`,
@@ -202,7 +218,10 @@ export class BizmessageService {
       if (error.response) {
         throw new HttpException(error.response.data, error.response.status);
       }
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        '[INTERNAL] ' + error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -244,8 +263,6 @@ export class BizmessageService {
     message.push(timestamp);
     message.push(newLine);
     message.push(userNcpInfo.accessKey);
-
-    console.log(userNcpInfo);
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();

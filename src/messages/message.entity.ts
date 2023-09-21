@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
-import { NcpResult, UrlResult } from 'src/results/result.entity';
+import { NcpResult, UrlResult } from 'src/results/entity/result.entity';
 
 @Entity()
 export class Message extends BaseEntity {

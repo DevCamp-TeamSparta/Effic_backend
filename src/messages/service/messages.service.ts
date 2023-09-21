@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersRepository } from '../../users/users.repository';
@@ -11,7 +11,7 @@ import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
 import { MessageGroupRepo } from '../messages.repository';
 import { AdvertiseReceiverListRepository } from '../messages.repository';
-import { UsedPayments } from 'src/results/result.entity';
+import { UsedPayments } from 'src/results/entity/result.entity';
 import {
   NCP_contentPrefix,
   NCP_contentSuffix,
@@ -20,6 +20,7 @@ import {
 
 @Injectable()
 export class MessagesService {
+  private readonly logger = new Logger('NcpMessagesService');
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly usersService: UsersService,

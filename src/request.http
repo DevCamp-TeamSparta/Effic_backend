@@ -337,7 +337,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "userId": 1,
     "hostnumberwithmemo": [{"hostnumber":"15228016","memo": "스파르타"}, {"hostnumber":"01036289823","memo": ""}, {"hostnumber":"01011111113","memo": "항해"}]
 }
 
@@ -436,7 +435,9 @@ Content-Type: application/json
 
 {
     "plusFriendId": "@스파르타코딩클럽",
-    "bizMessageInfoList": {"content": "기본 친구톡 테스트", "isAd": false, "urlList": ["https://www.google.com","https://www.naver.com"]},
-    "receiverList": [{"phone": "01036289823", "name": "clo"}]
+    "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "isAd": false, "urlList": []},
+    "receiverList": [{"phone": "01036289823", "name": "clo"}],
+    "imageInfo": {"imageId": "8ae5c21c8ab116a0018ab5c4b02a0018", "imageLink": "https://app.effic.biz"},
+    "buttonInfo": {"type": "", "name": ""}
 }
 
