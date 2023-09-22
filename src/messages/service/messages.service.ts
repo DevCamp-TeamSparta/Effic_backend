@@ -79,6 +79,7 @@ export class MessagesService {
     await this.usersService.assertCheckUserMoney(
       user.userId,
       receiverPhones.length,
+      NCP_SMS_price,
     );
 
     const requestIdList: string[] = [];
@@ -397,6 +398,7 @@ export class MessagesService {
     await this.usersService.assertCheckUserMoney(
       user.userId,
       receiverPhones.length * 3,
+      NCP_SMS_price,
     );
 
     // 리시버를 3개로 나누기

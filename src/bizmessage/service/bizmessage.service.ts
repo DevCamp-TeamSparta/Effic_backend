@@ -1,10 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import {
-  BizmessageRepository,
-  BizmessageGroupRepository,
-} from '../bizmessage.repository';
+import { BizmessageGroupRepository } from '../bizmessage.repository';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import { UsersService } from '../../users/service/users.service';
 import {
@@ -26,7 +23,6 @@ import { bizmessageType } from '../bizmessage.enum';
 @Injectable()
 export class BizmessageService {
   constructor(
-    private readonly bizmessageRepository: BizmessageRepository,
     private readonly bizmessageGroupRepository: BizmessageGroupRepository,
     private readonly shorturlService: ShorturlService,
     private readonly usersService: UsersService,
@@ -102,9 +98,10 @@ export class BizmessageService {
       (receiver) => receiver.phone,
     );
 
-    await this.usersService.assertCheckUserMoneyForBiz(
+    await this.usersService.assertCheckUserMoney(
       userId,
       receiverPhones.length,
+      NCP_BizMessage_price,
     );
 
     let shortButtonLink;

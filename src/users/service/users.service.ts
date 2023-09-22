@@ -13,10 +13,6 @@ import * as jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../../config/jwt.config';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
-import {
-  NCP_BizMessage_price,
-  NCP_SMS_price,
-} from '../../../commons/constants';
 
 @Injectable()
 export class UsersService {
@@ -305,29 +301,14 @@ export class UsersService {
     return { userId: user.userId, bizServiceId };
   }
 
-  // 유저 금액 확인 (message)
-  async assertCheckUserMoney(userId: number, count: number) {
+  // 유저 금액 확인
+  async assertCheckUserMoney(userId: number, count: number, price: number) {
     const user = await this.usersRepository.findOneByUserId(userId);
 
     const totalMoney = user.point + user.money;
 
-    if (totalMoney < count * NCP_SMS_price) {
-      const requiredPoints = count * NCP_SMS_price - totalMoney;
-      throw new HttpException(
-        `User does not have enough money. Please charge your money. need ${requiredPoints} points`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  // 유저 금액 확인 (bizmessage)
-  async assertCheckUserMoneyForBiz(userId: number, count: number) {
-    const user = await this.usersRepository.findOneByUserId(userId);
-
-    const totalMoney = user.point + user.money;
-
-    if (totalMoney < count * NCP_BizMessage_price) {
-      const requiredPoints = count * NCP_BizMessage_price - totalMoney;
+    if (totalMoney < count * price) {
+      const requiredPoints = count * price - totalMoney;
       throw new HttpException(
         `User does not have enough money. Please charge your money. need ${requiredPoints} points`,
         HttpStatus.BAD_REQUEST,
