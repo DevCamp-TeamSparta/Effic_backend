@@ -15,6 +15,7 @@ import {
 import axios from 'axios';
 import * as crypto from 'crypto';
 import { UsedPayments } from 'src/results/entity/result.entity';
+import * as FormData from 'form-data';
 import {
   Bizmessage,
   BizmessageAdReceiverList,
@@ -58,15 +59,10 @@ export class BizmessageService {
       }
 
       const form = new FormData();
-      form.append(
-        'imageFile',
-        new Blob([imageFile.buffer], {
-          type: imageFile.mimetype,
-        }),
-        imageFile.originalname,
-      );
+      form.append('imageFile', imageFile.buffer, imageFile.originalname);
       form.append('plusFriendId', imageUploadDto.plusFriendId);
       form.append('isWide', booleanIsWide);
+
       const response = await axios.post(
         `https://sens.apigw.ntruss.com/friendtalk/v2/services/${UserNcpInfo.bizServiceId}/images`,
         form,
