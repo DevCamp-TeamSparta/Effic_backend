@@ -9,7 +9,10 @@ import { AdvertiseReceiverList, Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
 import { NcpResult, UrlResult } from '../results/entity/result.entity';
 import { PhonebookList } from 'src/phonebook/phonebook.entity';
-import { Bizmessage } from 'src/bizmessage/bizmessage.entity';
+import {
+  Bizmessage,
+  BizmessageAdReceiverList,
+} from 'src/bizmessage/bizmessage.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -74,6 +77,11 @@ export class User extends BaseEntity {
     cascade: true,
   })
   bizmessages: Bizmessage[];
+
+  @OneToMany(() => BizmessageAdReceiverList, (receiver) => receiver.user, {
+    cascade: true,
+  })
+  bizmessageAdReceiverList: BizmessageAdReceiverList[];
 }
 
 @Entity()

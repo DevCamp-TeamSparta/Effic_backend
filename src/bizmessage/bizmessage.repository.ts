@@ -1,10 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
-import { Bizmessage } from './bizmessage.entity';
+import { Bizmessage, BizmessageGroup } from './bizmessage.entity';
 
 @Injectable()
 export class BizmessageRepository extends Repository<Bizmessage> {
   constructor(private datasource: DataSource) {
     super(Bizmessage, datasource.createEntityManager());
+  }
+}
+
+@Injectable()
+export class BizmessageGroupRepository extends Repository<BizmessageGroup> {
+  constructor(private datasource: DataSource) {
+    super(BizmessageGroup, datasource.createEntityManager());
+  }
+
+  async createBizmessageGroup(userId: number): Promise<BizmessageGroup> {
+    const bizmessageGroup = new BizmessageGroup();
+    bizmessageGroup.userId = userId;
+    return await this.save(bizmessageGroup);
   }
 }

@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   JoinColumn,
 } from 'typeorm';
 import { bizmessageType } from './bizmessage.enum';
@@ -74,4 +75,82 @@ export class BizmessageGroup extends BaseEntity {
 
   @Column({ type: 'int', nullable: false })
   userId: number;
+
+  @OneToMany(
+    () => BizmessageAdReceiverList,
+    (bizmessageAdReceiverList) => bizmessageAdReceiverList.bizmessageGroup,
+    { cascade: true },
+  )
+  bizmessageAdReceiverList: BizmessageAdReceiverList[];
+}
+
+@Entity()
+export class BizmessageContent extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  bizmessageContentId: number;
+
+  @Column({ type: 'int', nullable: false })
+  bizmessageId: number;
+
+  @OneToOne(() => Bizmessage)
+  @JoinColumn({ name: 'bizmessageId' })
+  bizmessage: Bizmessage;
+
+  @Column()
+  sentType: bizmessageType;
+
+  @Column({ type: 'json', nullable: false, default: '[]' })
+  content: {
+    type: string;
+    content: string;
+    advertiseInfo: boolean;
+    contentUrlList?: string[];
+    buttonUrl?: string;
+    imageUrl?: string;
+    reserveTime?: Date;
+  };
+
+  @Column({ type: 'varchar', nullable: false })
+  plusFriendId: string;
+
+  @Column('json', { default: [] })
+  receiverList: Record<string, any>;
+
+  @Column('json', { default: [] })
+  remainReceiverList: Record<string, any>;
+
+  @Column({ type: 'int', nullable: true })
+  bizmessageGroupId: number;
+}
+
+@Entity()
+export class BizmessageAdReceiverList extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  bizmessageAdReceiverId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  phone: string;
+
+  @Column({ type: 'timestamptz', nullable: false })
+  sentAt: Date;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.bizmessageAdReceiverList, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ type: 'int', nullable: true })
+  bizmessageGroupId: number;
+
+  @ManyToOne(
+    () => BizmessageGroup,
+    (bizmessageGroup) => bizmessageGroup.bizmessageAdReceiverList,
+    { onDelete: 'CASCADE' },
+  )
+  @JoinColumn({ name: 'bizmessageGroupId' })
+  bizmessageGroup: BizmessageGroup;
 }

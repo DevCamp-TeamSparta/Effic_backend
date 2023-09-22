@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { BizmessageRepository } from '../bizmessage.repository';
+import {
+  BizmessageRepository,
+  BizmessageGroupRepository,
+} from '../bizmessage.repository';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import { UsersService } from '../../users/service/users.service';
 import {
@@ -12,12 +15,18 @@ import {
 import axios from 'axios';
 import * as crypto from 'crypto';
 import { UsedPayments } from 'src/results/entity/result.entity';
-import { Bizmessage } from '../bizmessage.entity';
+import {
+  Bizmessage,
+  BizmessageAdReceiverList,
+  BizmessageContent,
+} from '../bizmessage.entity';
+import { bizmessageType } from '../bizmessage.enum';
 
 @Injectable()
 export class BizmessageService {
   constructor(
     private readonly bizmessageRepository: BizmessageRepository,
+    private readonly bizmessageGroupRepository: BizmessageGroupRepository,
     private readonly shorturlService: ShorturlService,
     private readonly usersService: UsersService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -102,22 +111,33 @@ export class BizmessageService {
       receiverPhones.length,
     );
 
-    let shortButtonLink = '';
-    // 버튼 link shorturl로 변경
+    let shortButtonLink;
+    let shortImageLink;
     if (defaultBizmessageDto.buttonInfo) {
-      const changebuttonLink = await this.shorturlService.createShorturl(
+      shortButtonLink = await this.shorturlService.createShorturl(
         defaultBizmessageDto.buttonInfo.buttonLink,
       );
-      shortButtonLink = changebuttonLink.shortURL;
     }
-
-    // 이미지 link shorturl로 변경
+    if (defaultBizmessageDto.imageInfo) {
+      shortImageLink = await this.shorturlService.createShorturl(
+        defaultBizmessageDto.imageInfo.imageLink,
+      );
+    }
+    if (
+      defaultBizmessageDto.buttonInfo &&
+      defaultBizmessageDto.imageInfo &&
+      defaultBizmessageDto.buttonInfo.buttonLink ===
+        defaultBizmessageDto.imageInfo.imageLink
+    ) {
+      shortImageLink = shortButtonLink;
+    }
 
     const requestIdList: string[] = [];
     const receiverList = defaultBizmessageDto.receiverList;
     const receiverLength = receiverList.length;
     const receiverCount = Math.ceil(receiverLength / 100);
     let takeBody;
+    const idStringList = [];
 
     for (let i = 0; i < receiverCount; i++) {
       const receiverListForSend = receiverList.slice(i * 100, (i + 1) * 100);
@@ -127,19 +147,97 @@ export class BizmessageService {
         defaultBizmessageDto,
         receiverListForSend,
         shortButtonLink,
+        shortImageLink,
       );
       takeBody = body;
       requestIdList.push(body.response.data.requestId);
     }
+    idStringList.push(...takeBody.idStrings);
+
+    if (shortImageLink === shortButtonLink) {
+      idStringList.push(shortImageLink.idString);
+    } else {
+      idStringList.push(shortImageLink.idString);
+      idStringList.push(shortButtonLink.idString);
+    }
+
+    const urlForResult = defaultBizmessageDto.urlForResult;
+    let idStringForResult;
+    if (defaultBizmessageDto.buttonInfo) {
+      if (defaultBizmessageDto.buttonInfo.buttonLink === urlForResult) {
+        idStringForResult = shortButtonLink.idString;
+      }
+    }
+    if (defaultBizmessageDto.imageInfo) {
+      if (defaultBizmessageDto.imageInfo.imageLink === urlForResult) {
+        idStringForResult = shortImageLink.idString;
+      }
+    }
+    if (defaultBizmessageDto.bizMessageInfoList.urlList) {
+      for (const url of defaultBizmessageDto.bizMessageInfoList.urlList) {
+        if (url === urlForResult) {
+          idStringForResult =
+            takeBody.idStrings[
+              defaultBizmessageDto.bizMessageInfoList.urlList.indexOf(url)
+            ];
+        }
+      }
+    }
+
+    if (!idStringForResult) {
+      throw new HttpException(
+        'urlForResult가 잘못되었습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const messageContents = JSON.stringify({
+      ...defaultBizmessageDto.bizMessageInfoList,
+      ...(defaultBizmessageDto.imageInfo
+        ? { imageInfo: defaultBizmessageDto.imageInfo }
+        : {}),
+      ...(defaultBizmessageDto.buttonInfo
+        ? { buttonInfo: defaultBizmessageDto.buttonInfo }
+        : {}),
+    });
+
+    const messageContent = JSON.parse(messageContents);
 
     // db에 bizmessageinfo 저장
+    const saveBizmessageInfo = await this.saveBizmessageInfo(
+      bizmessageType.D,
+      userId,
+      idStringList,
+      idStringForResult,
+      requestIdList,
+      receiverPhones,
+      messageContent,
+      defaultBizmessageDto.plusFriendId,
+      defaultBizmessageDto.receiverList,
+      [],
+    );
 
     // 금액 차감
-    await this.deductedUserMoney(userId, receiverPhones, takeBody);
+    await this.deductedUserMoney(
+      userId,
+      receiverPhones,
+      saveBizmessageInfo.bizmessageGroupId,
+    );
 
     // 피로도 관리
+    if (defaultBizmessageDto.bizMessageInfoList.isAd === true) {
+      await this.saveAdBizmessageRecieverList(
+        defaultBizmessageDto.receiverList,
+        userId,
+        saveBizmessageInfo.bizmessageGroupId,
+        new Date(),
+      );
+    }
 
-    return { requestIdList }; // 수정되어야할 부분
+    return {
+      bizmessageId: saveBizmessageInfo.bizmessageId,
+      bizmessageGroupId: saveBizmessageInfo.bizmessageGroupId,
+    };
   }
 
   async makeBody(
@@ -148,6 +246,7 @@ export class BizmessageService {
     messageDto,
     receiverList,
     buttonLink,
+    imageLink,
   ) {
     const shortenedUrls = [];
     const idStrings = [];
@@ -179,8 +278,8 @@ export class BizmessageService {
     const linktype = {};
     if (messageDto.buttonInfo) {
       if (messageDto.buttonInfo.type === 'WL') {
-        linktype['linkMobile'] = buttonLink;
-        linktype['linkPc'] = buttonLink;
+        linktype['linkMobile'] = buttonLink.shortURL;
+        linktype['linkPc'] = buttonLink.shortURL;
       } else if (messageDto.buttonInfo.type === 'AL') {
         linktype['schemeIos'] = messageDto.buttonInfo.schemeIos;
         linktype['schemeAndroid'] = messageDto.buttonInfo.schemeAndroid;
@@ -211,7 +310,7 @@ export class BizmessageService {
           ? {
               image: {
                 imageId: messageDto.imageInfo.imageId,
-                imageLink: messageDto.imageInfo.imageLink,
+                imageLink: imageLink.shortURL,
               },
             }
           : {}),
@@ -294,12 +393,52 @@ export class BizmessageService {
   }
 
   // 정보 저장
-  async saveBizmessageInfo() {
+  async saveBizmessageInfo(
+    bizmessageType,
+    userId,
+    idStringList,
+    idStringForResult,
+    ncpRequestIdList,
+    receiverPhoneList,
+    messageContent,
+    plusFriendId,
+    receiverList,
+    remainReceiverList,
+  ) {
+    const group = await this.bizmessageGroupRepository.createBizmessageGroup(
+      userId,
+    );
+
     const bizmessage = new Bizmessage();
+    bizmessage.isSent = true;
+    bizmessage.sentTpye = bizmessageType;
+    bizmessage.idStringList = idStringList;
+    bizmessage.urlForResult = idStringForResult;
+    bizmessage.ncpRequestIdList = ncpRequestIdList;
+    bizmessage.receiverList = receiverPhoneList;
+    bizmessage.userId = userId;
+    bizmessage.bizmessageGroupId = group.bizmessageGroupId;
+    await this.entityManager.save(bizmessage);
+
+    const bizmessageContent = new BizmessageContent();
+    bizmessageContent.bizmessage = bizmessage;
+    bizmessageContent.sentType = bizmessageType;
+    bizmessageContent.content = messageContent;
+    bizmessageContent.plusFriendId = plusFriendId;
+    bizmessageContent.receiverList = receiverList;
+    bizmessageContent.remainReceiverList = remainReceiverList;
+    bizmessageContent.bizmessageGroupId = group.bizmessageGroupId;
+
+    await this.entityManager.save(bizmessageContent);
+
+    return {
+      bizmessageId: bizmessage.bizmessageId,
+      bizmessageGroupId: group.bizmessageGroupId,
+    };
   }
 
   // 유저금액 차감
-  async deductedUserMoney(userId, receiverPhones, saveMessageInfo) {
+  async deductedUserMoney(userId, receiverPhones, bizmessageGroupId) {
     const user = await this.usersService.findUserByUserId(userId);
     const payment = new UsedPayments();
     const deductionMoney = receiverPhones.length * NCP_BizMessage_price;
@@ -316,10 +455,27 @@ export class BizmessageService {
     await this.entityManager.save(user);
 
     payment.userId = user.userId;
-    payment.messageGroupId = saveMessageInfo.messageGroupId; // 수정필요
+    payment.messageGroupId = bizmessageGroupId;
     payment.remainMoney = user.money;
     payment.remainPoint = user.point;
 
     await this.entityManager.save(payment);
+  }
+
+  // 피로도 관리
+  async saveAdBizmessageRecieverList(
+    receiverList,
+    userId,
+    bizmessageGroupId,
+    now,
+  ) {
+    for (let i = 0; i < receiverList.length; i++) {
+      const adReceiverList = new BizmessageAdReceiverList();
+      adReceiverList.phone = receiverList[i].phone;
+      adReceiverList.sentAt = now;
+      adReceiverList.userId = userId;
+      adReceiverList.bizmessageGroupId = bizmessageGroupId;
+      await this.entityManager.save(adReceiverList);
+    }
   }
 }
