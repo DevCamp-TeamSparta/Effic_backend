@@ -414,8 +414,8 @@ Content-Type: application/json
 
 ### NCP에 이미지 업로드 
 ### 이 파일에서는 사용할 수 없습니다. 이미지 업로드가 가능한 postman이나 thunderclient를 사용해주세요.
-### isWide값과, imageFile을 form-data로 보내주세요.
-### 예) isWide: false(type - string), imageFile: image.png
+### isWide값과, imageFile, plusFriendId를 form-data로 보내주세요.
+### 예) isWide: false(type - string), imageFile: image.png, plusFriendId: @스파르타코딩클럽
 Post http://localhost:8000/bizmessage/image
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 
@@ -438,7 +438,7 @@ Content-Type: application/json
 {
     "plusFriendId": "@스파르타코딩클럽",
     "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "isAd": false, "urlList": []},
-    "receiverList": [{"phone": "01036289823", "name": "clo"}],
+    "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
     "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
     "buttonInfo": {"type": "WL", "name": "히히💕", "buttonLink":"https://app.effic.biz"},
     "urlForResult": "https://app.effic.biz"
