@@ -12,6 +12,7 @@ import {
 import axios from 'axios';
 import * as crypto from 'crypto';
 import { UsedPayments } from 'src/results/entity/result.entity';
+import { Bizmessage } from '../bizmessage.entity';
 
 @Injectable()
 export class BizmessageService {
@@ -101,6 +102,16 @@ export class BizmessageService {
       receiverPhones.length,
     );
 
+    // 버튼 link shorturl로 변경
+    if (defaultBizmessageDto.buttonInfo) {
+      const changebuttonLink = await this.shorturlService.createShorturl(
+        defaultBizmessageDto.buttonInfo.buttonLink,
+      );
+      const shortButtonLink = changebuttonLink.shortURL;
+    }
+
+    // 이미지 link shorturl로 변경
+
     const requestIdList: string[] = [];
     const receiverList = defaultBizmessageDto.receiverList;
     const receiverLength = receiverList.length;
@@ -114,6 +125,7 @@ export class BizmessageService {
         defaultBizmessageDto.bizMessageInfoList,
         defaultBizmessageDto,
         receiverListForSend,
+        shortButtonLink,
       );
       takeBody = body;
       requestIdList.push(body.response.data.requestId);
@@ -129,7 +141,13 @@ export class BizmessageService {
     return { requestIdList }; // 수정되어야할 부분
   }
 
-  async makeBody(userId, bizMessageInfoList, messageDto, receiverList) {
+  async makeBody(
+    userId,
+    bizMessageInfoList,
+    messageDto,
+    receiverList,
+    buttonLink,
+  ) {
     const shortenedUrls = [];
     const idStrings = [];
 
@@ -160,8 +178,8 @@ export class BizmessageService {
     const linktype = {};
     if (messageDto.buttonInfo) {
       if (messageDto.buttonInfo.type === 'WL') {
-        linktype['linkMobile'] = messageDto.buttonInfo.buttonLink;
-        linktype['linkPc'] = messageDto.buttonInfo.buttonLink;
+        linktype['linkMobile'] = buttonLink;
+        linktype['linkPc'] = buttonLink;
       } else if (messageDto.buttonInfo.type === 'AL') {
         linktype['schemeIos'] = messageDto.buttonInfo.schemeIos;
         linktype['schemeAndroid'] = messageDto.buttonInfo.schemeAndroid;
@@ -275,7 +293,9 @@ export class BizmessageService {
   }
 
   // 정보 저장
-  async saveBizmessageInfo() {}
+  async saveBizmessageInfo() {
+    const bizmessage = new Bizmessage();
+  }
 
   // 유저금액 차감
   async deductedUserMoney(userId, receiverPhones, saveMessageInfo) {

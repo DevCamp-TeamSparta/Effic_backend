@@ -3,7 +3,7 @@ import { BizmessageController } from './controller/bizmessage.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BizmessageService } from './service/bizmessage.service';
 import { BizmessageRepository } from './bizmessage.repository';
-import { Bizmessage } from './bizmessage.entity';
+import { Bizmessage, BizmessageGroup } from './bizmessage.entity';
 import { UsersService } from 'src/users/service/users.service';
 import {
   UserNcpInfoRepository,
@@ -13,7 +13,7 @@ import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Bizmessage])],
+  imports: [TypeOrmModule.forFeature([Bizmessage, BizmessageGroup])],
   controllers: [BizmessageController],
   providers: [
     BizmessageService,
