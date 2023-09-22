@@ -13,6 +13,7 @@ import { ImageUploadDto } from '../dto/image-upload.dto';
 import * as jwt from 'jsonwebtoken';
 import { UsersService } from 'src/users/service/users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { DefaultBizbodyValidationPipe } from '../pipe/defualt-bizbody-validation-pipe';
 
 @Controller('bizmessage')
 export class BizmessageController {
@@ -50,7 +51,8 @@ export class BizmessageController {
   @Post('/default')
   async sendDefaultBizmessage(
     @Headers('Authorization') authorization: string,
-    @Body() defaultBizmessageDto: DefaultBizmessageDto,
+    @Body(new DefaultBizbodyValidationPipe())
+    defaultBizmessageDto: DefaultBizmessageDto,
   ): Promise<object> {
     this.logger.verbose('Default bizmessage sending');
 

@@ -5,11 +5,13 @@ import { BizmessageRepository } from '../bizmessage.repository';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import { UsersService } from '../../users/service/users.service';
 import {
+  NCP_BizMessage_price,
   NCP_contentPrefix,
   NCP_contentSuffix,
 } from '../../../commons/constants';
 import axios from 'axios';
 import * as crypto from 'crypto';
+import { UsedPayments } from 'src/results/entity/result.entity';
 
 @Injectable()
 export class BizmessageService {
@@ -94,7 +96,10 @@ export class BizmessageService {
       (receiver) => receiver.phone,
     );
 
-    await this.usersService.assertCheckUserMoney(userId, receiverPhones.length);
+    await this.usersService.assertCheckUserMoneyForBiz(
+      userId,
+      receiverPhones.length,
+    );
 
     const requestIdList: string[] = [];
     const receiverList = defaultBizmessageDto.receiverList;
@@ -114,11 +119,10 @@ export class BizmessageService {
       requestIdList.push(body.response.data.requestId);
     }
 
-    // buttonInfo가 있으면 버튼 url을 단축시켜서 저장
-
     // db에 bizmessageinfo 저장
 
     // 금액 차감
+    await this.deductedUserMoney(userId, receiverPhones, takeBody);
 
     // 피로도 관리
 
@@ -153,11 +157,15 @@ export class BizmessageService {
       bizMessageInfoList.content,
     );
 
-    let linktype = '';
-    if (messageDto.buttonInfo.type === 'WL') {
-      linktype = 'linkMobile: messageDto.buttonInfo.buttonlink';
-    } else {
-      linktype = 'linkPc: messageDto.buttonInfo.buttonlink';
+    const linktype = {};
+    if (messageDto.buttonInfo) {
+      if (messageDto.buttonInfo.type === 'WL') {
+        linktype['linkMobile'] = messageDto.buttonInfo.buttonLink;
+        linktype['linkPc'] = messageDto.buttonInfo.buttonLink;
+      } else if (messageDto.buttonInfo.type === 'AL') {
+        linktype['schemeIos'] = messageDto.buttonInfo.schemeIos;
+        linktype['schemeAndroid'] = messageDto.buttonInfo.schemeAndroid;
+      }
     }
 
     const body = {
@@ -175,7 +183,7 @@ export class BizmessageService {
                 {
                   type: messageDto.buttonInfo.type,
                   name: messageDto.buttonInfo.name,
-                  linktype,
+                  ...(linktype ? linktype : {}),
                 },
               ],
             }
@@ -196,8 +204,6 @@ export class BizmessageService {
           }
         : {}),
     };
-
-    console.log(body);
 
     let headers;
     try {
@@ -225,7 +231,7 @@ export class BizmessageService {
     }
   }
 
-  // 변수명 변경적용
+  // content - 변수명 변경적용
   createMessageWithVariable(content: string, info: { [key: string]: string }) {
     Object.keys(info).forEach((key) => {
       const regex = new RegExp(`#{${key}}`, 'g');
@@ -234,7 +240,7 @@ export class BizmessageService {
     return content;
   }
 
-  // url 변경적용
+  // content - url 변경적용
   async replaceUrlContent(
     urlList: string[],
     shortenedUrls: string[],
@@ -266,5 +272,33 @@ export class BizmessageService {
 
     const signature = hmac.update(message.join('')).digest('base64');
     return signature.toString();
+  }
+
+  // 정보 저장
+  async saveBizmessageInfo() {}
+
+  // 유저금액 차감
+  async deductedUserMoney(userId, receiverPhones, saveMessageInfo) {
+    const user = await this.usersService.findUserByUserId(userId);
+    const payment = new UsedPayments();
+    const deductionMoney = receiverPhones.length * NCP_BizMessage_price;
+    if (user.point >= deductionMoney) {
+      user.point -= deductionMoney;
+      payment.usedPoint = deductionMoney;
+    } else {
+      user.money -= deductionMoney - user.point;
+      user.point = 0;
+      payment.usedPoint = deductionMoney;
+      payment.usedMoney = deductionMoney - payment.usedPoint;
+    }
+
+    await this.entityManager.save(user);
+
+    payment.userId = user.userId;
+    payment.messageGroupId = saveMessageInfo.messageGroupId; // 수정필요
+    payment.remainMoney = user.money;
+    payment.remainPoint = user.point;
+
+    await this.entityManager.save(payment);
   }
 }
