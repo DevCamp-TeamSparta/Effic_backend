@@ -102,12 +102,13 @@ export class BizmessageService {
       receiverPhones.length,
     );
 
+    let shortButtonLink = '';
     // 버튼 link shorturl로 변경
     if (defaultBizmessageDto.buttonInfo) {
       const changebuttonLink = await this.shorturlService.createShorturl(
         defaultBizmessageDto.buttonInfo.buttonLink,
       );
-      const shortButtonLink = changebuttonLink.shortURL;
+      shortButtonLink = changebuttonLink.shortURL;
     }
 
     // 이미지 link shorturl로 변경
