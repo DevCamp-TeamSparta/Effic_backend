@@ -322,6 +322,11 @@ export class UsersService {
     return user;
   }
 
+  async findOneByEmail(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    return user;
+  }
+
   // 유저의 NcpInfo 가져오기
   async findUserNcpInfoByUserId(userId: number) {
     const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(

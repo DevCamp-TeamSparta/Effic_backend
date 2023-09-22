@@ -5,14 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import {
-  MessageGroupRepo,
-  MessagesRepository,
-} from 'src/messages/messages.repository';
-import {
-  UserNcpInfoRepository,
-  UsersRepository,
-} from 'src/users/users.repository';
+import { MessagesRepository } from 'src/messages/messages.repository';
 import { NcpResult, UrlResult, UsedPayments } from '../entity/result.entity';
 import {
   UrlResultsRepository,
@@ -28,16 +21,15 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { MessageType } from 'src/messages/message.enum';
 import { MessageContent } from 'src/messages/message.entity';
 import { ShorturlService } from 'src/shorturl/service/shorturl.service';
+import { UsersService } from 'src/users/service/users.service';
 
 @Injectable()
 export class ResultsService {
   private logger = new Logger('ResultsService');
   constructor(
-    private readonly usersRepository: UsersRepository,
-    private readonly userNcpInfoRepository: UserNcpInfoRepository,
+    private readonly usersService: UsersService,
     private readonly messagesService: MessagesService,
     private readonly messagesRepository: MessagesRepository,
-    private readonly messageGroupRepo: MessageGroupRepo,
     private readonly urlResultsRepository: UrlResultsRepository,
     private readonly ncpResultsRepository: NcpResultsRepository,
     private readonly urlInfosRepository: UrlInfosRepository,
@@ -48,10 +40,10 @@ export class ResultsService {
 
   // 기본메세지 ncp 결과
   async ncpResult(messageId: number, email: string): Promise<any> {
-    const message = await this.messagesRepository.findOneByMessageId(messageId);
-    const user = await this.usersRepository.findOneByEmail(email);
+    const message = await this.messagesService.findOneByMessageId(messageId);
+    const user = await this.usersService.findOneByEmail(email);
 
-    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+    const userNcpInfo = await this.usersService.findUserNcpInfoByUserId(
       user.userId,
     );
 
@@ -104,7 +96,7 @@ export class ResultsService {
 
   // 단축 url 결과
   async shortUrlResult(messageId: number) {
-    const message = await this.messagesRepository.findOneByMessageId(messageId);
+    const message = await this.messagesService.findOneByMessageId(messageId);
     if (!message) {
       throw new BadRequestException('messageId is wrong');
     }
@@ -126,7 +118,7 @@ export class ResultsService {
 
   // 단축 url A/B 비교 결과
   async shortUrlAbTestResult(messageId: number) {
-    const message = await this.messagesRepository.findOneByMessageId(messageId);
+    const message = await this.messagesService.findOneByMessageId(messageId);
     if (!message) {
       throw new BadRequestException('messageId is wrong');
     }
@@ -165,14 +157,13 @@ export class ResultsService {
   }
 
   async allMessageGroupResult(email: any) {
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       throw new BadRequestException('email is wrong');
     }
 
-    const messageGroups = await this.messageGroupRepo.findAllByUserId(
-      user.userId,
-    );
+    const messageGroups =
+      await this.messagesService.findAllMessageGroupByUserId(user.userId);
     if (!messageGroups) {
       throw new BadRequestException('email is wrong');
     }
@@ -187,17 +178,17 @@ export class ResultsService {
 
   async messageGroupResult(messageGroupId: number, email: string) {
     const result =
-      this.messageGroupRepo.findOneByMessageGroupId(messageGroupId);
+      this.messagesService.findOneMessageGroupByMessageGroupId(messageGroupId);
     if (!result) {
       throw new BadRequestException('messageGroupId is wrong');
     }
 
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       throw new BadRequestException('email is wrong');
     }
 
-    const messages = await this.messagesRepository.findAllByMessageGroupId(
+    const messages = await this.messagesService.findAllMessageByMessageGroupId(
       messageGroupId,
     );
     if (!messages) {
@@ -223,8 +214,8 @@ export class ResultsService {
   // 메세지별 결과 (polling 결과 + 클릭했을 때의 결과를 같이 반환)
   async messageResult(messageId: number) {
     // 클릭했을 때 결과를 하나 만듦
-    const message = await this.messagesRepository.findOneByMessageId(messageId);
-    const user = await this.usersRepository.findOneByUserId(message.userId);
+    const message = await this.messagesService.findOneByMessageId(messageId);
+    const user = await this.usersService.findUserByUserId(message.userId);
     const newNcpResult = await this.ncpResult(messageId, user.email);
 
     const resultEntity = this.entityManager.create(NcpResult, {
@@ -300,7 +291,7 @@ export class ResultsService {
 
   // 사용 내역 조회
   async paymentResult(email: string) {
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     if (!user) {
       throw new BadRequestException('email is wrong');
     }
@@ -314,7 +305,7 @@ export class ResultsService {
 
     for (const payment of payments) {
       const messageContent =
-        await this.messagesContentRepository.findOneByMessageGroupId(
+        await this.messagesService.findOneMessageContentByMessageGroupId(
           payment.messageGroupId,
         );
 
@@ -349,7 +340,7 @@ export class ResultsService {
     const ncpmessages = await this.messagesRepository.findThreeDaysBeforeSend();
 
     for (const message of ncpmessages) {
-      const user = await this.usersRepository.findOneByUserId(message.userId);
+      const user = await this.usersService.findUserByUserId(message.userId);
 
       try {
         const ncpResult = await this.ncpResult(message.messageId, user.email);
@@ -422,14 +413,14 @@ export class ResultsService {
         const bHumanClick = bShortUrlResult[0].humanClicks;
 
         if (aHumanClick >= bHumanClick) {
-          const message = await this.messagesRepository.findOneByMessageId(
+          const message = await this.messagesService.findOneByMessageId(
             aMessageId,
           );
           const index = message.idString.indexOf(message.urlForResult);
 
           const response = await this.sendAbTestWinnerMessage(aMessageId);
 
-          const newMessage = await this.messagesRepository.findOneByMessageId(
+          const newMessage = await this.messagesService.findOneByMessageId(
             aMessageId + 2,
           );
           newMessage.isSent = true;
@@ -440,7 +431,9 @@ export class ResultsService {
           await this.messagesRepository.save(newMessage);
 
           const usedMessageContent =
-            await this.messagesContentRepository.findOneByMessageId(aMessageId);
+            await this.messagesService.findOneMessageContentByMessageId(
+              aMessageId,
+            );
 
           const newMessageContent = new MessageContent();
           newMessageContent.messageId = aMessageId + 2;
@@ -452,14 +445,14 @@ export class ResultsService {
 
           await this.messagesContentRepository.save(newMessageContent);
         } else {
-          const message = await this.messagesRepository.findOneByMessageId(
+          const message = await this.messagesService.findOneByMessageId(
             bMessageId,
           );
           const index = message.idString.indexOf(message.urlForResult);
 
           const response = await this.sendAbTestWinnerMessage(bMessageId);
 
-          const newMessage = await this.messagesRepository.findOneByMessageId(
+          const newMessage = await this.messagesService.findOneByMessageId(
             1 + bMessageId,
           );
 
@@ -471,7 +464,9 @@ export class ResultsService {
           await this.messagesRepository.save(newMessage);
 
           const usedMessageContent =
-            await this.messagesContentRepository.findOneByMessageId(bMessageId);
+            await this.messagesService.findOneMessageContentByMessageId(
+              bMessageId,
+            );
 
           const newMessageContent = new MessageContent();
           newMessageContent.messageId = bMessageId + 1;
@@ -510,11 +505,11 @@ export class ResultsService {
 
   async sendAbTestWinnerMessage(messageId: number) {
     const messageContent =
-      await this.messagesContentRepository.findOneByMessageId(messageId);
+      await this.messagesService.findOneMessageContentByMessageId(messageId);
 
-    const message = await this.messagesRepository.findOneByMessageId(messageId);
+    const message = await this.messagesService.findOneByMessageId(messageId);
 
-    const user = await this.usersRepository.findOneByUserId(message.userId);
+    const user = await this.usersService.findUserByUserId(message.userId);
 
     const requestIdList: string[] = [];
     const receiverList = messageContent.remainReceiverList;
@@ -551,7 +546,7 @@ export class ResultsService {
 
     for (const message of messages) {
       try {
-        const user = await this.usersRepository.findOneByUserId(message.userId);
+        const user = await this.usersService.findUserByUserId(message.userId);
         const ncpResult =
           await this.ncpResultsRepository.findLastOneByMessageId(
             message.messageId,

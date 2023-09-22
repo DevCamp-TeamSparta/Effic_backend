@@ -9,7 +9,11 @@ import axios from 'axios';
 import { Message, AdvertiseReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
-import { MessageGroupRepo } from '../messages.repository';
+import {
+  MessageGroupRepo,
+  MessagesContentRepository,
+  MessagesRepository,
+} from '../messages.repository';
 import { AdvertiseReceiverListRepository } from '../messages.repository';
 import { UsedPayments } from 'src/results/entity/result.entity';
 import {
@@ -26,6 +30,8 @@ export class MessagesService {
     private readonly usersService: UsersService,
     private readonly shorturlService: ShorturlService,
     private readonly messageGroupRepo: MessageGroupRepo,
+    private readonly messagesRepository: MessagesRepository,
+    private readonly messagesContentRepository: MessagesContentRepository,
     private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
@@ -582,5 +588,48 @@ export class MessagesService {
     );
 
     return result;
+  }
+
+  // message info 가져오기
+  async findOneByMessageId(messageId: number) {
+    const message = await this.messagesRepository.findOneByMessageId(messageId);
+    return message;
+  }
+
+  // messageGroup info 가져오기
+  async findAllMessageGroupByUserId(userId: number) {
+    const messageGroupList = await this.messageGroupRepo.findAllByUserId(
+      userId,
+    );
+    return messageGroupList;
+  }
+
+  async findOneMessageGroupByMessageGroupId(messageGroupId: number) {
+    const messageGroup = await this.messageGroupRepo.findOneByMessageGroupId(
+      messageGroupId,
+    );
+    return messageGroup;
+  }
+
+  async findAllMessageByMessageGroupId(messageGroupId: number) {
+    const messageList = await this.messagesRepository.findAllByMessageGroupId(
+      messageGroupId,
+    );
+    return messageList;
+  }
+
+  // messageContent info 가져오기
+  async findOneMessageContentByMessageGroupId(messageGroupId: number) {
+    const messageContent =
+      await this.messagesContentRepository.findOneByMessageGroupId(
+        messageGroupId,
+      );
+    return messageContent;
+  }
+
+  async findOneMessageContentByMessageId(messageId: number) {
+    const messageContent =
+      await this.messagesContentRepository.findOneByMessageId(messageId);
+    return messageContent;
   }
 }

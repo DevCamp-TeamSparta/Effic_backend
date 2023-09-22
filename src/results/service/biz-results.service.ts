@@ -11,6 +11,8 @@ export class BizmessageResultsService {
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
-  // 기본 친구톡 ncp 결과
-  async;
+  // ncp 결과
+  async ncpResult(bizmessageId: number): Promise<any> {}
+
+  //
 }
