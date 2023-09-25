@@ -448,3 +448,7 @@ Content-Type: application/json
 #   "bizmessageId": 9,
 #   "bizmessageGroupId": 9
 # }
+
+### 친구톡 ncp 결과조회 - 실제로 사용되지 않습니다.
+Get http://localhost:8000/results/bizmessage/14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
