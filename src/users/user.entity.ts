@@ -121,8 +121,7 @@ export class UserNcpInfo extends BaseEntity {
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
 
-  // [{"plusFriendId":"@스파르타코딩클럽","memo": "스파르타"}, {"plusFriendId":"@항해","memo": ""}]
-  @Column({ type: 'json', nullable: true, default: '[]' })
+  @Column({ type: 'jsonb', nullable: true, default: '[]' })
   plusFriendIdList: { plusFriendId: string; memo: string };
 
   @Column({ type: 'int', nullable: false })

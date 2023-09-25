@@ -113,7 +113,7 @@ export class BizmessageContent extends BaseEntity {
   @Column()
   sentType: bizmessageType;
 
-  @Column({ type: 'json', nullable: false, default: '[]' })
+  @Column({ type: 'jsonb', nullable: false, default: '[]' })
   content: {
     type: string;
     content: string;
@@ -127,10 +127,10 @@ export class BizmessageContent extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   plusFriendId: string;
 
-  @Column('json', { default: [] })
+  @Column('jsonb', { default: [] })
   receiverList: Record<string, any>;
 
-  @Column('json', { default: [] })
+  @Column('jsonb', { default: [] })
   remainReceiverList: Record<string, any>;
 
   @Column({ type: 'int', nullable: true })

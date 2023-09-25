@@ -12,7 +12,7 @@ import { User } from 'src/users/user.entity';
 @Entity()
 export class BizNcpResult extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
-  BizNcpResultId: number;
+  bizNcpResultId: number;
 
   @Column({ type: 'int', nullable: false })
   bizmessageId: number;

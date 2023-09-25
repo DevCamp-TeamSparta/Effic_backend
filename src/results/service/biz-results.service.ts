@@ -162,7 +162,7 @@ export class BizmessageResultsService {
     });
 
     const bizNcpResultId = (await this.entityManager.save(resultEntity))
-      .BizNcpResultId;
+      .bizNcpResultId;
 
     const newBizUrlResult = await this.shortUrlResult(bizmessageId);
 
@@ -177,7 +177,14 @@ export class BizmessageResultsService {
       });
       await this.entityManager.save(resultEntity);
     }
-    // const
+
+    const NcpBizmessage =
+      await this.bizmessageNcpResultsRepository.findAllByBizmessageId(
+        bizmessageId,
+      );
+    if (!NcpBizmessage) {
+      throw new NotFoundException('NcpBizmessageId is wrong');
+    }
   }
 
   // 친구톡 결과 polling
@@ -205,7 +212,7 @@ export class BizmessageResultsService {
         });
 
         const bizNcpResultId = (await this.entityManager.save(resultEntity))
-          .BizNcpResultId;
+          .bizNcpResultId;
 
         console.log(
           `NCP results for bizmessage ${bizmessage.bizmessageId} saved`,
