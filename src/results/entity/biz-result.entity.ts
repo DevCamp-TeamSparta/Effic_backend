@@ -62,7 +62,7 @@ export class BizUrlResult extends BaseEntity {
   idString: string;
 
   @Column({ type: 'int', nullable: true })
-  BizNcpResultId: number;
+  bizNcpResultId: number;
 
   @Column({ type: 'int', nullable: false })
   bizmessageId: number;

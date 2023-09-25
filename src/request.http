@@ -106,7 +106,7 @@ Content-Type: application/json
 }
 
 ### result - messageId
-Get http://localhost:8000/results/3
+Get http://localhost:8000/results/1
 Content-Type: application/json
 
 
@@ -514,10 +514,66 @@ Content-Type: application/json
 # }
 
 ### 친구톡 ncp 결과조회 - 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/bizmessage/14
+Get http://localhost:8000/results/bizmessage/ncp/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
 ### 친구톡 url 클릭 결과조회 - 실제로 사용되지 않습니다
-Get http://localhost:8000/results/bizmessage/url/14
+Get http://localhost:8000/results/bizmessage/url/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
+### 친구톡 결과조회
+Get http://localhost:8000/results/bizmessage/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
+
+# [
+#   {
+#     "bizmessage": 1,
+#     "user": 1,
+#     "urls": [
+#       {
+#         "idString": "lnk_3xIn_S857zWdpVHcRGf99i1rsw",
+#         "shortUrl": "https://effi.kr/I1m6ro",
+#         "originalUrl": "https://app.effic.biz",
+#         "humanclicks": 0,
+#         "totalclicks": 0
+#       },
+#       {
+#         "idString": "lnk_3xIn_ntD71ot5a3WLjShEMHLTj",
+#         "shortUrl": "https://effi.kr/W94uqu",
+#         "originalUrl": "https://www.google.com",
+#         "humanclicks": 0,
+#         "totalclicks": 0
+#       }
+#     ],
+#     "success": 1,
+#     "reserved": 0,
+#     "fail": 1,
+#     "createdAt": "2023-09-25T08:20:02.185Z"
+#   },
+#   {
+#     "bizmessage": 1,
+#     "user": 1,
+#     "urls": [
+#       {
+#         "idString": "lnk_3xIn_S857zWdpVHcRGf99i1rsw",
+#         "shortUrl": "https://effi.kr/I1m6ro",
+#         "originalUrl": "https://app.effic.biz",
+#         "humanclicks": 0,
+#         "totalclicks": 0
+#       },
+#       {
+#         "idString": "lnk_3xIn_ntD71ot5a3WLjShEMHLTj",
+#         "shortUrl": "https://effi.kr/W94uqu",
+#         "originalUrl": "https://www.google.com",
+#         "humanclicks": 0,
+#         "totalclicks": 0
+#       }
+#     ],
+#     "success": 1,
+#     "reserved": 0,
+#     "fail": 1,
+#     "createdAt": "2023-09-25T08:25:16.220Z"
+#   }
+# ]
+
+### 친구톡 테스트 발송

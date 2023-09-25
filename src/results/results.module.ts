@@ -22,7 +22,10 @@ import { UsersService } from 'src/users/service/users.service';
 import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 import { BizmessageResultsService } from './service/biz-results.service';
-import { BizmessageNcpResultsRepository } from './repository/biz-result.repository';
+import {
+  BizmessageNcpResultsRepository,
+  BizmessageUrlResultRepository,
+} from './repository/biz-result.repository';
 import { BizmessageService } from 'src/bizmessage/service/bizmessage.service';
 import {
   BizmessageContentRepository,
@@ -47,6 +50,7 @@ import {
     BizmessageGroupRepository,
     BizmessageContentRepository,
     BizmessageRepository,
+    BizmessageUrlResultRepository,
     MessagesRepository,
     MessageGroupRepo,
     MessagesContentRepository,
@@ -60,6 +64,7 @@ import {
     UrlResultsRepository,
     BizmessageResultsService,
     BizmessageNcpResultsRepository,
+    BizmessageUrlResultRepository,
   ],
 })
 export class ResultsModule {}

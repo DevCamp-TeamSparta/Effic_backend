@@ -9,7 +9,10 @@ import {
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { BizmessageNcpResultsRepository } from '../repository/biz-result.repository';
+import {
+  BizmessageNcpResultsRepository,
+  BizmessageUrlResultRepository,
+} from '../repository/biz-result.repository';
 import { BizmessageService } from 'src/bizmessage/service/bizmessage.service';
 import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 import { UsersService } from 'src/users/service/users.service';
@@ -27,6 +30,8 @@ export class BizmessageResultsService {
     private readonly usersService: UsersService,
     private readonly shorturlService: ShorturlService,
     private readonly bizmessageNcpResultsRepository: BizmessageNcpResultsRepository,
+    private readonly bizmessageUrlResultsRepository: BizmessageUrlResultRepository,
+    private readonly urlInfosRepository: ShorturlService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -172,19 +177,55 @@ export class BizmessageResultsService {
         humanclicks: result.humanclicks,
         totalclicks: result.totalclicks,
         idString: result.idString,
-        BizNcpResultId: bizNcpResultId,
+        bizNcpResultId: bizNcpResultId,
         user: user,
       });
       await this.entityManager.save(resultEntity);
     }
 
-    const NcpBizmessage =
+    const NcpBizmessages =
       await this.bizmessageNcpResultsRepository.findAllByBizmessageId(
         bizmessageId,
       );
-    if (!NcpBizmessage) {
+    if (!NcpBizmessages) {
       throw new NotFoundException('NcpBizmessageId is wrong');
     }
+
+    const bizmessageResults = [];
+
+    for (const ncp of NcpBizmessages) {
+      const urlBizmessages =
+        await this.bizmessageUrlResultsRepository.findAllByResultId(
+          ncp.bizNcpResultId,
+        );
+
+      const result = {
+        bizmessage: bizmessageId,
+        user: ncp.userId,
+        urls: [],
+        success: ncp.success,
+        reserved: ncp.reserved,
+        fail: ncp.fail,
+        createdAt: ncp.createdAt,
+      };
+      for (const url of urlBizmessages) {
+        if (ncp.bizmessageId === url.bizmessageId) {
+          const urlInfo = await this.shorturlService.findUrlInfoByIdString(
+            url.idString,
+          );
+
+          result.urls.push({
+            idString: url.idString,
+            shortUrl: urlInfo.shortenUrl,
+            originalUrl: urlInfo.originalUrl,
+            humanclicks: url.humanclicks,
+            totalclicks: url.totalclicks,
+          });
+        }
+      }
+      bizmessageResults.push(result);
+    }
+    return bizmessageResults;
   }
 
   // 친구톡 결과 polling
@@ -230,7 +271,7 @@ export class BizmessageResultsService {
                 humanclicks: result.humanclicks,
                 totalclicks: result.totalclicks,
                 idString: result.idString,
-                BizNcpResultId: bizNcpResultId,
+                bizNcpResultId: bizNcpResultId,
                 user: user,
               });
               await this.entityManager.save(resultEntity);

@@ -12,7 +12,6 @@ import {
   UrlResultsRepository,
   NcpResultsRepository,
 } from '../repository/results.repository';
-import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 import { MessagesContentRepository } from 'src/messages/messages.repository';
 import { MessagesService } from 'src/messages/service/messages.service';
 import { EntityManager } from 'typeorm';
@@ -33,7 +32,6 @@ export class ResultsService {
     private readonly messagesRepository: MessagesRepository,
     private readonly urlResultsRepository: UrlResultsRepository,
     private readonly ncpResultsRepository: NcpResultsRepository,
-    private readonly urlInfosRepository: UrlInfosRepository,
     private readonly messagesContentRepository: MessagesContentRepository,
     private readonly shorturlService: ShorturlService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -278,7 +276,7 @@ export class ResultsService {
       };
       for (const url of urlMessage) {
         if (ncp.messageId === url.messageId) {
-          const urlInfo = await this.urlInfosRepository.findOneByIdString(
+          const urlInfo = await this.shorturlService.findUrlInfoByIdString(
             url.idString,
           );
 
