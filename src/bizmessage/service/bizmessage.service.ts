@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import {
+  BizmessageContentRepository,
   BizmessageGroupRepository,
   BizmessageRepository,
 } from '../bizmessage.repository';
@@ -28,6 +29,7 @@ export class BizmessageService {
   constructor(
     private readonly bizmessageRepository: BizmessageRepository,
     private readonly bizmessageGroupRepository: BizmessageGroupRepository,
+    private readonly bizmessageContentRepository: BizmessageContentRepository,
     private readonly shorturlService: ShorturlService,
     private readonly usersService: UsersService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -477,10 +479,26 @@ export class BizmessageService {
   }
 
   // bizmessage info 조회
-  async findBizmessageInfoByBizmessageId(bizmessageId) {
+  async findOneBizmessageInfoByBizmessageId(bizmessageId) {
     const bizmessage = await this.bizmessageRepository.findOneByBizmessageId(
       bizmessageId,
     );
     return bizmessage;
+  }
+
+  //bizmessageContent 조회
+  async findOneBizmessageContentByBizmessageId(bizmessageId) {
+    const bizmessageContent =
+      await this.bizmessageContentRepository.findOneByBizmessageId(
+        bizmessageId,
+      );
+    return bizmessageContent;
+  }
+
+  // bizmessage 날짜별 조회
+  async findThreeDaysBeforeSend() {
+    const bizmessages =
+      await this.bizmessageRepository.findThreeDaysBeforeSend();
+    return bizmessages;
   }
 }

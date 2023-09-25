@@ -632,4 +632,21 @@ export class MessagesService {
       await this.messagesContentRepository.findOneByMessageId(messageId);
     return messageContent;
   }
+
+  // messagerepo info 가져오기 (날짜)
+  async findThreeDaysBeforeSend() {
+    const messages = await this.messagesRepository.findThreeDaysBeforeSend();
+    return messages;
+  }
+
+  async findThreeDaysBeforeSendAndNotChecked() {
+    const messages =
+      await this.messagesRepository.findThreeDaysBeforeSendAndNotChecked();
+    return messages;
+  }
+
+  async findNotSend() {
+    const messages = await this.messagesRepository.findNotSend();
+    return messages;
+  }
 }

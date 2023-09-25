@@ -25,6 +25,7 @@ import { BizmessageResultsService } from './service/biz-results.service';
 import { BizmessageNcpResultsRepository } from './repository/biz-result.repository';
 import { BizmessageService } from 'src/bizmessage/service/bizmessage.service';
 import {
+  BizmessageContentRepository,
   BizmessageGroupRepository,
   BizmessageRepository,
 } from 'src/bizmessage/bizmessage.repository';
@@ -44,6 +45,7 @@ import {
     BizmessageResultsService,
     BizmessageNcpResultsRepository,
     BizmessageGroupRepository,
+    BizmessageContentRepository,
     BizmessageRepository,
     MessagesRepository,
     MessageGroupRepo,

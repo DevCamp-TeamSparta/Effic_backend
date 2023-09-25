@@ -93,7 +93,7 @@ export class ResultsController {
   }
 
   // 친구톡 ncp 결과조회 - 실제로 사용되지 않습니다.
-  @Get('/bizmessage/:bizmessageId')
+  @Get('/bizmessage/ncp/:bizmessageId')
   async bizmessageNcpResult(
     @Param('bizmessageId') bizmessageId: number,
     @Headers('Authorization') authorization: string,
@@ -106,6 +106,39 @@ export class ResultsController {
     const decodedAccessToken: any = jwt.decode(accessToken);
 
     return await this.bizmessageResultsService.ncpResult(
+      bizmessageId,
+      decodedAccessToken.userId,
+    );
+  }
+
+  // 친구톡 url 클릭 결과조회 - 실제로 사용되지 않습니다
+  @Get('/bizmessage/url/:bizmessageId')
+  async bizmessageUrlResult(
+    @Param('bizmessageId') bizmessageId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage url result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    return await this.bizmessageResultsService.shortUrlResult(bizmessageId);
+  }
+
+  // 친구톡 결과조회
+  @Get('/bizmessage/:bizmessageId')
+  async bizmessageResult(
+    @Param('bizmessageId') bizmessageId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    return await this.bizmessageResultsService.BizmessageResult(
       bizmessageId,
       decodedAccessToken.userId,
     );

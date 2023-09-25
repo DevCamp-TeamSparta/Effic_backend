@@ -204,7 +204,9 @@ export class ResultsService {
     const results = await Promise.all(
       messages.map(async (message) => {
         const [content, results] = await Promise.all([
-          this.messagesContentRepository.findOneByMessageId(message.messageId),
+          this.messagesService.findOneMessageContentByMessageId(
+            message.messageId,
+          ),
           this.messageResult(message.messageId),
         ]);
         return {
@@ -343,7 +345,7 @@ export class ResultsService {
   @Cron('0 */1 * * *', { name: 'result' })
   async handleResultCron() {
     this.logger.log('result polling');
-    const ncpmessages = await this.messagesRepository.findThreeDaysBeforeSend();
+    const ncpmessages = await this.messagesService.findThreeDaysBeforeSend();
 
     for (const message of ncpmessages) {
       const user = await this.usersService.findUserByUserId(message.userId);
@@ -405,7 +407,7 @@ export class ResultsService {
   @Cron(CronExpression.EVERY_5_MINUTES, { name: 'abtest' })
   async handleAbTestInterval() {
     this.logger.log('abtest polling');
-    const messages = await this.messagesRepository.findNotSend();
+    const messages = await this.messagesService.findNotSend();
 
     for (const message of messages) {
       try {
@@ -548,7 +550,7 @@ export class ResultsService {
     this.logger.log('refund polling');
 
     const messages =
-      await this.messagesRepository.findThreeDaysBeforeSendAndNotChecked();
+      await this.messagesService.findThreeDaysBeforeSendAndNotChecked();
 
     for (const message of messages) {
       try {

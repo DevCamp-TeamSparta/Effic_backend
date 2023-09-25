@@ -13,6 +13,10 @@ import {
   Bizmessage,
   BizmessageAdReceiverList,
 } from 'src/bizmessage/bizmessage.entity';
+import {
+  BizNcpResult,
+  BizUrlResult,
+} from 'src/results/entity/biz-result.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -82,6 +86,16 @@ export class User extends BaseEntity {
     cascade: true,
   })
   bizmessageAdReceiverList: BizmessageAdReceiverList[];
+
+  @OneToMany(() => BizNcpResult, (bizNcpResult) => bizNcpResult.user, {
+    cascade: true,
+  })
+  bizncpResults: BizNcpResult[];
+
+  @OneToMany(() => BizUrlResult, (bizUrlResult) => bizUrlResult.user, {
+    cascade: true,
+  })
+  bizurlResults: BizUrlResult[];
 }
 
 @Entity()

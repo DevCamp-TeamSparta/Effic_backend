@@ -10,6 +10,10 @@ import {
 } from 'typeorm';
 import { bizmessageType } from './bizmessage.enum';
 import { User } from 'src/users/user.entity';
+import {
+  BizNcpResult,
+  BizUrlResult,
+} from 'src/results/entity/biz-result.entity';
 
 @Entity()
 export class Bizmessage extends BaseEntity {
@@ -61,6 +65,16 @@ export class Bizmessage extends BaseEntity {
   )
   @JoinColumn({ name: 'bizmessageGroupId' })
   bizmessageGroup: Promise<BizmessageGroup>;
+
+  @OneToMany(() => BizNcpResult, (bizNcpResult) => bizNcpResult.bizmessage, {
+    cascade: true,
+  })
+  bizncpResults: BizNcpResult[];
+
+  @OneToMany(() => BizUrlResult, (bizUrlResult) => bizUrlResult.bizmessage, {
+    cascade: true,
+  })
+  bizurlResults: BizUrlResult[];
 }
 
 @Entity()
