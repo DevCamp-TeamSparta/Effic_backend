@@ -1,6 +1,6 @@
 ### Create User
 POST http://localhost:8000/users/signup
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk0NTk2ODgxLCJleHAiOjE2OTQ2ODMyODF9.Q2y91DtvtO-iXnBleP_ui9YF42rg7hv-1kntw0Dw38c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk1NjI3ODk5LCJleHAiOjE2OTU3MTQyOTl9.YmP-aYte4C0P36wBwdRRX7nrTsnJ6wJNm9sS_ils8o8
 Content-Type: application/json
 
 {
@@ -154,22 +154,27 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #   "email": "clo@sparta.com",
 #   "name": "clo",
 #   "hostnumber": [
-#     "15228016",
-#     "01036289823",
-#     "01011111113"
+#     "15228016"
 #   ],
 #   "advertisementOpt": false,
 #   "advertiseNumber": [
-#     "0801111112"
+#     "08011111111"
 #   ],
 #   "accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
 #   "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
 #   "secretKey": "x5zzaAzozM5h0k36cROO6LEuUMyRqP0di1eWXHJu",
 #   "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub",
 #   "plusFriendIdList": [
-#     "@스파르타코딩클럽"
+#     {
+#       "plusFriendId": "@스파르타코딩클럽",
+#       "memo": "스파르타"
+#     },
+#     {
+#       "plusFriendId": "@항해",
+#       "memo": ""
+#     }
 #   ],
-#   "point": 9841,
+#   "point": 3000,
 #   "money": 0
 # }
 
@@ -412,12 +417,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 
 ### bizmessage serviceId 입력
 Patch http://localhost:8000/users/me/bizserviceid
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk1NjI3ODk5LCJleHAiOjE2OTU3MTQyOTl9.YmP-aYte4C0P36wBwdRRX7nrTsnJ6wJNm9sS_ils8o8
 Content-Type: application/json
 
 {
-    "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub",
-    "plusFriendIdList": ["@스파르타코딩클럽"]
+    "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub"
 }
 
 # {
@@ -434,11 +438,43 @@ Content-Type: application/json
 #     "01036289823",
 #     "01011111113"
 #   ],
+#   "userId": 1
+# }
+
+### bizmessage plusFriendId와 메모 입력
+PATCH http://localhost:8000/users/me/plusfriendid
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "plusFriendIdList": [{"plusFriendId":"@스파르타코딩클럽","memo": "스파르타"}, {"plusFriendId":"@항해","memo": ""}]
+}
+
+# {
+#   "userInfoNcpId": 1,
+#   "accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
+#   "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
+#   "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub",
+#   "secretKey": "x5zzaAzozM5h0k36cROO6LEuUMyRqP0di1eWXHJu",
+#   "advertiseNumber": [
+#     "08011111111"
+#   ],
+#   "hostnumber": [
+#     "15228016"
+#   ],
 #   "plusFriendIdList": [
-#     "@스파르타코딩클럽"
+#     {
+#       "plusFriendId": "@스파르타코딩클럽",
+#       "memo": "스파르타"
+#     },
+#     {
+#       "plusFriendId": "@항해",
+#       "memo": ""
+#     }
 #   ],
 #   "userId": 1
 # }
+
 
 ### NCP에 이미지 업로드 
 ### 이 파일에서는 사용할 수 없습니다. 이미지 업로드가 가능한 postman이나 thunderclient를 사용해주세요.

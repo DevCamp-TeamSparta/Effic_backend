@@ -347,7 +347,23 @@ export class UsersService {
 
     userNcpInfo.bizServiceId = null;
     userNcpInfo.bizServiceId = updateBizserviceIdDto.bizServiceId;
-    userNcpInfo.plusFriendIdList = updateBizserviceIdDto.plusFriendIdList;
+
+    await this.userNcpInfoRepository.save(userNcpInfo);
+
+    return userNcpInfo;
+  }
+
+  // bizmessage plusFriendId와 메모 입력
+  async updatePlusFriendId(userId: number, updatePlusFriendIdDto) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    if (!userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    userNcpInfo.plusFriendIdList = updatePlusFriendIdDto.plusFriendIdList;
 
     await this.userNcpInfoRepository.save(userNcpInfo);
 
