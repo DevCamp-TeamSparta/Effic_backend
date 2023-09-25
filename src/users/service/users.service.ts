@@ -345,15 +345,9 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    if (userNcpInfo.bizServiceId !== '') {
-      throw new HttpException(
-        'BizServiceId is already provided',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     userNcpInfo.bizServiceId = null;
     userNcpInfo.bizServiceId = updateBizserviceIdDto.bizServiceId;
+    userNcpInfo.plusFriendIdList = updateBizserviceIdDto.plusFriendIdList;
 
     await this.userNcpInfoRepository.save(userNcpInfo);
 

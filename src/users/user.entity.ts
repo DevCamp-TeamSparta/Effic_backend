@@ -121,6 +121,9 @@ export class UserNcpInfo extends BaseEntity {
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
 
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  plusFriendIdList: Array<string>;
+
   @Column({ type: 'int', nullable: false })
   userId: number;
 }

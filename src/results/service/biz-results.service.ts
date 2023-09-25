@@ -145,11 +145,39 @@ export class BizmessageResultsService {
 
   // 친구톡 결과조회
   async BizmessageResult(bizmessageId: number, userId: number): Promise<any> {
-    const bizmessage = await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
-      bizmessageId,
-    );
+    const bizmessage =
+      await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+        bizmessageId,
+      );
     const user = await this.usersService.findUserByUserId(userId);
-    const newBizNcpResult = ;
+    const newBizNcpResult = await this.ncpResult(bizmessageId, userId);
+
+    const resultEntity = this.entityManager.create(BizNcpResult, {
+      bizmessage: bizmessage,
+      success: newBizNcpResult.success,
+      reserved: newBizNcpResult.reserved,
+      fail: newBizNcpResult.fail,
+      createdAt: new Date(),
+      user: user,
+    });
+
+    const bizNcpResultId = (await this.entityManager.save(resultEntity))
+      .BizNcpResultId;
+
+    const newBizUrlResult = await this.shortUrlResult(bizmessageId);
+
+    for (const result of newBizUrlResult) {
+      const resultEntity = this.entityManager.create(BizUrlResult, {
+        bizmessage: bizmessage,
+        humanclicks: result.humanclicks,
+        totalclicks: result.totalclicks,
+        idString: result.idString,
+        BizNcpResultId: bizNcpResultId,
+        user: user,
+      });
+      await this.entityManager.save(resultEntity);
+    }
+    // const
   }
 
   // 친구톡 결과 polling
