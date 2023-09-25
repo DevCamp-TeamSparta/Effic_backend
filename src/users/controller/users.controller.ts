@@ -149,6 +149,7 @@ export class UsersController {
         serviceId: userNcpInfo.serviceId,
         secretKey: userNcpInfo.secretKey,
         bizServiceId: userNcpInfo.bizServiceId,
+        plusFriendIdList: userNcpInfo.plusFriendIdList,
         point: user.point,
         money: user.money,
       };
