@@ -7,6 +7,10 @@ export class BizmessageRepository extends Repository<Bizmessage> {
   constructor(private datasource: DataSource) {
     super(Bizmessage, datasource.createEntityManager());
   }
+
+  async findOneByBizmessageId(bizmessageId: number): Promise<Bizmessage> {
+    return await this.findOne({ where: { bizmessageId } });
+  }
 }
 
 @Injectable()

@@ -1,7 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { BizmessageGroupRepository } from '../bizmessage.repository';
+import {
+  BizmessageGroupRepository,
+  BizmessageRepository,
+} from '../bizmessage.repository';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import { UsersService } from '../../users/service/users.service';
 import {
@@ -23,6 +26,7 @@ import { bizmessageType } from '../bizmessage.enum';
 @Injectable()
 export class BizmessageService {
   constructor(
+    private readonly bizmessageRepository: BizmessageRepository,
     private readonly bizmessageGroupRepository: BizmessageGroupRepository,
     private readonly shorturlService: ShorturlService,
     private readonly usersService: UsersService,
@@ -470,5 +474,13 @@ export class BizmessageService {
       adReceiverList.bizmessageGroupId = bizmessageGroupId;
       await this.entityManager.save(adReceiverList);
     }
+  }
+
+  // bizmessage info 조회
+  async findBizmessageInfoByBizmessageId(bizmessageId) {
+    const bizmessage = await this.bizmessageRepository.findOneByBizmessageId(
+      bizmessageId,
+    );
+    return bizmessage;
   }
 }

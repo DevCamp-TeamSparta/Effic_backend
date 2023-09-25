@@ -92,5 +92,22 @@ export class ResultsController {
     return await this.resultsService.ncpResult(messageId, headerEmail);
   }
 
-  // 친구톡 결과조회
+  // 친구톡 ncp 결과조회 - 실제로 사용되지 않습니다.
+  @Get('/bizmessage/:bizmessageId')
+  async bizmessageNcpResult(
+    @Param('bizmessageId') bizmessageId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage ncp result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    return await this.bizmessageResultsService.ncpResult(
+      bizmessageId,
+      decodedAccessToken.userId,
+    );
+  }
 }

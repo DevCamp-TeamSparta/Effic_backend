@@ -1,8 +1,9 @@
 import {
   Injectable,
-  InternalServerErrorException,
   BadRequestException,
   Logger,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { MessagesRepository } from 'src/messages/messages.repository';
@@ -87,8 +88,13 @@ export class ResultsService {
           }
         }
       } catch (error) {
-        console.error(error);
-        throw new InternalServerErrorException();
+        if (error.response) {
+          throw new HttpException(error.response.data, error.response.status);
+        }
+        throw new HttpException(
+          error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
     return { success, reserved, fail };

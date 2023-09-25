@@ -23,6 +23,11 @@ import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
 import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 import { BizmessageResultsService } from './service/biz-results.service';
 import { BizmessageNcpResultsRepository } from './repository/biz-result.repository';
+import { BizmessageService } from 'src/bizmessage/service/bizmessage.service';
+import {
+  BizmessageGroupRepository,
+  BizmessageRepository,
+} from 'src/bizmessage/bizmessage.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([NcpResult, UrlResult])],
@@ -35,8 +40,11 @@ import { BizmessageNcpResultsRepository } from './repository/biz-result.reposito
     UserNcpInfoRepository,
     NcpResultsRepository,
     UrlResultsRepository,
+    BizmessageService,
     BizmessageResultsService,
     BizmessageNcpResultsRepository,
+    BizmessageGroupRepository,
+    BizmessageRepository,
     MessagesRepository,
     MessageGroupRepo,
     MessagesContentRepository,

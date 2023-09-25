@@ -440,7 +440,11 @@ Content-Type: application/json
     "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "isAd": false, "urlList": []},
     "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
     "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
-    "buttonInfo": {"type": "WL", "name": "히히💕", "buttonLink":"https://app.effic.biz"},
+    "buttonInfo": {"type": "WL", "name": "히히💕", "buttonLink":"https://www.google.com"},
     "urlForResult": "https://app.effic.biz"
 }
 
+# {
+#   "bizmessageId": 9,
+#   "bizmessageGroupId": 9
+# }
