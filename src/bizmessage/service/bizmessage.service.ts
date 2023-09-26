@@ -240,6 +240,11 @@ export class BizmessageService {
     };
   }
 
+  // ab 친구톡 보내기
+  async sendAbTestBizmessage(userId, abTestBizmessageDto) {
+    const user = await this.usersService.findUserByUserId(userId);
+  }
+
   async makeshortLinks(messageDto) {
     let shortButtonLinkList;
     let shortImageLink;
