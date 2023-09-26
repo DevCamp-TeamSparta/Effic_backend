@@ -23,7 +23,7 @@ export class AbTestMessageDto {
   @IsBoolean()
   advertiseInfo?: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   urlForResult: string;
 

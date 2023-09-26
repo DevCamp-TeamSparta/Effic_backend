@@ -80,13 +80,13 @@ Content-Type: application/json
 
 ### dafault message result - shortio
 ### test용입니다 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/default/1
+Get http://localhost:8000/results/default/6
 Content-Type: application/json
 
 
 ### dafault message result - ncp 
 ### test용입니다 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/default/ncp/2
+Get http://localhost:8000/results/default/ncp/6
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0MDUzNDEsImV4cCI6MTY5NDQ5MTc0MX0.EzZnKByWYN0jbb_mogFluYy3FjY_lvD2F0dXd1zsrws
 Content-Type: application/json
 
@@ -106,7 +106,7 @@ Content-Type: application/json
 }
 
 ### result - messageId
-Get http://localhost:8000/results/1
+Get http://localhost:8000/results/6
 Content-Type: application/json
 
 
@@ -586,7 +586,7 @@ Content-Type: application/json
     "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "isAd": false, "urlList": []},
     "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
     "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
-    "buttonInfoList": [{"type": "WL", "name": "히히💕", "linkMobile" : "https://www.google.com", "linkPc": "https://app.effic.biz"}, {"type": "WL", "name": "하하", "linkMobile" : "https://www.google.com", "linkPc": ""}],
+    "buttonInfoList": [{"type": "WL", "name": "히히💕", "linkMobile" : "https://www.naver.com", "linkPc": "https://app.effic.biz"}, {"type": "WL", "name": "하하", "linkMobile" : "https://www.google.com", "linkPc": "https://app.effic.biz"}],
     "urlForResult": "https://app.effic.biz"
 }
 

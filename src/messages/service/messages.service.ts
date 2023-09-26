@@ -138,10 +138,12 @@ export class MessagesService {
       user.userId,
     );
 
-    for (const url of messageInfoList.urlList) {
-      const response = await this.shorturlService.createShorturl(url);
-      shortenedUrls.push(response.shortURL);
-      idStrings.push(response.idString);
+    if (messageInfoList.urlList) {
+      for (const url of messageInfoList.urlList) {
+        const response = await this.shorturlService.createShorturl(url);
+        shortenedUrls.push(response.shortURL);
+        idStrings.push(response.idString);
+      }
     }
 
     const newContent = await this.replaceUrlContent(
@@ -449,10 +451,13 @@ export class MessagesService {
           requestIdList.push(body.response.data.requestId);
         }
 
-        const urlForResult = abTestMessageDto.urlForResult;
-        const idStringIndex =
-          abTestMessageDto.messageInfoList[0].urlList.indexOf(urlForResult);
-        const idStringForResult = takeBody.idStrings[idStringIndex];
+        let idStringForResult = null;
+        if (abTestMessageDto.urlForResult) {
+          const urlForResult = abTestMessageDto.urlForResult;
+          const idStringIndex =
+            abTestMessageDto.messageInfoList[0].urlList.indexOf(urlForResult);
+          idStringForResult = takeBody.idStrings[idStringIndex];
+        }
 
         const AbMessageInfo = await this.saveAbMessageInfo(
           MessageType.A,
@@ -491,10 +496,13 @@ export class MessagesService {
           requestIdList.push(body.response.data.requestId);
         }
 
-        const urlForResult = abTestMessageDto.urlForResult;
-        const idStringIndex =
-          abTestMessageDto.messageInfoList[1].urlList.indexOf(urlForResult);
-        const idStringForResult = takeBody.idStrings[idStringIndex];
+        let idStringForResult = null;
+        if (abTestMessageDto.urlForResult) {
+          const urlForResult = abTestMessageDto.urlForResult;
+          const idStringIndex =
+            abTestMessageDto.messageInfoList[1].urlList.indexOf(urlForResult);
+          idStringForResult = takeBody.idStrings[idStringIndex];
+        }
 
         const AbMessageInfo = await this.saveAbMessageInfo(
           MessageType.B,

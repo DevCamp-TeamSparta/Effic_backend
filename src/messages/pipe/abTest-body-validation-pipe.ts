@@ -37,29 +37,31 @@ export class abTestMessageValidationPipe implements PipeTransform {
       }
     }
 
-    const uniqueUrl = new Set(value.messageInfoList[0].urlList);
-    if (uniqueUrl.size !== value.messageInfoList[0].urlList.length) {
-      throw new BadRequestException('Duplicate urls found');
-    }
+    if (value.urlList) {
+      const uniqueUrl = new Set(value.messageInfoList[0].urlList);
+      if (uniqueUrl.size !== value.messageInfoList[0].urlList.length) {
+        throw new BadRequestException('Duplicate urls found');
+      }
 
-    const uniqueUrl2 = new Set(value.messageInfoList[1].urlList);
-    if (uniqueUrl2.size !== value.messageInfoList[1].urlList.length) {
-      throw new BadRequestException('Duplicate urls found');
-    }
+      const uniqueUrl2 = new Set(value.messageInfoList[1].urlList);
+      if (uniqueUrl2.size !== value.messageInfoList[1].urlList.length) {
+        throw new BadRequestException('Duplicate urls found');
+      }
 
-    const findSameUrl = value.messageInfoList[0].urlList.filter((x) =>
-      value.messageInfoList[1].urlList.includes(x),
-    );
-    if (findSameUrl.length === 0) {
-      throw new BadRequestException('There must be at least one same url');
-    }
-
-    const urlForResult = value.urlForResult;
-    const findSameUrl2 = findSameUrl.filter((x) => urlForResult.includes(x));
-    if (findSameUrl2.length === 0) {
-      throw new BadRequestException(
-        'There must be at least one same url in urlForResult',
+      const findSameUrl = value.messageInfoList[0].urlList.filter((x) =>
+        value.messageInfoList[1].urlList.includes(x),
       );
+      if (findSameUrl.length === 0) {
+        throw new BadRequestException('There must be at least one same url');
+      }
+
+      const urlForResult = value.urlForResult;
+      const findSameUrl2 = findSameUrl.filter((x) => urlForResult.includes(x));
+      if (findSameUrl2.length === 0) {
+        throw new BadRequestException(
+          'There must be at least one same url in urlForResult',
+        );
+      }
     }
 
     return value;
