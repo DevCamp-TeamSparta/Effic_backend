@@ -124,34 +124,9 @@ export class BizmessageService {
       NCP_BizMessage_price,
     );
 
-    let shortButtonLinkList;
-    let shortImageLink;
-    if (defaultBizmessageDto.buttonInfoList) {
-      shortButtonLinkList = await Promise.all(
-        defaultBizmessageDto.buttonInfoList.map((button) =>
-          this.shorturlService.createShorturl(button.buttonLink),
-        ),
-      );
-    }
-    if (defaultBizmessageDto.imageInfo) {
-      shortImageLink = await this.shorturlService.createShorturl(
-        defaultBizmessageDto.imageInfo.imageLink,
-      );
-    }
-    if (
-      defaultBizmessageDto.buttonInfoList &&
-      defaultBizmessageDto.imageInfo &&
-      defaultBizmessageDto.buttonInfoList.some(
-        (button) =>
-          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
-      )
-    ) {
-      const index = defaultBizmessageDto.buttonInfoList.findIndex(
-        (button) =>
-          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
-      );
-      shortButtonLinkList[index] = shortImageLink;
-    }
+    const { shortButtonLinkList, shortImageLink } = await this.makeshortLinks(
+      defaultBizmessageDto,
+    );
 
     const requestIdList: string[] = [];
     const receiverList = defaultBizmessageDto.receiverList;
@@ -183,16 +158,22 @@ export class BizmessageService {
       idStringList.push(
         ...shortButtonLinkList.map((button) => button.idString),
       );
-    } else {
+    } else if (shortButtonLinkList && shortImageLink) {
       idStringList.push(
         ...shortButtonLinkList.map((button) => button.idString),
         shortImageLink.idString,
       );
+    } else if (shortButtonLinkList) {
+      idStringList.push(
+        ...shortButtonLinkList.map((button) => button.idString),
+      );
+    } else if (shortImageLink) {
+      idStringList.push(shortImageLink.idString);
     }
 
     const urlForResult = defaultBizmessageDto.urlForResult;
     let idStringForResult;
-    if (defaultBizmessageDto.buttonInfo) {
+    if (defaultBizmessageDto.buttonInfoList) {
       if (
         defaultBizmessageDto.buttonInfoList.some(
           (button) => button.buttonLink === urlForResult,
@@ -232,8 +213,8 @@ export class BizmessageService {
       ...(defaultBizmessageDto.imageInfo
         ? { imageInfo: defaultBizmessageDto.imageInfo }
         : {}),
-      ...(defaultBizmessageDto.buttonInfo
-        ? { buttonInfo: defaultBizmessageDto.buttonInfo }
+      ...(defaultBizmessageDto.buttonInfoList
+        ? { buttonInfoList: defaultBizmessageDto.buttonInfoList }
         : {}),
     });
 
@@ -276,7 +257,38 @@ export class BizmessageService {
     };
   }
 
-  //   async makeshortLinks() {}
+  async makeshortLinks(defaultBizmessageDto) {
+    let shortButtonLinkList;
+    let shortImageLink;
+    if (defaultBizmessageDto.buttonInfoList) {
+      shortButtonLinkList = await Promise.all(
+        defaultBizmessageDto.buttonInfoList.map((button) =>
+          this.shorturlService.createShorturl(button.buttonLink),
+        ),
+      );
+    }
+    if (defaultBizmessageDto.imageInfo) {
+      shortImageLink = await this.shorturlService.createShorturl(
+        defaultBizmessageDto.imageInfo.imageLink,
+      );
+    }
+    if (
+      defaultBizmessageDto.buttonInfoList &&
+      defaultBizmessageDto.imageInfo &&
+      defaultBizmessageDto.buttonInfoList.some(
+        (button) =>
+          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
+      )
+    ) {
+      const index = defaultBizmessageDto.buttonInfoList.findIndex(
+        (button) =>
+          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
+      );
+      shortButtonLinkList[index] = shortImageLink;
+    }
+
+    return { shortButtonLinkList, shortImageLink };
+  }
 
   async makeBody(
     userId,
@@ -314,8 +326,8 @@ export class BizmessageService {
     );
 
     const linktype = {};
-    if (messageDto.buttonInfoList) {
-      const buttons = messageDto.buttonInfoList.map((buttonInfo) => {
+    const buttons =
+      messageDto.buttonInfoList?.map((buttonInfo) => {
         if (buttonInfo.type === 'WL') {
           linktype['linkMobile'] =
             buttonLink[messageDto.buttonInfoList.indexOf(buttonInfo)].shortURL;
@@ -331,62 +343,58 @@ export class BizmessageService {
           name: buttonInfo.name,
           ...(linktype ? linktype : {}),
         };
-      });
+      }) || [];
 
-      const body = {
-        plusFriendId: messageDto.plusFriendId,
-        messages: receiverList.map((info) => ({
-          idAd: messageDto.bizMessageInfoList.isAd,
-          to: info.phone,
-          content: `${contentPrefix} ${this.createMessageWithVariable(
-            newContent,
-            info,
-          )} ${contentSuffix}`,
-          buttons,
-          ...(messageDto.imageInfo
-            ? {
-                image: {
-                  imageId: messageDto.imageInfo.imageId,
-                  imageLink: imageLink.shortURL,
-                },
-              }
-            : {}),
-        })),
-        ...(messageDto.reservetime
+    const body = {
+      plusFriendId: messageDto.plusFriendId,
+      messages: receiverList.map((info) => ({
+        idAd: messageDto.bizMessageInfoList.isAd,
+        to: info.phone,
+        content: `${contentPrefix} ${this.createMessageWithVariable(
+          newContent,
+          info,
+        )} ${contentSuffix}`,
+        buttons,
+        ...(messageDto.imageInfo
           ? {
-              reserveTime: messageDto.reservetime,
-              reserveTimeZone: 'Asia/Seoul',
+              image: {
+                imageId: messageDto.imageInfo.imageId,
+                imageLink: imageLink.shortURL,
+              },
             }
           : {}),
-      };
+      })),
+      ...(messageDto.reservetime
+        ? {
+            reserveTime: messageDto.reservetime,
+            reserveTimeZone: 'Asia/Seoul',
+          }
+        : {}),
+    };
 
-      let headers;
-      try {
-        const now = Date.now().toString();
-        headers = {
-          'Content-Type': 'application/json; charset=utf-8',
-          'x-ncp-apigw-timestamp': now,
-          'x-ncp-iam-access-key': userNcpInfo.accessKey,
-          'x-ncp-apigw-signature-v2': await this.makeSignature(
-            userNcpInfo,
-            now,
-          ),
-        };
-        const response = await axios.post(
-          `https://sens.apigw.ntruss.com/friendtalk/v2/services/${userNcpInfo.bizServiceId}/messages`,
-          body,
-          { headers },
-        );
-        return { body, response, idStrings, shortenedUrls };
-      } catch (error) {
-        if (error.response) {
-          throw new HttpException(error.response.data, error.response.status);
-        }
-        throw new HttpException(
-          '[INTERNAL] ' + error.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+    let headers;
+    try {
+      const now = Date.now().toString();
+      headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-apigw-timestamp': now,
+        'x-ncp-iam-access-key': userNcpInfo.accessKey,
+        'x-ncp-apigw-signature-v2': await this.makeSignature(userNcpInfo, now),
+      };
+      const response = await axios.post(
+        `https://sens.apigw.ntruss.com/friendtalk/v2/services/${userNcpInfo.bizServiceId}/messages`,
+        body,
+        { headers },
+      );
+      return { body, response, idStrings, shortenedUrls };
+    } catch (error) {
+      if (error.response) {
+        throw new HttpException(error.response.data, error.response.status);
       }
+      throw new HttpException(
+        '[INTERNAL] ' + error.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
