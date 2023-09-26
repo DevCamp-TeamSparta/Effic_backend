@@ -23,6 +23,7 @@ import {
   BizmessageContent,
 } from '../bizmessage.entity';
 import { bizmessageType } from '../bizmessage.enum';
+import { info } from 'console';
 
 @Injectable()
 export class BizmessageService {
@@ -243,6 +244,39 @@ export class BizmessageService {
   // ab 친구톡 보내기
   async sendAbTestBizmessage(userId, abTestBizmessageDto) {
     const user = await this.usersService.findUserByUserId(userId);
+
+    const receiverPhones = abTestBizmessageDto.receiverList.map(
+      (info) => info.phone,
+    );
+
+    await this.usersService.assertCheckUserMoney(
+      userId,
+      receiverPhones.length,
+      NCP_BizMessage_price,
+    );
+
+    let testReceiverAmount = 0;
+    if (Math.ceil(receiverPhones.length / 2) % 2 == 1) {
+      testReceiverAmount = Math.ceil(receiverPhones.length / 2) + 1;
+    } else {
+      testReceiverAmount = Math.ceil(receiverPhones.length / 2);
+    }
+
+    const aTestReceiverList = abTestBizmessageDto.receiverList.slice(
+      0,
+      testReceiverAmount / 2,
+    );
+
+    const bTestReceiverList = abTestBizmessageDto.receiverList.slice(
+      testReceiverAmount / 2,
+      testReceiverAmount,
+    );
+
+    // a 메세지보내기
+
+    // b 메세지보내기
+
+    // 나머지
   }
 
   async makeshortLinks(messageDto) {
