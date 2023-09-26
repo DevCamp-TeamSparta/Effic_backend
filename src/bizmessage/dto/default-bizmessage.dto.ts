@@ -34,9 +34,9 @@ export class DefaultBizmessageDto {
   @IsNotEmpty()
   receiverList: string[];
 
-  @IsObject()
+  @IsArray()
   @IsOptional()
-  buttonInfo?: string[];
+  buttonInfoList?: string[];
 
   @IsOptional()
   @IsString()

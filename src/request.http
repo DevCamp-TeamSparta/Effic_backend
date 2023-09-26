@@ -504,7 +504,7 @@ Content-Type: application/json
     "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "isAd": false, "urlList": []},
     "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
     "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
-    "buttonInfo": {"type": "WL", "name": "히히💕", "buttonLink":"https://www.google.com"},
+    "buttonInfoList": [{"type": "WL", "name": "히히💕", "buttonLink":"https://www.google.com"},{"type": "WL", "name": "하하", "buttonLink":"https://www.naver.com"}],
     "urlForResult": "https://app.effic.biz"
 }
 
@@ -577,3 +577,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # ]
 
 ### 친구톡 테스트 발송
+Post http://localhost:8000/bizmessage/test
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
+Content-Type: application/json
+
+{
+    "plusFriendId": "@스파르타코딩클럽",
+    "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "isAd": false, "urlList": []},
+    "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
+    "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
+    "buttonInfo": [{"type": "WL", "name": "히히💕", "buttonLink":"https://www.google.com"},{"type": "WL", "name": "하하", "buttonLink":"https://www.naver.com"}],
+    "urlForResult": "https://app.effic.biz"
+}

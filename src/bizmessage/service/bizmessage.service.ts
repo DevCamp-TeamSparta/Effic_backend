@@ -97,6 +97,20 @@ export class BizmessageService {
     return signature.toString();
   }
 
+  // 테스트 친구톡 보내기
+  async sendTestBizmessage(userId, defaultBizmessageDto) {
+    const user = await this.usersService.findUserByUserId(userId);
+
+    // await this.makeBody(
+    //   user.userId,
+    //   defaultBizmessageDto.bizMessageInfoList,
+    //   defaultBizmessageDto,
+    //   defaultBizmessageDto.receiverList,
+    //   shortButtonLink,
+    //   shortImageLink,
+    // );
+  }
+
   // 기본 친구톡 보내기
   async sendDefaultBizmessage(userId, defaultBizmessageDto) {
     // 유저금액 확인
@@ -110,11 +124,13 @@ export class BizmessageService {
       NCP_BizMessage_price,
     );
 
-    let shortButtonLink;
+    let shortButtonLinkList;
     let shortImageLink;
-    if (defaultBizmessageDto.buttonInfo) {
-      shortButtonLink = await this.shorturlService.createShorturl(
-        defaultBizmessageDto.buttonInfo.buttonLink,
+    if (defaultBizmessageDto.buttonInfoList) {
+      shortButtonLinkList = await Promise.all(
+        defaultBizmessageDto.buttonInfoList.map((button) =>
+          this.shorturlService.createShorturl(button.buttonLink),
+        ),
       );
     }
     if (defaultBizmessageDto.imageInfo) {
@@ -123,12 +139,18 @@ export class BizmessageService {
       );
     }
     if (
-      defaultBizmessageDto.buttonInfo &&
+      defaultBizmessageDto.buttonInfoList &&
       defaultBizmessageDto.imageInfo &&
-      defaultBizmessageDto.buttonInfo.buttonLink ===
-        defaultBizmessageDto.imageInfo.imageLink
+      defaultBizmessageDto.buttonInfoList.some(
+        (button) =>
+          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
+      )
     ) {
-      shortImageLink = shortButtonLink;
+      const index = defaultBizmessageDto.buttonInfoList.findIndex(
+        (button) =>
+          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
+      );
+      shortButtonLinkList[index] = shortImageLink;
     }
 
     const requestIdList: string[] = [];
@@ -145,7 +167,7 @@ export class BizmessageService {
         defaultBizmessageDto.bizMessageInfoList,
         defaultBizmessageDto,
         receiverListForSend,
-        shortButtonLink,
+        shortButtonLinkList,
         shortImageLink,
       );
       takeBody = body;
@@ -153,18 +175,33 @@ export class BizmessageService {
     }
     idStringList.push(...takeBody.idStrings);
 
-    if (shortImageLink === shortButtonLink) {
-      idStringList.push(shortImageLink.idString);
+    if (
+      shortButtonLinkList &&
+      shortImageLink &&
+      shortButtonLinkList.some((button) => button.shortURL === shortImageLink)
+    ) {
+      idStringList.push(
+        ...shortButtonLinkList.map((button) => button.idString),
+      );
     } else {
-      idStringList.push(shortImageLink.idString);
-      idStringList.push(shortButtonLink.idString);
+      idStringList.push(
+        ...shortButtonLinkList.map((button) => button.idString),
+        shortImageLink.idString,
+      );
     }
 
     const urlForResult = defaultBizmessageDto.urlForResult;
     let idStringForResult;
     if (defaultBizmessageDto.buttonInfo) {
-      if (defaultBizmessageDto.buttonInfo.buttonLink === urlForResult) {
-        idStringForResult = shortButtonLink.idString;
+      if (
+        defaultBizmessageDto.buttonInfoList.some(
+          (button) => button.buttonLink === urlForResult,
+        )
+      ) {
+        const index = defaultBizmessageDto.buttonInfoList.findIndex(
+          (button) => button.buttonLink === urlForResult,
+        );
+        idStringForResult = shortButtonLinkList[index].idString;
       }
     }
     if (defaultBizmessageDto.imageInfo) {
@@ -239,6 +276,8 @@ export class BizmessageService {
     };
   }
 
+  //   async makeshortLinks() {}
+
   async makeBody(
     userId,
     bizMessageInfoList,
@@ -275,76 +314,79 @@ export class BizmessageService {
     );
 
     const linktype = {};
-    if (messageDto.buttonInfo) {
-      if (messageDto.buttonInfo.type === 'WL') {
-        linktype['linkMobile'] = buttonLink.shortURL;
-        linktype['linkPc'] = buttonLink.shortURL;
-      } else if (messageDto.buttonInfo.type === 'AL') {
-        linktype['schemeIos'] = messageDto.buttonInfo.schemeIos;
-        linktype['schemeAndroid'] = messageDto.buttonInfo.schemeAndroid;
-      }
-    }
+    if (messageDto.buttonInfoList) {
+      const buttons = messageDto.buttonInfoList.map((buttonInfo) => {
+        if (buttonInfo.type === 'WL') {
+          linktype['linkMobile'] =
+            buttonLink[messageDto.buttonInfoList.indexOf(buttonInfo)].shortURL;
+          linktype['linkPc'] =
+            buttonLink[messageDto.buttonInfoList.indexOf(buttonInfo)].shortURL;
+        } else if (buttonInfo.type === 'AL') {
+          linktype['schemeIos'] = buttonInfo.schemeIos;
+          linktype['schemeAndroid'] = buttonInfo.schemeAndroid;
+        }
 
-    const body = {
-      plusFriendId: messageDto.plusFriendId,
-      messages: receiverList.map((info) => ({
-        idAd: messageDto.bizMessageInfoList.isAd,
-        to: info.phone,
-        content: `${contentPrefix} ${this.createMessageWithVariable(
-          newContent,
-          info,
-        )} ${contentSuffix}`,
-        ...(messageDto.buttonInfo
-          ? {
-              buttons: [
-                {
-                  type: messageDto.buttonInfo.type,
-                  name: messageDto.buttonInfo.name,
-                  ...(linktype ? linktype : {}),
+        return {
+          type: buttonInfo.type,
+          name: buttonInfo.name,
+          ...(linktype ? linktype : {}),
+        };
+      });
+
+      const body = {
+        plusFriendId: messageDto.plusFriendId,
+        messages: receiverList.map((info) => ({
+          idAd: messageDto.bizMessageInfoList.isAd,
+          to: info.phone,
+          content: `${contentPrefix} ${this.createMessageWithVariable(
+            newContent,
+            info,
+          )} ${contentSuffix}`,
+          buttons,
+          ...(messageDto.imageInfo
+            ? {
+                image: {
+                  imageId: messageDto.imageInfo.imageId,
+                  imageLink: imageLink.shortURL,
                 },
-              ],
-            }
-          : {}),
-        ...(messageDto.imageInfo
+              }
+            : {}),
+        })),
+        ...(messageDto.reservetime
           ? {
-              image: {
-                imageId: messageDto.imageInfo.imageId,
-                imageLink: imageLink.shortURL,
-              },
+              reserveTime: messageDto.reservetime,
+              reserveTimeZone: 'Asia/Seoul',
             }
           : {}),
-      })),
-      ...(messageDto.reservetime
-        ? {
-            reserveTime: messageDto.reservetime,
-            reserveTimeZone: 'Asia/Seoul',
-          }
-        : {}),
-    };
-
-    let headers;
-    try {
-      const now = Date.now().toString();
-      headers = {
-        'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-apigw-timestamp': now,
-        'x-ncp-iam-access-key': userNcpInfo.accessKey,
-        'x-ncp-apigw-signature-v2': await this.makeSignature(userNcpInfo, now),
       };
-      const response = await axios.post(
-        `https://sens.apigw.ntruss.com/friendtalk/v2/services/${userNcpInfo.bizServiceId}/messages`,
-        body,
-        { headers },
-      );
-      return { body, response, idStrings, shortenedUrls };
-    } catch (error) {
-      if (error.response) {
-        throw new HttpException(error.response.data, error.response.status);
+
+      let headers;
+      try {
+        const now = Date.now().toString();
+        headers = {
+          'Content-Type': 'application/json; charset=utf-8',
+          'x-ncp-apigw-timestamp': now,
+          'x-ncp-iam-access-key': userNcpInfo.accessKey,
+          'x-ncp-apigw-signature-v2': await this.makeSignature(
+            userNcpInfo,
+            now,
+          ),
+        };
+        const response = await axios.post(
+          `https://sens.apigw.ntruss.com/friendtalk/v2/services/${userNcpInfo.bizServiceId}/messages`,
+          body,
+          { headers },
+        );
+        return { body, response, idStrings, shortenedUrls };
+      } catch (error) {
+        if (error.response) {
+          throw new HttpException(error.response.data, error.response.status);
+        }
+        throw new HttpException(
+          '[INTERNAL] ' + error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
-      throw new HttpException(
-        '[INTERNAL] ' + error.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 

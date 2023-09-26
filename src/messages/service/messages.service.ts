@@ -1,7 +1,6 @@
 import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { UsersRepository } from '../../users/users.repository';
 import { UsersService } from '../../users/service/users.service';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import * as crypto from 'crypto';
@@ -26,7 +25,6 @@ import {
 export class MessagesService {
   private readonly logger = new Logger('NcpMessagesService');
   constructor(
-    private readonly usersRepository: UsersRepository,
     private readonly usersService: UsersService,
     private readonly shorturlService: ShorturlService,
     private readonly messageGroupRepo: MessageGroupRepo,
@@ -37,7 +35,7 @@ export class MessagesService {
   ) {}
 
   async getGroupList(email: string) {
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     const messageGroupList = await this.messageGroupRepo.findAllByUserId(
       user.userId,
     );
@@ -76,7 +74,7 @@ export class MessagesService {
   // 기본메세지 보내기
   async sendDefaultMessage(email, defaultMessageDto) {
     // 유저정보 확인
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
 
     const receiverPhones = defaultMessageDto.receiverList.map(
       (info) => info.phone,
@@ -336,7 +334,7 @@ export class MessagesService {
   // 테스트 메세지 보내기
   async sendTestMessage(email, testMessageDto) {
     // 유저정보 확인
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
 
     await this.makeBody(
       user,
@@ -394,7 +392,7 @@ export class MessagesService {
   // AB테스트 메세지 보내기
   async sendAbTestMessage(email, abTestMessageDto) {
     // 유저정보 확인
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
 
     const receiverPhones = abTestMessageDto.receiverList.map(
       (info) => info.phone,
@@ -569,7 +567,7 @@ export class MessagesService {
 
   // 광고성 문자 수신자 필터링
   async filteredReceivers(email, filterReceiverDto) {
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     const settingDay = filterReceiverDto.day;
 
     const DaysAgo = new Date();
