@@ -69,6 +69,28 @@ export class BizmessageController {
     );
   }
 
+  // 테스트 친구톡 보내기
+  @Post('/test')
+  async sendTestBizmessage(
+    @Headers('Authorization') authorization: string,
+    @Body(new DefaultBizbodyValidationPipe())
+    defaultBizmessageDto: DefaultBizmessageDto,
+  ) {
+    this.logger.verbose('Test bizmessage sending');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkBizserviceId(email);
+
+    return await this.bizmessageService.sendTestBizmessage(
+      user.userId,
+      defaultBizmessageDto,
+    );
+  }
+
   // ab 친구톡 보내기
   // @Post('/abtest')
   // async sendAbTestBizmessage(@Headers('Authorization') authorization: string) {

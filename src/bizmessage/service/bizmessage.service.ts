@@ -101,14 +101,27 @@ export class BizmessageService {
   async sendTestBizmessage(userId, defaultBizmessageDto) {
     const user = await this.usersService.findUserByUserId(userId);
 
-    // await this.makeBody(
-    //   user.userId,
-    //   defaultBizmessageDto.bizMessageInfoList,
-    //   defaultBizmessageDto,
-    //   defaultBizmessageDto.receiverList,
-    //   shortButtonLink,
-    //   shortImageLink,
-    // );
+    const { shortButtonLinkList, shortImageLink } = await this.makeshortLinks(
+      defaultBizmessageDto,
+    );
+
+    const body = await this.makeBody(
+      user.userId,
+      defaultBizmessageDto.bizMessageInfoList,
+      defaultBizmessageDto,
+      defaultBizmessageDto.receiverList,
+      shortButtonLinkList,
+      shortImageLink,
+    );
+
+    await this.checkUrlForResult(
+      defaultBizmessageDto,
+      shortButtonLinkList,
+      shortImageLink,
+      body,
+    );
+
+    return 'success';
   }
 
   // 기본 친구톡 보내기
@@ -171,42 +184,12 @@ export class BizmessageService {
       idStringList.push(shortImageLink.idString);
     }
 
-    const urlForResult = defaultBizmessageDto.urlForResult;
-    let idStringForResult;
-    if (defaultBizmessageDto.buttonInfoList) {
-      if (
-        defaultBizmessageDto.buttonInfoList.some(
-          (button) => button.buttonLink === urlForResult,
-        )
-      ) {
-        const index = defaultBizmessageDto.buttonInfoList.findIndex(
-          (button) => button.buttonLink === urlForResult,
-        );
-        idStringForResult = shortButtonLinkList[index].idString;
-      }
-    }
-    if (defaultBizmessageDto.imageInfo) {
-      if (defaultBizmessageDto.imageInfo.imageLink === urlForResult) {
-        idStringForResult = shortImageLink.idString;
-      }
-    }
-    if (defaultBizmessageDto.bizMessageInfoList.urlList) {
-      for (const url of defaultBizmessageDto.bizMessageInfoList.urlList) {
-        if (url === urlForResult) {
-          idStringForResult =
-            takeBody.idStrings[
-              defaultBizmessageDto.bizMessageInfoList.urlList.indexOf(url)
-            ];
-        }
-      }
-    }
-
-    if (!idStringForResult) {
-      throw new HttpException(
-        'urlForResult가 잘못되었습니다.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const idStringForResult = await this.checkUrlForResult(
+      defaultBizmessageDto,
+      shortButtonLinkList,
+      shortImageLink,
+      takeBody,
+    );
 
     const messageContents = JSON.stringify({
       ...defaultBizmessageDto.bizMessageInfoList,
@@ -257,32 +240,30 @@ export class BizmessageService {
     };
   }
 
-  async makeshortLinks(defaultBizmessageDto) {
+  async makeshortLinks(messageDto) {
     let shortButtonLinkList;
     let shortImageLink;
-    if (defaultBizmessageDto.buttonInfoList) {
+    if (messageDto.buttonInfoList) {
       shortButtonLinkList = await Promise.all(
-        defaultBizmessageDto.buttonInfoList.map((button) =>
+        messageDto.buttonInfoList.map((button) =>
           this.shorturlService.createShorturl(button.buttonLink),
         ),
       );
     }
-    if (defaultBizmessageDto.imageInfo) {
+    if (messageDto.imageInfo) {
       shortImageLink = await this.shorturlService.createShorturl(
-        defaultBizmessageDto.imageInfo.imageLink,
+        messageDto.imageInfo.imageLink,
       );
     }
     if (
-      defaultBizmessageDto.buttonInfoList &&
-      defaultBizmessageDto.imageInfo &&
-      defaultBizmessageDto.buttonInfoList.some(
-        (button) =>
-          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
+      messageDto.buttonInfoList &&
+      messageDto.imageInfo &&
+      messageDto.buttonInfoList.some(
+        (button) => button.buttonLink === messageDto.imageInfo.imageLink,
       )
     ) {
-      const index = defaultBizmessageDto.buttonInfoList.findIndex(
-        (button) =>
-          button.buttonLink === defaultBizmessageDto.imageInfo.imageLink,
+      const index = messageDto.buttonInfoList.findIndex(
+        (button) => button.buttonLink === messageDto.imageInfo.imageLink,
       );
       shortButtonLinkList[index] = shortImageLink;
     }
@@ -396,6 +377,52 @@ export class BizmessageService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async checkUrlForResult(
+    messageDto,
+    shortButtonLinkList,
+    shortImageLink,
+    takeBody,
+  ) {
+    const urlForResult = messageDto.urlForResult;
+    let idStringForResult;
+    if (messageDto.buttonInfoList) {
+      if (
+        messageDto.buttonInfoList.some(
+          (button) => button.buttonLink === urlForResult,
+        )
+      ) {
+        const index = messageDto.buttonInfoList.findIndex(
+          (button) => button.buttonLink === urlForResult,
+        );
+        idStringForResult = shortButtonLinkList[index].idString;
+      }
+    }
+    if (messageDto.imageInfo) {
+      if (messageDto.imageInfo.imageLink === urlForResult) {
+        idStringForResult = shortImageLink.idString;
+      }
+    }
+    if (messageDto.bizMessageInfoList.urlList) {
+      for (const url of messageDto.bizMessageInfoList.urlList) {
+        if (url === urlForResult) {
+          idStringForResult =
+            takeBody.idStrings[
+              messageDto.bizMessageInfoList.urlList.indexOf(url)
+            ];
+        }
+      }
+    }
+
+    if (!idStringForResult) {
+      throw new HttpException(
+        'urlForResult가 잘못되었습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return idStringForResult;
   }
 
   // content - 변수명 변경적용
