@@ -23,7 +23,6 @@ import {
   BizmessageContent,
 } from '../bizmessage.entity';
 import { bizmessageType } from '../bizmessage.enum';
-import { info } from 'console';
 
 @Injectable()
 export class BizmessageService {
@@ -164,25 +163,14 @@ export class BizmessageService {
     }
     idStringList.push(...takeBody.idStrings);
 
-    if (
-      shortButtonLinkList &&
-      shortImageLink &&
-      shortButtonLinkList.some((button) => button.shortURL === shortImageLink)
-    ) {
-      idStringList.push(
-        ...shortButtonLinkList.map((button) => button.idString),
-      );
-    } else if (shortButtonLinkList && shortImageLink) {
-      idStringList.push(
-        ...shortButtonLinkList.map((button) => button.idString),
-        shortImageLink.idString,
-      );
-    } else if (shortButtonLinkList) {
-      idStringList.push(
-        ...shortButtonLinkList.map((button) => button.idString),
-      );
-    } else if (shortImageLink) {
+    if (shortImageLink) {
       idStringList.push(shortImageLink.idString);
+    }
+    if (shortButtonLinkList) {
+      shortButtonLinkList.forEach((buttonLink) => {
+        idStringList.push(buttonLink.shortbuttonMobile.idString);
+        idStringList.push(buttonLink.shortbuttonPc.idString);
+      });
     }
 
     const idStringForResult = await this.checkUrlForResult(
@@ -284,27 +272,24 @@ export class BizmessageService {
     let shortImageLink;
     if (messageDto.buttonInfoList) {
       shortButtonLinkList = await Promise.all(
-        messageDto.buttonInfoList.map((button) =>
-          this.shorturlService.createShorturl(button.buttonLink),
-        ),
+        messageDto.buttonInfoList.map(async (buttonInfo) => {
+          const shortbuttonMobile = await this.shorturlService.createShorturl(
+            buttonInfo.linkMobile,
+          );
+          const shortbuttonPc = await this.shorturlService.createShorturl(
+            buttonInfo.linkPc,
+          );
+          return {
+            shortbuttonMobile: shortbuttonMobile,
+            shortbuttonPc: shortbuttonPc,
+          };
+        }),
       );
     }
     if (messageDto.imageInfo) {
       shortImageLink = await this.shorturlService.createShorturl(
         messageDto.imageInfo.imageLink,
       );
-    }
-    if (
-      messageDto.buttonInfoList &&
-      messageDto.imageInfo &&
-      messageDto.buttonInfoList.some(
-        (button) => button.buttonLink === messageDto.imageInfo.imageLink,
-      )
-    ) {
-      const index = messageDto.buttonInfoList.findIndex(
-        (button) => button.buttonLink === messageDto.imageInfo.imageLink,
-      );
-      shortButtonLinkList[index] = shortImageLink;
     }
 
     return { shortButtonLinkList, shortImageLink };
@@ -350,9 +335,13 @@ export class BizmessageService {
       messageDto.buttonInfoList?.map((buttonInfo) => {
         if (buttonInfo.type === 'WL') {
           linktype['linkMobile'] =
-            buttonLink[messageDto.buttonInfoList.indexOf(buttonInfo)].shortURL;
+            buttonLink[
+              messageDto.buttonInfoList.indexOf(buttonInfo)
+            ].shortbuttonMobile.shortURL;
           linktype['linkPc'] =
-            buttonLink[messageDto.buttonInfoList.indexOf(buttonInfo)].shortURL;
+            buttonLink[
+              messageDto.buttonInfoList.indexOf(buttonInfo)
+            ].shortbuttonPc.shortURL;
         } else if (buttonInfo.type === 'AL') {
           linktype['schemeIos'] = buttonInfo.schemeIos;
           linktype['schemeAndroid'] = buttonInfo.schemeAndroid;
@@ -429,13 +418,23 @@ export class BizmessageService {
     if (messageDto.buttonInfoList) {
       if (
         messageDto.buttonInfoList.some(
-          (button) => button.buttonLink === urlForResult,
+          (button) => button.linkMobile === urlForResult,
         )
       ) {
         const index = messageDto.buttonInfoList.findIndex(
-          (button) => button.buttonLink === urlForResult,
+          (button) => button.linkMobile === urlForResult,
         );
-        idStringForResult = shortButtonLinkList[index].idString;
+        idStringForResult =
+          shortButtonLinkList[index].shortbuttonMobile.idString;
+      } else if (
+        messageDto.buttonInfoList.some(
+          (button) => button.linkPc === urlForResult,
+        )
+      ) {
+        const index = messageDto.buttonInfoList.findIndex(
+          (button) => button.linkPc === urlForResult,
+        );
+        idStringForResult = shortButtonLinkList[index].shortbuttonPc.idString;
       }
     }
     if (messageDto.imageInfo) {
@@ -570,7 +569,7 @@ export class BizmessageService {
     await this.entityManager.save(user);
 
     payment.userId = user.userId;
-    payment.messageGroupId = bizmessageGroupId;
+    payment.bizmessageGroupId = bizmessageGroupId;
     payment.remainMoney = user.money;
     payment.remainPoint = user.point;
 

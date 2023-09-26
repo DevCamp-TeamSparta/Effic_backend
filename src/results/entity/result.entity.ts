@@ -114,6 +114,9 @@ export class UsedPayments extends BaseEntity {
   @Column({ type: 'int', nullable: false, default: 0 })
   messageGroupId: number;
 
+  @Column({ type: 'int', nullable: false, default: 0 })
+  bizmessageGroupId: number;
+
   @ManyToOne(() => User, (user) => user.urlResults, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
