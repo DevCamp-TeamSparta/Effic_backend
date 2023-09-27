@@ -137,32 +137,41 @@ export class BizmessageResultsService {
       return [];
     }
 
-    const statisticsArray = [];
+    const contentArray = [];
+    const buttonArray = [];
+    const imageArray = [];
 
-    for (const idString of bizmessage.contentIdStringList) {
-      statisticsArray.push({
-        ...(await this.shorturlService.getShorturlResult(idString)),
-        idString,
-      });
+    if (bizmessage.contentIdStringList) {
+      for (const idString of bizmessage.contentIdStringList) {
+        contentArray.push({
+          ...(await this.shorturlService.getShorturlResult(idString)),
+          idString,
+        });
+      }
     }
-    console.log('=========> ~ statisticsArray:1111111', statisticsArray);
 
-    for (const idString of bizmessage.buttonIdStringList) {
-      statisticsArray.push({
-        ...(await this.shorturlService.getShorturlResult(idString)),
-        idString,
-      });
+    if (bizmessage.imageIdString) {
+      for (const idString of bizmessage.imageIdString) {
+        imageArray.push({
+          ...(await this.shorturlService.getShorturlResult(idString)),
+          idString,
+        });
+      }
     }
-    console.log('=========> ~ statisticsArray:22222222222222', statisticsArray);
 
-    for (const idString of bizmessage.imageIdString) {
-      statisticsArray.push({
-        ...(await this.shorturlService.getShorturlResult(idString)),
-        idString,
-      });
+    if (bizmessage.buttonIdStringList) {
+      for (const button of bizmessage.buttonIdStringList) {
+        const buttonObject = {};
+        for (const key of Object.keys(button)) {
+          buttonObject[key] = {
+            ...(await this.shorturlService.getShorturlResult(button[key])),
+            idString: button[key],
+          };
+        }
+        buttonArray.push(buttonObject);
+      }
     }
-    console.log('=========> ~ statisticsArray:3!!!!!!!!1', statisticsArray);
-    return statisticsArray;
+    return { contentArray, imageArray, buttonArray };
   }
 
   // 친구톡 결과조회
@@ -188,7 +197,7 @@ export class BizmessageResultsService {
 
     const newBizUrlResult = await this.shortUrlResult(bizmessageId);
 
-    for (const result of newBizUrlResult) {
+    for (const result of newBizUrlResult.contentArray) {
       const resultEntity = this.entityManager.create(BizUrlResult, {
         bizmessage: bizmessage,
         humanclicks: result.humanclicks,
@@ -200,45 +209,111 @@ export class BizmessageResultsService {
       await this.entityManager.save(resultEntity);
     }
 
-    const NcpBizmessages =
+    for (const result of newBizUrlResult.imageArray) {
+      const resultEntity = this.entityManager.create(BizUrlResult, {
+        bizmessage: bizmessage,
+        humanclicks: result.humanclicks,
+        totalclicks: result.totalclicks,
+        idString: result.idString,
+        bizNcpResultId: bizNcpResultId,
+        user: user,
+      });
+      await this.entityManager.save(resultEntity);
+    }
+
+    for (const result of newBizUrlResult.buttonArray) {
+      for (const key of Object.keys(result)) {
+        const resultEntity = this.entityManager.create(BizUrlResult, {
+          bizmessage: bizmessage,
+          humanclicks: result[key].humanclicks,
+          totalclicks: result[key].totalclicks,
+          idString: result[key].idString,
+          bizNcpResultId: bizNcpResultId,
+          user: user,
+        });
+        await this.entityManager.save(resultEntity);
+      }
+    }
+
+    const bizmessageNcpResults =
       await this.bizmessageNcpResultsRepository.findAllByBizmessageId(
         bizmessageId,
       );
-    if (!NcpBizmessages) {
+    if (!bizmessageNcpResults) {
       throw new NotFoundException('NcpBizmessageId is wrong');
     }
 
     const bizmessageResults = [];
 
-    for (const ncp of NcpBizmessages) {
-      const urlBizmessages =
+    for (const ncpResult of bizmessageNcpResults) {
+      const bizmessageUrlResults =
         await this.bizmessageUrlResultsRepository.findAllByResultId(
-          ncp.bizNcpResultId,
+          ncpResult.bizNcpResultId,
         );
 
       const result = {
         bizmessage: bizmessageId,
-        user: ncp.userId,
-        urls: [],
-        success: ncp.success,
-        reserved: ncp.reserved,
-        fail: ncp.fail,
-        createdAt: ncp.createdAt,
+        user: ncpResult.userId,
+        urls: {
+          content: [],
+          image: [],
+          button: [],
+        },
+        success: ncpResult.success,
+        reserved: ncpResult.reserved,
+        fail: ncpResult.fail,
+        createdAt: ncpResult.createdAt,
       };
 
-      for (const url of urlBizmessages) {
-        if (ncp.bizmessageId === url.bizmessageId) {
-          const urlInfo = await this.shorturlService.findUrlInfoByIdString(
-            url.idString,
-          );
+      for (const urlResult of bizmessageUrlResults) {
+        if (ncpResult.bizmessageId !== urlResult.bizmessageId) {
+          throw new Error('unreachable!');
+        }
+        const urlInfo = await this.shorturlService.findUrlInfoByIdString(
+          urlResult.idString,
+        );
 
-          result.urls.push({
-            idString: url.idString,
+        // content
+        if (bizmessage.contentIdStringList.includes(urlResult.idString)) {
+          result.urls.content.push({
+            idString: urlResult.idString,
             shortUrl: urlInfo.shortenUrl,
             originalUrl: urlInfo.originalUrl,
-            humanclicks: url.humanclicks,
-            totalclicks: url.totalclicks,
+            humanclicks: urlResult.humanclicks,
+            totalclicks: urlResult.totalclicks,
           });
+        }
+
+        // image
+        if (bizmessage.imageIdString.includes(urlResult.idString)) {
+          result.urls.image.push({
+            idString: urlResult.idString,
+            shortUrl: urlInfo.shortenUrl,
+            originalUrl: urlInfo.originalUrl,
+            humanclicks: urlResult.humanclicks,
+            totalclicks: urlResult.totalclicks,
+          });
+        }
+
+        // button
+        if (bizmessage.buttonIdStringList) {
+          for (const button of bizmessage.buttonIdStringList) {
+            const buttonObject = {};
+            for (const key of Object.keys(button)) {
+              if (button[key] === urlResult.idString) {
+                buttonObject[key] = {
+                  idString: urlResult.idString,
+                  shortUrl: urlInfo.shortenUrl,
+                  originalUrl: urlInfo.originalUrl,
+                  humanclicks: urlResult.humanclicks,
+                  totalclicks: urlResult.totalclicks,
+                };
+              }
+            }
+            if (Object.keys(buttonObject).length !== 0) {
+              result.urls.button.push(buttonObject);
+            }
+          }
         }
       }
       bizmessageResults.push(result);

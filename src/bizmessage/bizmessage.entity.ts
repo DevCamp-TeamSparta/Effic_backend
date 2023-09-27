@@ -26,11 +26,11 @@ export class Bizmessage extends BaseEntity {
   @Column()
   sentTpye: bizmessageType;
 
-  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  @Column({ nullable: true, type: 'jsonb', default: '[]' })
   buttonIdStringList: Array<string>;
 
-  @Column({ type: 'varchar', nullable: true })
-  imageIdString: string[];
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  imageIdString: Array<string>;
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   contentIdStringList: Array<string>;
