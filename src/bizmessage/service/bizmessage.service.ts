@@ -205,14 +205,12 @@ export class BizmessageService {
     );
 
     // 피로도 관리
-    if (defaultBizmessageDto.bizMessageInfoList.isAd === true) {
-      await this.saveAdBizmessageRecieverList(
-        defaultBizmessageDto.receiverList,
-        userId,
-        saveBizmessageInfo.bizmessageGroupId,
-        new Date(),
-      );
-    }
+    await this.saveAdBizmessageRecieverList(
+      defaultBizmessageDto.receiverList,
+      userId,
+      saveBizmessageInfo.bizmessageGroupId,
+      new Date(),
+    );
 
     return {
       bizmessageId: saveBizmessageInfo.bizmessageId,

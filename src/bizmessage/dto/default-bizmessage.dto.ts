@@ -15,7 +15,6 @@ export class DefaultBizmessageDto {
   @IsObject()
   bizMessageInfoList: Array<{
     content: string;
-    isAd: boolean;
     urlList: string[];
   }>;
 
