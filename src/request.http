@@ -106,8 +106,10 @@ Content-Type: application/json
 }
 
 ### result - messageId
-Get http://localhost:8000/results/6
+Get http://localhost:8000/results/group/1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjkzOTgxNTY4LCJleHAiOjE2OTQwNjc5Njh9.wtd6CLkethnPASO_aN5lJ1nz1rq6vxWS0A2y6K1gzdQ
+
 
 
 ### abTest message sending
@@ -558,69 +560,142 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # }
 
 ### 친구톡 결과조회
-Get http://localhost:8000/results/group/bizmessage/2
+Get http://localhost:8000/results/group/bizmessage/5
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
 # [
 #   {
-#     "bizmessage": 2,
-#     "user": 1,
-#     "urls": {
-#       "content": [],
-#       "image": [
+#     "bizmessage": {
+#       "bizmessageId": 5,
+#       "isSent": true,
+#       "sentTpye": "Default",
+#       "buttonIdStringList": [
 #         {
-#           "idString": "lnk_3xIn_C1kONiIRCE0Kt79Fd8cHZ",
-#           "shortUrl": "https://effi.kr/YV9m4A",
-#           "originalUrl": "https://app.effic.biz",
-#           "humanclicks": 0,
-#           "totalclicks": 0
+#           "pc": "lnk_3xIn_BPNheurfa6W2MLZTzoe27",
+#           "mobile": "lnk_3xIn_xupS6kKcX61Am2p0jPdjv"
+#         },
+#         {
+#           "pc": "lnk_3xIn_8Pm2it8mgVLvtpPbuPWHp",
+#           "mobile": "lnk_3xIn_YxlLovV1Y4xPeo2LH9Gye"
 #         }
 #       ],
-#       "button": [
-#         {
-#           "pc": {
-#             "idString": "lnk_3xIn_4otZlSqdy1lE5Hzu98sUU",
-#             "shortUrl": "https://effi.kr/PLwwqj",
-#             "originalUrl": "https://app.effic.biz",
-#             "humanclicks": 0,
-#             "totalclicks": 0
-#           }
-#         },
-#         {
-#           "mobile": {
-#             "idString": "lnk_3xIn_JEYdA2oCNuwq6XfImgz8h",
-#             "shortUrl": "https://effi.kr/D8gedO",
-#             "originalUrl": "https://www.naver.com",
-#             "humanclicks": 0,
-#             "totalclicks": 0
-#           }
-#         },
-#         {
-#           "pc": {
-#             "idString": "lnk_3xIn_lyBZsGYkKPqP3cyJQjoYN",
-#             "shortUrl": "https://effi.kr/v9nOsa",
-#             "originalUrl": "https://app.effic.biz",
-#             "humanclicks": 0,
-#             "totalclicks": 0
-#           }
-#         },
-#         {
-#           "mobile": {
-#             "idString": "lnk_3xIn_u611vivoxWEG1knRzCQtN",
-#             "shortUrl": "https://effi.kr/BknjLW",
-#             "originalUrl": "https://www.google.com",
-#             "humanclicks": 0,
-#             "totalclicks": 0
-#           }
-#         }
-#       ]
+#       "imageIdString": [
+#         "lnk_3xIn_FrkN1T5SPwhewp1gRSyhI"
+#       ],
+#       "contentIdStringList": [],
+#       "ncpRequestIdList": [
+#         "RBFA-1695810065199-4072-56990729-RmQKlSpX"
+#       ],
+#       "receiverList": [
+#         "01036289823",
+#         "01848415676"
+#       ],
+#       "createdAt": "2023-09-27T10:21:03.886Z",
+#       "isMoneyCheck": false,
+#       "userId": 1,
+#       "bizmessageGroupId": 5
 #     },
-#     "success": 1,
-#     "reserved": 0,
-#     "fail": 1,
-#     "createdAt": "2023-09-27T08:56:15.073Z"
-#   },
-#   ...
+#     "content": {
+#       "bizmessageContentId": 5,
+#       "bizmessageId": 5,
+#       "sentType": "Default",
+#       "content": {
+#         "content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!",
+#         "urlList": [],
+#         "imageInfo": {
+#           "imageId": "8ae5c21e8ab7022c018abab5f34f000a",
+#           "imageLink": "https://app.effic.biz"
+#         },
+#         "buttonInfoList": [
+#           {
+#             "name": "히히💕",
+#             "type": "WL",
+#             "linkPc": "https://app.effic.biz",
+#             "linkMobile": "https://www.naver.com"
+#           },
+#           {
+#             "name": "하하",
+#             "type": "WL",
+#             "linkPc": "https://app.effic.biz",
+#             "linkMobile": "https://www.google.com"
+#           }
+#         ]
+#       },
+#       "plusFriendId": "@스파르타코딩클럽",
+#       "receiverList": [
+#         {
+#           "name": "clo",
+#           "phone": "01036289823"
+#         },
+#         {
+#           "name": "clo2",
+#           "phone": "01848415676"
+#         }
+#       ],
+#       "remainReceiverList": [],
+#       "bizmessageGroupId": 5
+#     },
+#     "result": [
+#       {
+#         "bizmessage": 5,
+#         "user": 1,
+#         "urls": {
+#           "content": [],
+#           "image": [
+#             {
+#               "idString": "lnk_3xIn_FrkN1T5SPwhewp1gRSyhI",
+#               "shortUrl": "https://effi.kr/AsSxPk",
+#               "originalUrl": "https://app.effic.biz",
+#               "humanclicks": 0,
+#               "totalclicks": 0
+#             }
+#           ],
+#           "button": [
+#             {
+#               "pc": {
+#                 "idString": "lnk_3xIn_BPNheurfa6W2MLZTzoe27",
+#                 "shortUrl": "https://effi.kr/A8PYsp",
+#                 "originalUrl": "https://app.effic.biz",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             },
+#             {
+#               "mobile": {
+#                 "idString": "lnk_3xIn_xupS6kKcX61Am2p0jPdjv",
+#                 "shortUrl": "https://effi.kr/aUEjgJ",
+#                 "originalUrl": "https://www.naver.com",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             },
+#             {
+#               "pc": {
+#                 "idString": "lnk_3xIn_8Pm2it8mgVLvtpPbuPWHp",
+#                 "shortUrl": "https://effi.kr/oIcu7G",
+#                 "originalUrl": "https://app.effic.biz",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             },
+#             {
+#               "mobile": {
+#                 "idString": "lnk_3xIn_YxlLovV1Y4xPeo2LH9Gye",
+#                 "shortUrl": "https://effi.kr/uVshUr",
+#                 "originalUrl": "https://www.google.com",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             }
+#           ]
+#         },
+#         "success": 1,
+#         "reserved": 0,
+#         "fail": 1,
+#         "createdAt": "2023-09-27T10:21:08.082Z"
+#       }
+#     ]
+#   }
 # ]
 
 ### 친구톡 테스트 발송

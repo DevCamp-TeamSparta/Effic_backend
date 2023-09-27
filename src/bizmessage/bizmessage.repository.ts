@@ -44,6 +44,12 @@ export class BizmessageRepository extends Repository<Bizmessage> {
       .andWhere('bizmessage.isMoneyCheck = :status', { status: false })
       .getMany();
   }
+
+  async findAllByBizmessageGroupId(
+    bizmessageGroupId: number,
+  ): Promise<Bizmessage[]> {
+    return await this.find({ where: { bizmessageGroupId } });
+  }
 }
 
 @Injectable()

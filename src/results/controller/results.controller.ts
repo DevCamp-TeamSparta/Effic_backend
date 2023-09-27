@@ -125,7 +125,7 @@ export class ResultsController {
     return await this.bizmessageResultsService.shortUrlResult(bizmessageId);
   }
 
-  // 친구톡 결과조회
+  // 친구톡 결과조회 - 사용하지 않습니다.
   @Get('/bizmessage/:bizmessageId')
   async bizmessageResult(
     @Param('bizmessageId') bizmessageId: number,
@@ -157,7 +157,7 @@ export class ResultsController {
     const accessToken = authorization.split(' ')[1];
     const decodedAccessToken: any = jwt.decode(accessToken);
 
-    return await this.bizmessageResultsService.BizmessageResult(
+    return await this.bizmessageResultsService.bizmessageGroupResult(
       groupId,
       decodedAccessToken.userId,
     );

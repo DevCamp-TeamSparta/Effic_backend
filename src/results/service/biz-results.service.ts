@@ -43,10 +43,9 @@ export class BizmessageResultsService {
       );
     const user = await this.usersService.findUserByUserId(userId);
     const userNcpInfo = await this.usersService.findUserNcpInfoByUserId(userId);
-    const bizmessageContent =
-      await this.bizmessageService.findOneBizmessageContentByBizmessageId(
-        bizmessageId,
-      );
+    await this.bizmessageService.findOneBizmessageContentByBizmessageId(
+      bizmessageId,
+    );
 
     if (!bizmessage || !user) {
       throw new BadRequestException('Invalid request');
@@ -67,7 +66,6 @@ export class BizmessageResultsService {
         'x-ncp-iam-access-key': userNcpInfo.accessKey,
         'x-ncp-apigw-signature-v2': await this.makeSignature(
           userNcpInfo,
-          bizmessageContent.plusFriendId,
           requestId,
           now,
         ),
@@ -103,7 +101,7 @@ export class BizmessageResultsService {
     return { success, reserved, fail };
   }
 
-  async makeSignature(userNcpInfo, plusFriendId, requestId, timestamp) {
+  async makeSignature(userNcpInfo, requestId, timestamp) {
     const message = [];
     const hmac = crypto.createHmac('sha256', userNcpInfo.secretKey);
     const space = ' ';
@@ -319,6 +317,38 @@ export class BizmessageResultsService {
       bizmessageResults.push(result);
     }
     return bizmessageResults;
+  }
+
+  async bizmessageGroupResult(groupId: number, userId: number): Promise<any> {
+    const result = this.bizmessageService.findAllBizmessageByGroupId(groupId);
+    if (!result) {
+      throw new NotFoundException('groupId is wrong');
+    }
+
+    const user = await this.usersService.findUserByUserId(userId);
+    if (!user) {
+      throw new NotFoundException('userId is wrong');
+    }
+
+    const bizmessages = await this.bizmessageService.findAllBizmessageByGroupId(
+      groupId,
+    );
+    if (!bizmessages) {
+      throw new NotFoundException('bizmessages is wrong');
+    }
+
+    const results = await Promise.all(
+      bizmessages.map(async (bizmessage) => {
+        const [content, result] = await Promise.all([
+          this.bizmessageService.findOneBizmessageContentByBizmessageId(
+            bizmessage.bizmessageId,
+          ),
+          this.BizmessageResult(bizmessage.bizmessageId, userId),
+        ]);
+        return { bizmessage: bizmessage, content: content, result: result };
+      }),
+    );
+    return results;
   }
 
   // 친구톡 결과 polling

@@ -249,6 +249,9 @@ export class BizmessageService {
       testReceiverAmount,
     );
 
+    const requestIdList = [];
+    // const receiverList;
+
     // a 메세지보내기
 
     // b 메세지보내기
@@ -590,6 +593,14 @@ export class BizmessageService {
       bizmessageId,
     );
     return bizmessage;
+  }
+
+  async findAllBizmessageByGroupId(bizmessageGroupId) {
+    const bizmessages =
+      await this.bizmessageRepository.findAllByBizmessageGroupId(
+        bizmessageGroupId,
+      );
+    return bizmessages;
   }
 
   //bizmessageContent 조회
