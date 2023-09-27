@@ -43,9 +43,9 @@ export class ResultsController {
     return await this.resultsService.messageResult(messageId);
   }
 
-  @Get('/group/:messageId')
+  @Get('/group/:groupId')
   async messageGroupResults(
-    @Param('messageId') messageId: number,
+    @Param('groupId') groupId: number,
     @Headers('Authorization') authorization: string,
   ) {
     this.logger.verbose('Message group result');
@@ -56,7 +56,7 @@ export class ResultsController {
     const decodedAccessToken: any = jwt.decode(accessToken);
     this.logger.verbose('Message result');
     const result = await this.resultsService.messageGroupResult(
-      messageId,
+      groupId,
       decodedAccessToken.email,
     );
     return result;
@@ -140,6 +140,25 @@ export class ResultsController {
 
     return await this.bizmessageResultsService.BizmessageResult(
       bizmessageId,
+      decodedAccessToken.userId,
+    );
+  }
+
+  // 친구톡 결과조회
+  @Get('/group/bizmessage/:groupId')
+  async bizmessageGroupResult(
+    @Param('groupId') groupId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    return await this.bizmessageResultsService.BizmessageResult(
+      groupId,
       decodedAccessToken.userId,
     );
   }
