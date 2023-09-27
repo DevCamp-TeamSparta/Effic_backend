@@ -27,10 +27,13 @@ export class Bizmessage extends BaseEntity {
   sentTpye: bizmessageType;
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
-  idStringList: Array<string>;
+  buttonIdStringList: Array<string>;
 
   @Column({ type: 'varchar', nullable: true })
-  urlForResult: string;
+  imageIdString: string[];
+
+  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  contentIdStringList: Array<string>;
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   ncpRequestIdList: string[];

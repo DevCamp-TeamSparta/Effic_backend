@@ -105,20 +105,13 @@ export class BizmessageService {
       defaultBizmessageDto,
     );
 
-    const body = await this.makeBody(
+    await this.makeBody(
       user.userId,
       defaultBizmessageDto.bizMessageInfoList,
       defaultBizmessageDto,
       defaultBizmessageDto.receiverList,
       shortButtonLinkList,
       shortImageLink,
-    );
-
-    await this.checkUrlForResult(
-      defaultBizmessageDto,
-      shortButtonLinkList,
-      shortImageLink,
-      body,
     );
 
     return 'success';
@@ -146,7 +139,9 @@ export class BizmessageService {
     const receiverLength = receiverList.length;
     const receiverCount = Math.ceil(receiverLength / 100);
     let takeBody;
-    const idStringList = [];
+    const contentIdStringList = [];
+    const imageIdString = [];
+    const buttonIdStringList = [];
 
     for (let i = 0; i < receiverCount; i++) {
       const receiverListForSend = receiverList.slice(i * 100, (i + 1) * 100);
@@ -161,24 +156,19 @@ export class BizmessageService {
       takeBody = body;
       requestIdList.push(body.response.data.requestId);
     }
-    idStringList.push(...takeBody.idStrings);
+    contentIdStringList.push(...takeBody.idStrings);
 
     if (shortImageLink) {
-      idStringList.push(shortImageLink.idString);
+      imageIdString.push(shortImageLink.idString);
     }
     if (shortButtonLinkList) {
       shortButtonLinkList.forEach((buttonLink) => {
-        idStringList.push(buttonLink.shortbuttonMobile.idString);
-        idStringList.push(buttonLink.shortbuttonPc.idString);
+        buttonIdStringList.push({
+          mobile: buttonLink.shortbuttonMobile.idString,
+          pc: buttonLink.shortbuttonPc.idString,
+        });
       });
     }
-
-    const idStringForResult = await this.checkUrlForResult(
-      defaultBizmessageDto,
-      shortButtonLinkList,
-      shortImageLink,
-      takeBody,
-    );
 
     const messageContents = JSON.stringify({
       ...defaultBizmessageDto.bizMessageInfoList,
@@ -196,8 +186,9 @@ export class BizmessageService {
     const saveBizmessageInfo = await this.saveBizmessageInfo(
       bizmessageType.D,
       userId,
-      idStringList,
-      idStringForResult,
+      buttonIdStringList,
+      imageIdString,
+      contentIdStringList,
       requestIdList,
       receiverPhones,
       messageContent,
@@ -407,61 +398,61 @@ export class BizmessageService {
     }
   }
 
-  async checkUrlForResult(
-    messageDto,
-    shortButtonLinkList,
-    shortImageLink,
-    takeBody,
-  ) {
-    const urlForResult = messageDto.urlForResult;
-    let idStringForResult;
-    if (messageDto.buttonInfoList) {
-      if (
-        messageDto.buttonInfoList.some(
-          (button) => button.linkMobile === urlForResult,
-        )
-      ) {
-        const index = messageDto.buttonInfoList.findIndex(
-          (button) => button.linkMobile === urlForResult,
-        );
-        idStringForResult =
-          shortButtonLinkList[index].shortbuttonMobile.idString;
-      } else if (
-        messageDto.buttonInfoList.some(
-          (button) => button.linkPc === urlForResult,
-        )
-      ) {
-        const index = messageDto.buttonInfoList.findIndex(
-          (button) => button.linkPc === urlForResult,
-        );
-        idStringForResult = shortButtonLinkList[index].shortbuttonPc.idString;
-      }
-    }
-    if (messageDto.imageInfo) {
-      if (messageDto.imageInfo.imageLink === urlForResult) {
-        idStringForResult = shortImageLink.idString;
-      }
-    }
-    if (messageDto.bizMessageInfoList.urlList) {
-      for (const url of messageDto.bizMessageInfoList.urlList) {
-        if (url === urlForResult) {
-          idStringForResult =
-            takeBody.idStrings[
-              messageDto.bizMessageInfoList.urlList.indexOf(url)
-            ];
-        }
-      }
-    }
+  // async checkUrlForResult(
+  //   messageDto,
+  //   shortButtonLinkList,
+  //   shortImageLink,
+  //   takeBody,
+  // ) {
+  //   const urlForResult = messageDto.urlForResult;
+  //   let idStringForResult;
+  //   if (messageDto.buttonInfoList) {
+  //     if (
+  //       messageDto.buttonInfoList.some(
+  //         (button) => button.linkMobile === urlForResult,
+  //       )
+  //     ) {
+  //       const index = messageDto.buttonInfoList.findIndex(
+  //         (button) => button.linkMobile === urlForResult,
+  //       );
+  //       idStringForResult =
+  //         shortButtonLinkList[index].shortbuttonMobile.idString;
+  //     } else if (
+  //       messageDto.buttonInfoList.some(
+  //         (button) => button.linkPc === urlForResult,
+  //       )
+  //     ) {
+  //       const index = messageDto.buttonInfoList.findIndex(
+  //         (button) => button.linkPc === urlForResult,
+  //       );
+  //       idStringForResult = shortButtonLinkList[index].shortbuttonPc.idString;
+  //     }
+  //   }
+  //   if (messageDto.imageInfo) {
+  //     if (messageDto.imageInfo.imageLink === urlForResult) {
+  //       idStringForResult = shortImageLink.idString;
+  //     }
+  //   }
+  //   if (messageDto.bizMessageInfoList.urlList) {
+  //     for (const url of messageDto.bizMessageInfoList.urlList) {
+  //       if (url === urlForResult) {
+  //         idStringForResult =
+  //           takeBody.idStrings[
+  //             messageDto.bizMessageInfoList.urlList.indexOf(url)
+  //           ];
+  //       }
+  //     }
+  //   }
 
-    if (!idStringForResult) {
-      throw new HttpException(
-        'urlForResult가 잘못되었습니다.',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  //   if (!idStringForResult) {
+  //     throw new HttpException(
+  //       'urlForResult가 잘못되었습니다.',
+  //       HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
 
-    return idStringForResult;
-  }
+  //   return idStringForResult;
+  // }
 
   // content - 변수명 변경적용
   createMessageWithVariable(content: string, info: { [key: string]: string }) {
@@ -510,8 +501,9 @@ export class BizmessageService {
   async saveBizmessageInfo(
     bizmessageType,
     userId,
-    idStringList,
-    idStringForResult,
+    buttonIdStringList,
+    imageIdString,
+    contentIdStringList,
     ncpRequestIdList,
     receiverPhoneList,
     messageContent,
@@ -526,8 +518,9 @@ export class BizmessageService {
     const bizmessage = new Bizmessage();
     bizmessage.isSent = true;
     bizmessage.sentTpye = bizmessageType;
-    bizmessage.idStringList = idStringList;
-    bizmessage.urlForResult = idStringForResult;
+    bizmessage.buttonIdStringList = buttonIdStringList;
+    bizmessage.imageIdString = imageIdString;
+    bizmessage.contentIdStringList = contentIdStringList;
     bizmessage.ncpRequestIdList = ncpRequestIdList;
     bizmessage.receiverList = receiverPhoneList;
     bizmessage.userId = userId;

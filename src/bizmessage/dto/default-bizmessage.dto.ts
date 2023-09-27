@@ -26,10 +26,6 @@ export class DefaultBizmessageDto {
     imageLink: string;
   }>;
 
-  @IsString()
-  @IsNotEmpty()
-  urlForResult: string;
-
   @IsArray()
   @IsNotEmpty()
   receiverList: string[];

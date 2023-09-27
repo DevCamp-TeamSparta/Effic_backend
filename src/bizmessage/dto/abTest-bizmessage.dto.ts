@@ -10,10 +10,6 @@ export class AbTestBizmessageDto {
   receiverList: string[];
 
   @IsNotEmpty()
-  @IsString()
-  urlForResult: string;
-
-  @IsNotEmpty()
   @IsArray()
   messageInfoList: Array<{
     type: string;

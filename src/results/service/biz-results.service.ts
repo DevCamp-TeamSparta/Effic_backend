@@ -139,12 +139,29 @@ export class BizmessageResultsService {
 
     const statisticsArray = [];
 
-    for (const idString of bizmessage.idStringList) {
+    for (const idString of bizmessage.contentIdStringList) {
       statisticsArray.push({
         ...(await this.shorturlService.getShorturlResult(idString)),
         idString,
       });
     }
+    console.log('=========> ~ statisticsArray:1111111', statisticsArray);
+
+    for (const idString of bizmessage.buttonIdStringList) {
+      statisticsArray.push({
+        ...(await this.shorturlService.getShorturlResult(idString)),
+        idString,
+      });
+    }
+    console.log('=========> ~ statisticsArray:22222222222222', statisticsArray);
+
+    for (const idString of bizmessage.imageIdString) {
+      statisticsArray.push({
+        ...(await this.shorturlService.getShorturlResult(idString)),
+        idString,
+      });
+    }
+    console.log('=========> ~ statisticsArray:3!!!!!!!!1', statisticsArray);
     return statisticsArray;
   }
 
@@ -208,6 +225,7 @@ export class BizmessageResultsService {
         fail: ncp.fail,
         createdAt: ncp.createdAt,
       };
+
       for (const url of urlBizmessages) {
         if (ncp.bizmessageId === url.bizmessageId) {
           const urlInfo = await this.shorturlService.findUrlInfoByIdString(
