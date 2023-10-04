@@ -379,7 +379,10 @@ export class BizmessageResultsService {
 
     const results = await Promise.all(
       messageGroups.map(async (messageGroup) => {
-        return this.bizmessageGroupResult(messageGroup.id, userId);
+        return this.bizmessageGroupResult(
+          messageGroup.bizmessageGroupId,
+          userId,
+        );
       }),
     );
     return results;
