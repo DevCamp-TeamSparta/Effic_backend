@@ -38,7 +38,7 @@ export class Bizmessage extends BaseEntity {
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   ncpRequestIdList: string[];
 
-  @Column({ array: true, nullable: true, type: 'text', default: [] })
+  @Column({ array: true, nullable: false, type: 'text', default: [] })
   receiverList: string[];
 
   @Column({

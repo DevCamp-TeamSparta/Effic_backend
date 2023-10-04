@@ -139,8 +139,8 @@ export class BizmessageService {
     const receiverLength = receiverList.length;
     const receiverCount = Math.ceil(receiverLength / 100);
     let takeBody;
-    const contentIdStringList = [];
     const imageIdString = [];
+    const contentIdStringList = [];
     const buttonIdStringList = [];
 
     for (let i = 0; i < receiverCount; i++) {
@@ -220,8 +220,6 @@ export class BizmessageService {
 
   // ab 친구톡 보내기
   async sendAbTestBizmessage(userId, abTestBizmessageDto) {
-    const user = await this.usersService.findUserByUserId(userId);
-
     const receiverPhones = abTestBizmessageDto.receiverList.map(
       (info) => info.phone,
     );
@@ -243,20 +241,159 @@ export class BizmessageService {
       0,
       testReceiverAmount / 2,
     );
+    const aTestReceiverLength = aTestReceiverList.length;
+    const aTestReceiverCount = Math.ceil(aTestReceiverLength / 100);
 
     const bTestReceiverList = abTestBizmessageDto.receiverList.slice(
       testReceiverAmount / 2,
       testReceiverAmount,
     );
+    const bTestReceiverLength = bTestReceiverList.length;
+    const bTestReceiverCount = Math.ceil(bTestReceiverLength / 100);
 
-    const requestIdList = [];
-    // const receiverList;
+    let takeBody;
+    const aTestRequestIdList = [];
+    const aTestImageIdString = [];
+    const aTestContentIdStringList = [];
+    const aTestButtonIdStringList = [];
+    const bTestRequestIdList = [];
+    const bTestImageIdString = [];
+    const bTestContentIdStringList = [];
+    const bTestButtonIdStringList = [];
 
     // a 메세지보내기
+    const {
+      shortButtonLinkList: aTestShortButtonLinkList,
+      shortImageLink: aTestShortImageLink,
+    } = await this.makeshortLinks(
+      abTestBizmessageDto.messageInfoList[0].bizMessageInfoList,
+    );
+    console.log(aTestShortButtonLinkList);
+    console.log(aTestShortImageLink);
+
+    for (let i = 0; i < aTestReceiverCount; i++) {
+      const receiverListForSend = aTestReceiverList.slice(
+        i * 100,
+        (i + 1) * 100,
+      );
+
+      const body = await this.makeBody(
+        userId,
+        abTestBizmessageDto.messageInfoList[0].bizMessageInfoList,
+        abTestBizmessageDto.messageInfoList[0],
+        receiverListForSend,
+        aTestShortButtonLinkList,
+        aTestShortImageLink,
+      );
+      takeBody = body;
+      aTestRequestIdList.push(takeBody.reponse.data.requestId);
+    }
+    aTestContentIdStringList.push(...takeBody.idStrings);
+
+    if (aTestShortImageLink) {
+      aTestImageIdString.push(aTestShortImageLink.idString);
+    }
+
+    if (aTestShortButtonLinkList) {
+      aTestShortButtonLinkList.forEach((buttonLink) => {
+        aTestButtonIdStringList.push({
+          mobile: buttonLink.shortbuttonMobile.idString,
+          pc: buttonLink.shortbuttonPc.idString,
+        });
+      });
+    }
+
+    await this.saveBizmessageInfo(
+      bizmessageType.A,
+      userId,
+      aTestButtonIdStringList,
+      aTestImageIdString,
+      aTestContentIdStringList,
+      aTestRequestIdList,
+      receiverPhones.slice(0, aTestReceiverLength),
+      abTestBizmessageDto.messageInfoList[0].bizMessageInfoList,
+      abTestBizmessageDto.messageInfoList[0].plusFriendId,
+      aTestReceiverList,
+      abTestBizmessageDto.receiverList.slice(testReceiverAmount),
+    );
 
     // b 메세지보내기
+    // const {
+    //   shortButtonLinkList: bTestShortButtonLinkList,
+    //   shortImageLink: bTestShortImageLink,
+    // } = await this.makeshortLinks(abTestBizmessageDto.messageInfoList[1]);
 
-    // 나머지
+    // for (let i = 0; i < bTestReceiverCount; i++) {
+    //   const receiverListForSend = bTestReceiverList.slice(
+    //     i * 100,
+    //     (i + 1) * 100,
+    //   );
+
+    //   const body = await this.makeBody(
+    //     userId,
+    //     abTestBizmessageDto.messageInfoList[1].bizMessageInfoList,
+    //     abTestBizmessageDto.messageInfoList[1],
+    //     receiverListForSend,
+    //     bTestShortButtonLinkList,
+    //     bTestShortImageLink,
+    //   );
+    //   takeBody = body;
+    //   bTestRequestIdList.push(takeBody.reponse.data.requestId);
+    // }
+    // bTestContentIdStringList.push(...takeBody.idStrings);
+
+    // if (bTestShortImageLink) {
+    //   bTestImageIdString.push(bTestShortImageLink.idString);
+    // }
+
+    // if (bTestShortButtonLinkList) {
+    //   bTestShortButtonLinkList.forEach((buttonLink) => {
+    //     bTestButtonIdStringList.push({
+    //       mobile: buttonLink.shortbuttonMobile.idString,
+    //       pc: buttonLink.shortbuttonPc.idString,
+    //     });
+    //   });
+    // }
+
+    // const saveBizmessageInfo = await this.saveBizmessageInfo(
+    //   bizmessageType.B,
+    //   userId,
+    //   bTestButtonIdStringList,
+    //   bTestImageIdString,
+    //   bTestContentIdStringList,
+    //   bTestRequestIdList,
+    //   receiverPhones.slice(aTestReceiverLength),
+    //   abTestBizmessageDto.messageInfoList[1].bizMessageInfoList,
+    //   abTestBizmessageDto.messageInfoList[1].plusFriendId,
+    //   bTestReceiverList,
+    //   abTestBizmessageDto.receiverList.slice(testReceiverAmount),
+    // );
+
+    // // 나머지
+    // const bizmessage = new Bizmessage();
+    // bizmessage.isSent = false;
+    // bizmessage.sentTpye = bizmessageType.N;
+    // bizmessage.userId = userId;
+    // bizmessage.receiverList = receiverPhones.slice(testReceiverAmount);
+    // bizmessage.bizmessageGroupId = saveBizmessageInfo.bizmessageGroupId;
+    // await this.entityManager.save(bizmessage);
+
+    // await this.deductedUserMoney(
+    //   userId,
+    //   receiverPhones,
+    //   saveBizmessageInfo.bizmessageGroupId,
+    // );
+
+    // await this.saveAdBizmessageRecieverList(
+    //   abTestBizmessageDto.receiverList,
+    //   userId,
+    //   saveBizmessageInfo.bizmessageGroupId,
+    //   new Date(),
+    // );
+
+    // return {
+    //   bizmessageGroupId: saveBizmessageInfo.bizmessageGroupId,
+    // };
   }
 
   async makeshortLinks(messageDto) {
@@ -306,16 +443,6 @@ export class BizmessageService {
       idStrings.push(response.idString);
     }
 
-    const isAd = bizMessageInfoList.isAd;
-
-    let contentPrefix = '';
-    let contentSuffix = '';
-
-    if (isAd) {
-      contentPrefix = NCP_contentPrefix;
-      contentSuffix = `${NCP_contentSuffix} ${userNcpInfo.advertiseNumber}`;
-    }
-
     const newContent = await this.replaceUrlContent(
       bizMessageInfoList.urlList,
       shortenedUrls,
@@ -351,10 +478,7 @@ export class BizmessageService {
       messages: receiverList.map((info) => ({
         idAd: messageDto.bizMessageInfoList.isAd,
         to: info.phone,
-        content: `${contentPrefix} ${this.createMessageWithVariable(
-          newContent,
-          info,
-        )} ${contentSuffix}`,
+        content: `${this.createMessageWithVariable(newContent, info)}`,
         buttons,
         ...(messageDto.imageInfo
           ? {
@@ -398,62 +522,6 @@ export class BizmessageService {
       );
     }
   }
-
-  // async checkUrlForResult(
-  //   messageDto,
-  //   shortButtonLinkList,
-  //   shortImageLink,
-  //   takeBody,
-  // ) {
-  //   const urlForResult = messageDto.urlForResult;
-  //   let idStringForResult;
-  //   if (messageDto.buttonInfoList) {
-  //     if (
-  //       messageDto.buttonInfoList.some(
-  //         (button) => button.linkMobile === urlForResult,
-  //       )
-  //     ) {
-  //       const index = messageDto.buttonInfoList.findIndex(
-  //         (button) => button.linkMobile === urlForResult,
-  //       );
-  //       idStringForResult =
-  //         shortButtonLinkList[index].shortbuttonMobile.idString;
-  //     } else if (
-  //       messageDto.buttonInfoList.some(
-  //         (button) => button.linkPc === urlForResult,
-  //       )
-  //     ) {
-  //       const index = messageDto.buttonInfoList.findIndex(
-  //         (button) => button.linkPc === urlForResult,
-  //       );
-  //       idStringForResult = shortButtonLinkList[index].shortbuttonPc.idString;
-  //     }
-  //   }
-  //   if (messageDto.imageInfo) {
-  //     if (messageDto.imageInfo.imageLink === urlForResult) {
-  //       idStringForResult = shortImageLink.idString;
-  //     }
-  //   }
-  //   if (messageDto.bizMessageInfoList.urlList) {
-  //     for (const url of messageDto.bizMessageInfoList.urlList) {
-  //       if (url === urlForResult) {
-  //         idStringForResult =
-  //           takeBody.idStrings[
-  //             messageDto.bizMessageInfoList.urlList.indexOf(url)
-  //           ];
-  //       }
-  //     }
-  //   }
-
-  //   if (!idStringForResult) {
-  //     throw new HttpException(
-  //       'urlForResult가 잘못되었습니다.',
-  //       HttpStatus.BAD_REQUEST,
-  //     );
-  //   }
-
-  //   return idStringForResult;
-  // }
 
   // content - 변수명 변경적용
   createMessageWithVariable(content: string, info: { [key: string]: string }) {
