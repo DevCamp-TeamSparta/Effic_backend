@@ -6,8 +6,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Message } from '../messages/message.entity';
-import { User } from '../users/user.entity';
+import { Message } from '../../messages/message.entity';
+import { User } from '../../users/user.entity';
 
 @Entity()
 export class NcpResult extends BaseEntity {
@@ -113,6 +113,9 @@ export class UsedPayments extends BaseEntity {
 
   @Column({ type: 'int', nullable: false, default: 0 })
   messageGroupId: number;
+
+  @Column({ type: 'int', nullable: false, default: 0 })
+  bizmessageGroupId: number;
 
   @ManyToOne(() => User, (user) => user.urlResults, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })

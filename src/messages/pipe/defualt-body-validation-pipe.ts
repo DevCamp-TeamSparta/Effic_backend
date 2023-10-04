@@ -28,9 +28,11 @@ export class DefaultMessageValidationPipe implements PipeTransform {
       }
     }
 
-    const uniqueUrl = new Set(value.urlList);
-    if (uniqueUrl.size !== value.urlList.length) {
-      throw new BadRequestException('Duplicate urls found');
+    if (value.urlList) {
+      const uniqueUrl = new Set(value.urlList);
+      if (uniqueUrl.size !== value.urlList.length) {
+        throw new BadRequestException('Duplicate urls found');
+      }
     }
 
     return value;

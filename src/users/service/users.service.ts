@@ -13,7 +13,6 @@ import * as jwt from 'jsonwebtoken';
 import { jwtConfig } from '../../../config/jwt.config';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateHostnumberDto } from '../dto/update-hostnumber.dto';
-import { NCP_SMS_price } from '../../../commons/constants';
 
 @Injectable()
 export class UsersService {
@@ -311,13 +310,13 @@ export class UsersService {
   }
 
   // 유저 금액 확인
-  async assertCheckUserMoney(userId: number, count: number) {
+  async assertCheckUserMoney(userId: number, count: number, price: number) {
     const user = await this.usersRepository.findOneByUserId(userId);
 
     const totalMoney = user.point + user.money;
 
-    if (totalMoney < count * NCP_SMS_price) {
-      const requiredPoints = count * NCP_SMS_price - totalMoney;
+    if (totalMoney < count * price) {
+      const requiredPoints = count * price - totalMoney;
       throw new HttpException(
         `User does not have enough money. Please charge your money. need ${requiredPoints} points`,
         HttpStatus.BAD_REQUEST,
@@ -325,12 +324,22 @@ export class UsersService {
     }
   }
 
+  // 유저의 info 가져오기
+  async findUserByUserId(userId: number) {
+    const user = await this.usersRepository.findOneByUserId(userId);
+    return user;
+  }
+
+  async findOneByEmail(email: string) {
+    const user = await this.usersRepository.findOneByEmail(email);
+    return user;
+  }
+
   // 유저의 NcpInfo 가져오기
   async findUserNcpInfoByUserId(userId: number) {
     const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
       userId,
     );
-
     return userNcpInfo;
   }
 
@@ -344,15 +353,25 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    if (userNcpInfo.bizServiceId !== '') {
-      throw new HttpException(
-        'BizServiceId is already provided',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     userNcpInfo.bizServiceId = null;
     userNcpInfo.bizServiceId = updateBizserviceIdDto.bizServiceId;
+
+    await this.userNcpInfoRepository.save(userNcpInfo);
+
+    return userNcpInfo;
+  }
+
+  // bizmessage plusFriendId와 메모 입력
+  async updatePlusFriendId(userId: number, updatePlusFriendIdDto) {
+    const userNcpInfo = await this.userNcpInfoRepository.findOneByUserId(
+      userId,
+    );
+
+    if (!userNcpInfo) {
+      throw new NotFoundException('User not found');
+    }
+
+    userNcpInfo.plusFriendIdList = updatePlusFriendIdDto.plusFriendIdList;
 
     await this.userNcpInfoRepository.save(userNcpInfo);
 

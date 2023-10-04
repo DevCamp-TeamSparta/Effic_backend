@@ -32,6 +32,6 @@ export class DefaultMessageDto {
   reservetime?: string;
 
   @IsArray()
-  @IsNotEmpty()
+  @IsOptional()
   urlList?: string[];
 }

@@ -1,7 +1,6 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { UsersRepository } from '../../users/users.repository';
 import { UsersService } from '../../users/service/users.service';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import * as crypto from 'crypto';
@@ -9,9 +8,13 @@ import axios from 'axios';
 import { Message, AdvertiseReceiverList } from '../message.entity';
 import { MessageType } from '../message.enum';
 import { MessageContent } from '../message.entity';
-import { MessageGroupRepo } from '../messages.repository';
+import {
+  MessageGroupRepo,
+  MessagesContentRepository,
+  MessagesRepository,
+} from '../messages.repository';
 import { AdvertiseReceiverListRepository } from '../messages.repository';
-import { UsedPayments } from 'src/results/result.entity';
+import { UsedPayments } from 'src/results/entity/result.entity';
 import {
   NCP_contentPrefix,
   NCP_contentSuffix,
@@ -20,17 +23,19 @@ import {
 
 @Injectable()
 export class MessagesService {
+  private readonly logger = new Logger('NcpMessagesService');
   constructor(
-    private readonly usersRepository: UsersRepository,
     private readonly usersService: UsersService,
     private readonly shorturlService: ShorturlService,
     private readonly messageGroupRepo: MessageGroupRepo,
+    private readonly messagesRepository: MessagesRepository,
+    private readonly messagesContentRepository: MessagesContentRepository,
     private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
   async getGroupList(email: string) {
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     const messageGroupList = await this.messageGroupRepo.findAllByUserId(
       user.userId,
     );
@@ -69,7 +74,7 @@ export class MessagesService {
   // 기본메세지 보내기
   async sendDefaultMessage(email, defaultMessageDto) {
     // 유저정보 확인
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
 
     const receiverPhones = defaultMessageDto.receiverList.map(
       (info) => info.phone,
@@ -78,6 +83,7 @@ export class MessagesService {
     await this.usersService.assertCheckUserMoney(
       user.userId,
       receiverPhones.length,
+      NCP_SMS_price,
     );
 
     const requestIdList: string[] = [];
@@ -132,10 +138,12 @@ export class MessagesService {
       user.userId,
     );
 
-    for (const url of messageInfoList.urlList) {
-      const response = await this.shorturlService.createShorturl(url);
-      shortenedUrls.push(response.shortURL);
-      idStrings.push(response.idString);
+    if (messageInfoList.urlList) {
+      for (const url of messageInfoList.urlList) {
+        const response = await this.shorturlService.createShorturl(url);
+        shortenedUrls.push(response.shortURL);
+        idStrings.push(response.idString);
+      }
     }
 
     const newContent = await this.replaceUrlContent(
@@ -328,7 +336,7 @@ export class MessagesService {
   // 테스트 메세지 보내기
   async sendTestMessage(email, testMessageDto) {
     // 유저정보 확인
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
 
     await this.makeBody(
       user,
@@ -386,7 +394,7 @@ export class MessagesService {
   // AB테스트 메세지 보내기
   async sendAbTestMessage(email, abTestMessageDto) {
     // 유저정보 확인
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
 
     const receiverPhones = abTestMessageDto.receiverList.map(
       (info) => info.phone,
@@ -396,6 +404,7 @@ export class MessagesService {
     await this.usersService.assertCheckUserMoney(
       user.userId,
       receiverPhones.length * 3,
+      NCP_SMS_price,
     );
 
     // 리시버를 3개로 나누기
@@ -442,10 +451,13 @@ export class MessagesService {
           requestIdList.push(body.response.data.requestId);
         }
 
-        const urlForResult = abTestMessageDto.urlForResult;
-        const idStringIndex =
-          abTestMessageDto.messageInfoList[0].urlList.indexOf(urlForResult);
-        const idStringForResult = takeBody.idStrings[idStringIndex];
+        let idStringForResult = null;
+        if (abTestMessageDto.urlForResult) {
+          const urlForResult = abTestMessageDto.urlForResult;
+          const idStringIndex =
+            abTestMessageDto.messageInfoList[0].urlList.indexOf(urlForResult);
+          idStringForResult = takeBody.idStrings[idStringIndex];
+        }
 
         const AbMessageInfo = await this.saveAbMessageInfo(
           MessageType.A,
@@ -484,10 +496,13 @@ export class MessagesService {
           requestIdList.push(body.response.data.requestId);
         }
 
-        const urlForResult = abTestMessageDto.urlForResult;
-        const idStringIndex =
-          abTestMessageDto.messageInfoList[1].urlList.indexOf(urlForResult);
-        const idStringForResult = takeBody.idStrings[idStringIndex];
+        let idStringForResult = null;
+        if (abTestMessageDto.urlForResult) {
+          const urlForResult = abTestMessageDto.urlForResult;
+          const idStringIndex =
+            abTestMessageDto.messageInfoList[1].urlList.indexOf(urlForResult);
+          idStringForResult = takeBody.idStrings[idStringIndex];
+        }
 
         const AbMessageInfo = await this.saveAbMessageInfo(
           MessageType.B,
@@ -560,7 +575,7 @@ export class MessagesService {
 
   // 광고성 문자 수신자 필터링
   async filteredReceivers(email, filterReceiverDto) {
-    const user = await this.usersRepository.findOneByEmail(email);
+    const user = await this.usersService.findOneByEmail(email);
     const settingDay = filterReceiverDto.day;
 
     const DaysAgo = new Date();
@@ -579,5 +594,65 @@ export class MessagesService {
     );
 
     return result;
+  }
+
+  // message info 가져오기
+  async findOneByMessageId(messageId: number) {
+    const message = await this.messagesRepository.findOneByMessageId(messageId);
+    return message;
+  }
+
+  // messageGroup info 가져오기
+  async findAllMessageGroupByUserId(userId: number) {
+    const messageGroupList = await this.messageGroupRepo.findAllByUserId(
+      userId,
+    );
+    return messageGroupList;
+  }
+
+  async findOneMessageGroupByMessageGroupId(messageGroupId: number) {
+    const messageGroup = await this.messageGroupRepo.findOneByMessageGroupId(
+      messageGroupId,
+    );
+    return messageGroup;
+  }
+
+  async findAllMessageByMessageGroupId(messageGroupId: number) {
+    const messageList = await this.messagesRepository.findAllByMessageGroupId(
+      messageGroupId,
+    );
+    return messageList;
+  }
+
+  // messageContent info 가져오기
+  async findOneMessageContentByMessageGroupId(messageGroupId: number) {
+    const messageContent =
+      await this.messagesContentRepository.findOneByMessageGroupId(
+        messageGroupId,
+      );
+    return messageContent;
+  }
+
+  async findOneMessageContentByMessageId(messageId: number) {
+    const messageContent =
+      await this.messagesContentRepository.findOneByMessageId(messageId);
+    return messageContent;
+  }
+
+  // messagerepo info 가져오기 (날짜)
+  async findThreeDaysBeforeSend() {
+    const messages = await this.messagesRepository.findThreeDaysBeforeSend();
+    return messages;
+  }
+
+  async findThreeDaysBeforeSendAndNotChecked() {
+    const messages =
+      await this.messagesRepository.findThreeDaysBeforeSendAndNotChecked();
+    return messages;
+  }
+
+  async findNotSend() {
+    const messages = await this.messagesRepository.findNotSend();
+    return messages;
   }
 }

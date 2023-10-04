@@ -1,19 +1,24 @@
-import { IsString, IsNotEmpty, IsOptional, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsArray,
+  IsObject,
+} from 'class-validator';
 
 export class DefaultBizmessageDto {
   @IsNotEmpty()
   @IsString()
   plusFriendId: string;
 
-  @IsArray()
   @IsNotEmpty()
+  @IsObject()
   bizMessageInfoList: Array<{
     content: string;
-    isAd: boolean;
     urlList: string[];
   }>;
 
-  @IsArray()
+  @IsObject()
   @IsOptional()
   imageInfo?: Array<{
     imageId: string;
@@ -26,7 +31,7 @@ export class DefaultBizmessageDto {
 
   @IsArray()
   @IsOptional()
-  buttonInfo?: string[];
+  buttonInfoList?: string[];
 
   @IsOptional()
   @IsString()

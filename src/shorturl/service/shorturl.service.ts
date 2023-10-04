@@ -129,4 +129,10 @@ export class ShorturlService {
       throw new InternalServerErrorException();
     }
   }
+
+  // urlinfo 결과 조회
+  async findUrlInfoByIdString(idString: string) {
+    const urlInfo = await this.urlInfosRepository.findOneByIdString(idString);
+    return urlInfo;
+  }
 }

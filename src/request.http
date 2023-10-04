@@ -1,6 +1,6 @@
 ### Create User
 POST http://localhost:8000/users/signup
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk0NTk2ODgxLCJleHAiOjE2OTQ2ODMyODF9.Q2y91DtvtO-iXnBleP_ui9YF42rg7hv-1kntw0Dw38c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk1NjI3ODk5LCJleHAiOjE2OTU3MTQyOTl9.YmP-aYte4C0P36wBwdRRX7nrTsnJ6wJNm9sS_ils8o8
 Content-Type: application/json
 
 {
@@ -80,13 +80,13 @@ Content-Type: application/json
 
 ### dafault message result - shortio
 ### test용입니다 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/default/1
+Get http://localhost:8000/results/default/6
 Content-Type: application/json
 
 
 ### dafault message result - ncp 
 ### test용입니다 실제로 사용되지 않습니다.
-Get http://localhost:8000/results/default/ncp/3
+Get http://localhost:8000/results/default/ncp/6
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ0MDUzNDEsImV4cCI6MTY5NDQ5MTc0MX0.EzZnKByWYN0jbb_mogFluYy3FjY_lvD2F0dXd1zsrws
 Content-Type: application/json
 
@@ -106,8 +106,10 @@ Content-Type: application/json
 }
 
 ### result - messageId
-Get http://localhost:8000/results/3
+Get http://localhost:8000/results/group/1
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjkzOTgxNTY4LCJleHAiOjE2OTQwNjc5Njh9.wtd6CLkethnPASO_aN5lJ1nz1rq6vxWS0A2y6K1gzdQ
+
 
 
 ### abTest message sending
@@ -149,6 +151,35 @@ Content-Type: application/json
 Get http://localhost:8000/users/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NjEyNTMsImV4cCI6MTY5NDc0NzY1M30.YX7YetIVtrok4smc52lLpw4m2mgqlMjv-r7ien6yEq0
 
+# {
+#   "userId": 1,
+#   "email": "clo@sparta.com",
+#   "name": "clo",
+#   "hostnumber": [
+#     "15228016"
+#   ],
+#   "advertisementOpt": false,
+#   "advertiseNumber": [
+#     "08011111111"
+#   ],
+#   "accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
+#   "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
+#   "secretKey": "x5zzaAzozM5h0k36cROO6LEuUMyRqP0di1eWXHJu",
+#   "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub",
+#   "plusFriendIdList": [
+#     {
+#       "plusFriendId": "@스파르타코딩클럽",
+#       "memo": "스파르타"
+#     },
+#     {
+#       "plusFriendId": "@항해",
+#       "memo": ""
+#     }
+#   ],
+#   "point": 3000,
+#   "money": 0
+# }
+
 ### 주소록 생성
 Post http://localhost:8000/phonebook
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
@@ -172,7 +203,7 @@ Content-Type: application/json
 # }
 
 ### 주소록 멤버 수정
-Patch http://localhost:8000/phonebook/members/14
+Patch http://localhost:8000/phonebook/members/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 Content-Type: application/json
 
@@ -337,7 +368,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 Content-Type: application/json
 
 {
-    "userId": 1,
     "hostnumberwithmemo": [{"hostnumber":"15228016","memo": "스파르타"}, {"hostnumber":"01036289823","memo": ""}, {"hostnumber":"01011111113","memo": "항해"}]
 }
 
@@ -389,7 +419,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 
 ### bizmessage serviceId 입력
 Patch http://localhost:8000/users/me/bizserviceid
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk1NjI3ODk5LCJleHAiOjE2OTU3MTQyOTl9.YmP-aYte4C0P36wBwdRRX7nrTsnJ6wJNm9sS_ils8o8
 Content-Type: application/json
 
 {
@@ -413,13 +443,47 @@ Content-Type: application/json
 #   "userId": 1
 # }
 
+### bizmessage plusFriendId와 메모 입력
+PATCH http://localhost:8000/users/me/plusfriendid
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
+Content-Type: application/json
+
+{
+    "plusFriendIdList": [{"plusFriendId":"@스파르타코딩클럽","memo": "스파르타"}, {"plusFriendId":"@항해","memo": ""}]
+}
+
+# {
+#   "userInfoNcpId": 1,
+#   "accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
+#   "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
+#   "bizServiceId": "ncp:kkobizmsg:kr:2604237:spartacodingclub",
+#   "secretKey": "x5zzaAzozM5h0k36cROO6LEuUMyRqP0di1eWXHJu",
+#   "advertiseNumber": [
+#     "08011111111"
+#   ],
+#   "hostnumber": [
+#     "15228016"
+#   ],
+#   "plusFriendIdList": [
+#     {
+#       "plusFriendId": "@스파르타코딩클럽",
+#       "memo": "스파르타"
+#     },
+#     {
+#       "plusFriendId": "@항해",
+#       "memo": ""
+#     }
+#   ],
+#   "userId": 1
+# }
+
+
 ### NCP에 이미지 업로드 
 ### 이 파일에서는 사용할 수 없습니다. 이미지 업로드가 가능한 postman이나 thunderclient를 사용해주세요.
+### isWide값과, imageFile, plusFriendId를 form-data로 보내주세요.
+### 예) isWide: false(type - string), imageFile: image.png, plusFriendId: @스파르타코딩클럽
 Post http://localhost:8000/bizmessage/image
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
-
-# isWide값과, imageFile을 form-data로 보내주세요.
-# 예) isWide: false(string으로 보내주세요!), imageFile: image.png
 
 # {
 #   "imageId": "8ae5c21c8ab116a0018ab5c4b02a0018",
@@ -429,3 +493,233 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #   "createTime": "2023-09-21T12:24:40.874"
 # }
 
+### 친구톡 - 기본
+### buttonInfo - WL : 웹링크(https://~~ or http://~~), AL : 앱링크()
+### buttonInfo의 type이 WL일 경우 - buttonLink 사용
+### buttonInfo의 type이 AL일 경우 - schemeIos, schemeAndroid 사용
+Post http://localhost:8000/bizmessage/default
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
+Content-Type: application/json
+
+{
+    "plusFriendId": "@스파르타코딩클럽",
+    "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "urlList": []},
+    "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
+    "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
+    "buttonInfoList": [{"type": "WL", "name": "히히💕", "linkMobile" : "https://www.naver.com", "linkPc": "https://app.effic.biz"}, {"type": "WL", "name": "하하", "linkMobile" : "https://www.google.com", "linkPc": "https://app.effic.biz"}]
+}
+
+# {
+#   "bizmessageId": 9,
+#   "bizmessageGroupId": 9
+# }
+
+### 친구톡 ncp 결과조회 - 실제로 사용되지 않습니다.
+Get http://localhost:8000/results/bizmessage/ncp/3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
+
+### 친구톡 url 클릭 결과조회 - 실제로 사용되지 않습니다
+Get http://localhost:8000/results/bizmessage/url/6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
+
+# {
+#   "contentArray": [],
+#   "imageArray": [
+#     {
+#       "totalClicks": 0,
+#       "humanClicks": 0,
+#       "idString": "lnk_3xIn_WsTTXvmtxr9s2uTxTKwbN"
+#     }
+#   ],
+#   "buttonArray": [
+#     {
+#       "pc": {
+#         "totalClicks": 0,
+#         "humanClicks": 0,
+#         "idString": "lnk_3xIn_MrU1N8Y6PnJQZ1T95Pb12"
+#       },
+#       "mobile": {
+#         "totalClicks": 0,
+#         "humanClicks": 0,
+#         "idString": "lnk_3xIn_Ijm5BMnFnnURvZMQAQsLn"
+#       }
+#     },
+#     {
+#       "pc": {
+#         "totalClicks": 0,
+#         "humanClicks": 0,
+#         "idString": "lnk_3xIn_RdYJQAof5D6kaaI0RdM6P"
+#       },
+#       "mobile": {
+#         "totalClicks": 0,
+#         "humanClicks": 0,
+#         "idString": "lnk_3xIn_hvNm3Kdb6hcIGZN58waGa"
+#       }
+#     }
+#   ]
+# }
+
+### 친구톡 결과조회
+Get http://localhost:8000/results/group/bizmessage/6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
+
+# [
+#   {
+#     "bizmessage": {
+#       "bizmessageId": 5,
+#       "isSent": true,
+#       "sentTpye": "Default",
+#       "buttonIdStringList": [
+#         {
+#           "pc": "lnk_3xIn_BPNheurfa6W2MLZTzoe27",
+#           "mobile": "lnk_3xIn_xupS6kKcX61Am2p0jPdjv"
+#         },
+#         {
+#           "pc": "lnk_3xIn_8Pm2it8mgVLvtpPbuPWHp",
+#           "mobile": "lnk_3xIn_YxlLovV1Y4xPeo2LH9Gye"
+#         }
+#       ],
+#       "imageIdString": [
+#         "lnk_3xIn_FrkN1T5SPwhewp1gRSyhI"
+#       ],
+#       "contentIdStringList": [],
+#       "ncpRequestIdList": [
+#         "RBFA-1695810065199-4072-56990729-RmQKlSpX"
+#       ],
+#       "receiverList": [
+#         "01036289823",
+#         "01848415676"
+#       ],
+#       "createdAt": "2023-09-27T10:21:03.886Z",
+#       "isMoneyCheck": false,
+#       "userId": 1,
+#       "bizmessageGroupId": 5
+#     },
+#     "content": {
+#       "bizmessageContentId": 5,
+#       "bizmessageId": 5,
+#       "sentType": "Default",
+#       "content": {
+#         "content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!",
+#         "urlList": [],
+#         "imageInfo": {
+#           "imageId": "8ae5c21e8ab7022c018abab5f34f000a",
+#           "imageLink": "https://app.effic.biz"
+#         },
+#         "buttonInfoList": [
+#           {
+#             "name": "히히💕",
+#             "type": "WL",
+#             "linkPc": "https://app.effic.biz",
+#             "linkMobile": "https://www.naver.com"
+#           },
+#           {
+#             "name": "하하",
+#             "type": "WL",
+#             "linkPc": "https://app.effic.biz",
+#             "linkMobile": "https://www.google.com"
+#           }
+#         ]
+#       },
+#       "plusFriendId": "@스파르타코딩클럽",
+#       "receiverList": [
+#         {
+#           "name": "clo",
+#           "phone": "01036289823"
+#         },
+#         {
+#           "name": "clo2",
+#           "phone": "01848415676"
+#         }
+#       ],
+#       "remainReceiverList": [],
+#       "bizmessageGroupId": 5
+#     },
+#     "result": [
+#       {
+#         "bizmessage": 5,
+#         "user": 1,
+#         "urls": {
+#           "content": [],
+#           "image": [
+#             {
+#               "idString": "lnk_3xIn_FrkN1T5SPwhewp1gRSyhI",
+#               "shortUrl": "https://effi.kr/AsSxPk",
+#               "originalUrl": "https://app.effic.biz",
+#               "humanclicks": 0,
+#               "totalclicks": 0
+#             }
+#           ],
+#           "button": [
+#             {
+#               "pc": {
+#                 "idString": "lnk_3xIn_BPNheurfa6W2MLZTzoe27",
+#                 "shortUrl": "https://effi.kr/A8PYsp",
+#                 "originalUrl": "https://app.effic.biz",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             },
+#             {
+#               "mobile": {
+#                 "idString": "lnk_3xIn_xupS6kKcX61Am2p0jPdjv",
+#                 "shortUrl": "https://effi.kr/aUEjgJ",
+#                 "originalUrl": "https://www.naver.com",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             },
+#             {
+#               "pc": {
+#                 "idString": "lnk_3xIn_8Pm2it8mgVLvtpPbuPWHp",
+#                 "shortUrl": "https://effi.kr/oIcu7G",
+#                 "originalUrl": "https://app.effic.biz",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             },
+#             {
+#               "mobile": {
+#                 "idString": "lnk_3xIn_YxlLovV1Y4xPeo2LH9Gye",
+#                 "shortUrl": "https://effi.kr/uVshUr",
+#                 "originalUrl": "https://www.google.com",
+#                 "humanclicks": 0,
+#                 "totalclicks": 0
+#               }
+#             }
+#           ]
+#         },
+#         "success": 1,
+#         "reserved": 0,
+#         "fail": 1,
+#         "createdAt": "2023-09-27T10:21:08.082Z"
+#       }
+#     ]
+#   }
+# ]
+
+### 친구톡 테스트 발송
+Post http://localhost:8000/bizmessage/test
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
+Content-Type: application/json
+
+{
+    "plusFriendId": "@스파르타코딩클럽",
+    "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "urlList": []},
+    "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
+    "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
+    "buttonInfoList": [{"type": "WL", "name": "히히💕", "linkMobile" : "https://www.naver.com", "linkPc": "https://app.effic.biz"}, {"type": "WL", "name": "하하", "linkMobile" : "https://www.google.com", "linkPc": "https://app.effic.biz"}]
+}
+
+# success
+
+### ab 친구톡 보내기
+Post http://localhost:8000/bizmessage/abtest
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
+Content-Type: application/json
+
+{
+    "plusFriendId": "@스파르타코딩클럽",
+    "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
+    "messageInfoList": [{"type": "A", "bizMessageInfoList": {"content": "A 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "urlList": []}, "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"}, "buttonInfoList": [{"type": "WL", "name": "히히💕", "buttonLink":"https://www.google.com"},{"type": "WL", "name": "하하", "buttonLink":"https://www.naver.com"}]}, {"type": "B", "bizMessageInfoList": {"content": "B 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "urlList": []}, "buttonInfoList": [{"type": "WL", "name": "하하", "buttonLink":"https://app.effic.biz"}]}]
+}

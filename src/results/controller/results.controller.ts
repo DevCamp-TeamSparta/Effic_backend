@@ -9,11 +9,15 @@ import {
 } from '@nestjs/common';
 import { ResultsService } from '../service/results.service';
 import * as jwt from 'jsonwebtoken';
+import { BizmessageResultsService } from '../service/biz-results.service';
 
 @Controller('results')
 export class ResultsController {
   private logger = new Logger('ResultsController');
-  constructor(private resultsService: ResultsService) {}
+  constructor(
+    private readonly resultsService: ResultsService,
+    private readonly bizmessageResultsService: BizmessageResultsService,
+  ) {}
 
   @Get('/group')
   async getAllMessageGroupResult(
@@ -39,9 +43,9 @@ export class ResultsController {
     return await this.resultsService.messageResult(messageId);
   }
 
-  @Get('/group/:messageId')
+  @Get('/group/:groupId')
   async messageGroupResults(
-    @Param('messageId') messageId: number,
+    @Param('groupId') groupId: number,
     @Headers('Authorization') authorization: string,
   ) {
     this.logger.verbose('Message group result');
@@ -52,7 +56,7 @@ export class ResultsController {
     const decodedAccessToken: any = jwt.decode(accessToken);
     this.logger.verbose('Message result');
     const result = await this.resultsService.messageGroupResult(
-      messageId,
+      groupId,
       decodedAccessToken.email,
     );
     return result;
@@ -86,5 +90,76 @@ export class ResultsController {
   ) {
     this.logger.verbose('Default message ncp result');
     return await this.resultsService.ncpResult(messageId, headerEmail);
+  }
+
+  // 친구톡 ncp 결과조회 - 실제로 사용되지 않습니다.
+  @Get('/bizmessage/ncp/:bizmessageId')
+  async bizmessageNcpResult(
+    @Param('bizmessageId') bizmessageId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage ncp result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    return await this.bizmessageResultsService.ncpResult(
+      bizmessageId,
+      decodedAccessToken.userId,
+    );
+  }
+
+  // 친구톡 url 클릭 결과조회 - 실제로 사용되지 않습니다
+  @Get('/bizmessage/url/:bizmessageId')
+  async bizmessageUrlResult(
+    @Param('bizmessageId') bizmessageId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage url result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+
+    return await this.bizmessageResultsService.shortUrlResult(bizmessageId);
+  }
+
+  // 친구톡 결과조회 - 사용하지 않습니다.
+  @Get('/bizmessage/:bizmessageId')
+  async bizmessageResult(
+    @Param('bizmessageId') bizmessageId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    return await this.bizmessageResultsService.BizmessageResult(
+      bizmessageId,
+      decodedAccessToken.userId,
+    );
+  }
+
+  // 친구톡 결과조회
+  @Get('/group/bizmessage/:groupId')
+  async bizmessageGroupResult(
+    @Param('groupId') groupId: number,
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Bizmessage result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    return await this.bizmessageResultsService.bizmessageGroupResult(
+      groupId,
+      decodedAccessToken.userId,
+    );
   }
 }

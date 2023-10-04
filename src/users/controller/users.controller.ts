@@ -16,6 +16,7 @@ import { UpdateBizserviceIdDto } from '../dto/update-bizserviceId.dto';
 import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
 import { AuthGuard } from 'src/auth.guard';
+import { UpdatePlusFriendDto } from '../dto/update-plusFriend.dto';
 
 @Controller('users')
 export class UsersController {
@@ -148,6 +149,8 @@ export class UsersController {
         accessKey: userNcpInfo.accessKey,
         serviceId: userNcpInfo.serviceId,
         secretKey: userNcpInfo.secretKey,
+        bizServiceId: userNcpInfo.bizServiceId,
+        plusFriendIdList: userNcpInfo.plusFriendIdList,
         point: user.point,
         money: user.money,
       };
@@ -213,6 +216,29 @@ export class UsersController {
     return await this.usersService.updateBizserviceId(
       user.userId,
       updateBizserviceIdDto,
+    );
+  }
+
+  // bizmessage plusFriendId와 메모 입력
+  @Patch('/me/plusfriendid')
+  async updatePlusFriendId(
+    @Headers('Authorization') authorization: string,
+    @Body() updatePlusFriendIdDto: UpdatePlusFriendDto,
+  ) {
+    this.logger.verbose('User plusFriendId update');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkUserInfo(email);
+
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
+    return await this.usersService.updatePlusFriendId(
+      user.userId,
+      updatePlusFriendIdDto,
     );
   }
 }

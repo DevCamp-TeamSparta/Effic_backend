@@ -9,7 +9,6 @@ export class UserBodyValidationPipe implements PipeTransform {
   async transform(value: any): Promise<UpdateUserDto | CreateUserDto> {
     const hostnumberRegex = /^\d{7,11}$/;
 
-    // hostnumber가 undefined이면 에러 추가
     if (value.hostnumber === undefined) {
       throw new BadRequestException('hostnumber is not defined');
     }

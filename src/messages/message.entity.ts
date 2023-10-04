@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { MessageType } from './message.enum';
 import { User } from '../users/user.entity';
-import { NcpResult, UrlResult } from 'src/results/result.entity';
+import { NcpResult, UrlResult } from 'src/results/entity/result.entity';
 
 @Entity()
 export class Message extends BaseEntity {
@@ -128,43 +128,6 @@ export class MessageContent extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   messageGroupId: number;
 }
-
-// @Entity()
-// export class TlyUrlInfo extends BaseEntity {
-//   @Column({ type: 'varchar', nullable: false })
-//   idString: string;
-
-//   @Column({ type: 'varchar', nullable: false })
-//   originalUrl: string;
-
-//   @Column({ type: 'varchar', nullable: false })
-//   shortenUrl: string;
-
-//   @Column({ type: 'varchar', nullable: false, primary: true })
-//   firstShortenId: string;
-// }
-// @Entity()
-// export class UrlInfo extends BaseEntity {
-//   @PrimaryGeneratedColumn({ type: 'int' })
-//   urlInfoId: number;
-
-//   @Column({ type: 'varchar', nullable: false })
-//   originalUrl: string;
-
-//   @Column({ type: 'varchar', nullable: false })
-//   shortenUrl: string;
-
-//   @Column({ type: 'varchar', nullable: false })
-//   idString: string;
-
-//   @OneToOne(() => TlyUrlInfo)
-//   @JoinColumn({
-//     name: 'idString',
-//     referencedColumnName: 'firstShortenId',
-//     foreignKeyConstraintName: 'firstShortenId',
-//   })
-//   tlyUrlInfo: TlyUrlInfo;
-// }
 
 @Entity()
 export class AdvertiseReceiverList extends BaseEntity {

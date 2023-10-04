@@ -7,8 +7,16 @@ import {
 } from 'typeorm';
 import { AdvertiseReceiverList, Message } from '../messages/message.entity';
 import { Payment } from '../payments/payments.entity';
-import { NcpResult, UrlResult } from '../results/result.entity';
+import { NcpResult, UrlResult } from '../results/entity/result.entity';
 import { PhonebookList } from 'src/phonebook/phonebook.entity';
+import {
+  Bizmessage,
+  BizmessageAdReceiverList,
+} from 'src/bizmessage/bizmessage.entity';
+import {
+  BizNcpResult,
+  BizUrlResult,
+} from 'src/results/entity/biz-result.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -68,6 +76,26 @@ export class User extends BaseEntity {
     },
   )
   advertiseReceiverList: AdvertiseReceiverList[];
+
+  @OneToMany(() => Bizmessage, (bizmessage) => bizmessage.user, {
+    cascade: true,
+  })
+  bizmessages: Bizmessage[];
+
+  @OneToMany(() => BizmessageAdReceiverList, (receiver) => receiver.user, {
+    cascade: true,
+  })
+  bizmessageAdReceiverList: BizmessageAdReceiverList[];
+
+  @OneToMany(() => BizNcpResult, (bizNcpResult) => bizNcpResult.user, {
+    cascade: true,
+  })
+  bizncpResults: BizNcpResult[];
+
+  @OneToMany(() => BizUrlResult, (bizUrlResult) => bizUrlResult.user, {
+    cascade: true,
+  })
+  bizurlResults: BizUrlResult[];
 }
 
 @Entity()
@@ -92,6 +120,9 @@ export class UserNcpInfo extends BaseEntity {
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   hostnumber: Array<string>;
+
+  @Column({ type: 'jsonb', nullable: true, default: '[]' })
+  plusFriendIdList: { plusFriendId: string; memo: string };
 
   @Column({ type: 'int', nullable: false })
   userId: number;

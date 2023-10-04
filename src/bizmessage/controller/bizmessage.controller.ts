@@ -8,11 +8,13 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { BizmessageService } from '../service/bizmessage.service';
-import { DefaultBizmessageDto } from '../dto/default-bizmessage.dto';
 import { ImageUploadDto } from '../dto/image-upload.dto';
+import { DefaultBizmessageDto } from '../dto/default-bizmessage.dto';
+import { AbTestBizmessageDto } from '../dto/abTest-bizmessage.dto';
 import * as jwt from 'jsonwebtoken';
 import { UsersService } from 'src/users/service/users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { DefaultBizbodyValidationPipe } from '../pipe/defualt-bizbody-validation-pipe';
 
 @Controller('bizmessage')
 export class BizmessageController {
@@ -50,7 +52,8 @@ export class BizmessageController {
   @Post('/default')
   async sendDefaultBizmessage(
     @Headers('Authorization') authorization: string,
-    @Body() defaultBizmessageDto: DefaultBizmessageDto,
+    @Body(new DefaultBizbodyValidationPipe())
+    defaultBizmessageDto: DefaultBizmessageDto,
   ): Promise<object> {
     this.logger.verbose('Default bizmessage sending');
 
@@ -67,14 +70,49 @@ export class BizmessageController {
     );
   }
 
+  // 테스트 친구톡 보내기
+  @Post('/test')
+  async sendTestBizmessage(
+    @Headers('Authorization') authorization: string,
+    @Body(new DefaultBizbodyValidationPipe())
+    defaultBizmessageDto: DefaultBizmessageDto,
+  ) {
+    this.logger.verbose('Test bizmessage sending');
+
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkBizserviceId(email);
+
+    return await this.bizmessageService.sendTestBizmessage(
+      user.userId,
+      defaultBizmessageDto,
+    );
+  }
+
   // ab 친구톡 보내기
-  // @Post('/abtest')
-  // async sendAbTestBizmessage(@Headers('Authorization') authorization: string) {
-  //   this.logger.verbose('AB test bizmessage sending');
+  @Post('/abtest')
+  async sendAbTestBizmessage(
+    @Headers('Authorization') authorization: string,
+    @Body(new DefaultBizbodyValidationPipe())
+    abTestBizmessageDto: AbTestBizmessageDto,
+  ) {
+    this.logger.verbose('AB test bizmessage sending');
 
-  //   const accessToken = authorization.split(' ')[1];
-  //   const decodedAccessToken: any = jwt.decode(accessToken);
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
 
-  //   const email = decodedAccessToken.email;
-  // }
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkBizserviceId(email);
+
+    return await this.bizmessageService.sendAbTestBizmessage(
+      user.userId,
+      abTestBizmessageDto,
+    );
+  }
+
+  // plusFriendId 확인
 }
