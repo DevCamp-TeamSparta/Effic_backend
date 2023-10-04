@@ -658,9 +658,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #                 "originalUrl": "https://app.effic.biz",
 #                 "humanclicks": 0,
 #                 "totalclicks": 0
-#               }
-#             },
-#             {
+#               },
 #               "mobile": {
 #                 "idString": "lnk_3xIn_xupS6kKcX61Am2p0jPdjv",
 #                 "shortUrl": "https://effi.kr/aUEjgJ",
@@ -676,9 +674,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #                 "originalUrl": "https://app.effic.biz",
 #                 "humanclicks": 0,
 #                 "totalclicks": 0
-#               }
-#             },
-#             {
+#               },
 #               "mobile": {
 #                 "idString": "lnk_3xIn_YxlLovV1Y4xPeo2LH9Gye",
 #                 "shortUrl": "https://effi.kr/uVshUr",
@@ -697,6 +693,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 #     ]
 #   }
 # ]
+
+### bizmessage 전체 결과 조회
+Get http://localhost:8000/results/all/bizmessage
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
 
 ### 친구톡 테스트 발송
 Post http://localhost:8000/bizmessage/test

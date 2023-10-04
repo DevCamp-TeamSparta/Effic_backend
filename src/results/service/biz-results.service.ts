@@ -364,6 +364,27 @@ export class BizmessageResultsService {
     return results;
   }
 
+  // bizmessage 결과 전체 조회
+  async allBizmessageGroupResult(userId: number) {
+    const user = await this.usersService.findUserByUserId(userId);
+    if (!user) {
+      throw new BadRequestException('email is wrong');
+    }
+
+    const messageGroups =
+      await this.bizmessageService.findAllBizmessageGroupByUserId(userId);
+    if (!messageGroups) {
+      throw new BadRequestException('email is wrong');
+    }
+
+    const results = await Promise.all(
+      messageGroups.map(async (messageGroup) => {
+        return this.bizmessageGroupResult(messageGroup.id, userId);
+      }),
+    );
+    return results;
+  }
+
   // 친구톡 결과 polling
   @Cron('30 */1 * * *', { name: 'bizmessageResultPolling' })
   async handlebizmessageResultPolling() {
