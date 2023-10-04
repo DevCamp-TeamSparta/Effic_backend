@@ -63,6 +63,10 @@ export class BizmessageGroupRepository extends Repository<BizmessageGroup> {
     bizmessageGroup.userId = userId;
     return await this.save(bizmessageGroup);
   }
+
+  async findAllBizmessageGroupByUserId(userId: number): Promise<any> {
+    return await this.find({ where: { userId } });
+  }
 }
 
 @Injectable()

@@ -676,6 +676,15 @@ export class BizmessageService {
     return bizmessageContent;
   }
 
+  //bizmessageGroup 조회
+  async findAllBizmessageGroupByUserId(userId) {
+    const bizmessageGroups =
+      await this.bizmessageGroupRepository.findAllBizmessageGroupByUserId(
+        userId,
+      );
+    return bizmessageGroups;
+  }
+
   // bizmessage 날짜별 조회
   async findThreeDaysBeforeSend() {
     const bizmessages =

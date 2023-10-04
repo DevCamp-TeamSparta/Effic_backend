@@ -19,6 +19,7 @@ export class ResultsController {
     private readonly bizmessageResultsService: BizmessageResultsService,
   ) {}
 
+  // message 결과 전체 조회
   @Get('/group')
   async getAllMessageGroupResult(
     @Headers('Authorization') authorization: string,
@@ -161,5 +162,24 @@ export class ResultsController {
       groupId,
       decodedAccessToken.userId,
     );
+  }
+
+  // bizmessage 결과 전체 조회
+  @Get('/all/bizmessage')
+  async getAllBizmessageGroupResult(
+    @Headers('Authorization') authorization: string,
+  ) {
+    this.logger.verbose('Message group result');
+    if (!authorization) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const result = await this.bizmessageResultsService.allBizmessageGroupResult(
+      decodedAccessToken.userId,
+    );
+    return {
+      result,
+    };
   }
 }
