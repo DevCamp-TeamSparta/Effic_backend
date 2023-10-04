@@ -582,7 +582,7 @@ export class BizmessageService {
 
     const bizmessage = new Bizmessage();
     bizmessage.isSent = true;
-    bizmessage.sentTpye = bizmessageType;
+    bizmessage.sentType = bizmessageType;
     bizmessage.buttonIdStringList = buttonIdStringList;
     bizmessage.imageIdString = imageIdString;
     bizmessage.contentIdStringList = contentIdStringList;
