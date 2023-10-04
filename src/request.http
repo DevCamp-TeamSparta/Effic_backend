@@ -560,7 +560,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # }
 
 ### 친구톡 결과조회
-Get http://localhost:8000/results/group/bizmessage/6
+Get http://localhost:8000/results/group/bizmessage/2
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
 # [
