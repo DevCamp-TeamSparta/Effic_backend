@@ -8,11 +8,7 @@ import {
 } from '../bizmessage.repository';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
 import { UsersService } from '../../users/service/users.service';
-import {
-  NCP_BizMessage_price,
-  NCP_contentPrefix,
-  NCP_contentSuffix,
-} from '../../../commons/constants';
+import { NCP_BizMessage_price } from '../../../commons/constants';
 import axios from 'axios';
 import * as crypto from 'crypto';
 import { UsedPayments } from 'src/results/entity/result.entity';

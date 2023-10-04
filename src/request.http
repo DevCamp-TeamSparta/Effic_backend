@@ -519,7 +519,7 @@ Get http://localhost:8000/results/bizmessage/ncp/3
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
 ### 친구톡 url 클릭 결과조회 - 실제로 사용되지 않습니다
-Get http://localhost:8000/results/bizmessage/url/1
+Get http://localhost:8000/results/bizmessage/url/6
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
 # {

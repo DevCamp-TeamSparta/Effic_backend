@@ -195,42 +195,30 @@ export class BizmessageResultsService {
 
     const newBizUrlResult = await this.shortUrlResult(bizmessageId);
 
-    for (const result of newBizUrlResult.contentArray) {
-      const resultEntity = this.entityManager.create(BizUrlResult, {
-        bizmessage: bizmessage,
-        humanclicks: result.humanclicks,
-        totalclicks: result.totalclicks,
-        idString: result.idString,
-        bizNcpResultId: bizNcpResultId,
-        user: user,
-      });
-      await this.entityManager.save(resultEntity);
-    }
+    await this.createBizUrlResultEntities(
+      this.entityManager,
+      bizmessage,
+      bizNcpResultId,
+      user,
+      newBizUrlResult.contentArray,
+    );
 
-    for (const result of newBizUrlResult.imageArray) {
-      const resultEntity = this.entityManager.create(BizUrlResult, {
-        bizmessage: bizmessage,
-        humanclicks: result.humanclicks,
-        totalclicks: result.totalclicks,
-        idString: result.idString,
-        bizNcpResultId: bizNcpResultId,
-        user: user,
-      });
-      await this.entityManager.save(resultEntity);
-    }
+    await this.createBizUrlResultEntities(
+      this.entityManager,
+      bizmessage,
+      bizNcpResultId,
+      user,
+      newBizUrlResult.imageArray,
+    );
 
     for (const result of newBizUrlResult.buttonArray) {
-      for (const key of Object.keys(result)) {
-        const resultEntity = this.entityManager.create(BizUrlResult, {
-          bizmessage: bizmessage,
-          humanclicks: result[key].humanclicks,
-          totalclicks: result[key].totalclicks,
-          idString: result[key].idString,
-          bizNcpResultId: bizNcpResultId,
-          user: user,
-        });
-        await this.entityManager.save(resultEntity);
-      }
+      await this.createBizUrlResultEntities(
+        this.entityManager,
+        bizmessage,
+        bizNcpResultId,
+        user,
+        Object.values(result),
+      );
     }
 
     const bizmessageNcpResults =
@@ -263,6 +251,31 @@ export class BizmessageResultsService {
         createdAt: ncpResult.createdAt,
       };
 
+      // button
+      if (bizmessageUrlResults.length && bizmessage.buttonIdStringList) {
+        for (const button of bizmessage.buttonIdStringList) {
+          const buttonObject = {};
+          for (const key of Object.keys(button)) {
+            const urlResult = bizmessageUrlResults.find((result) => {
+              return result.idString === button[key];
+            });
+            const urlInfo = await this.shorturlService.findUrlInfoByIdString(
+              button[key],
+            );
+            buttonObject[key] = {
+              idString: urlResult.idString,
+              shortUrl: urlInfo.shortenUrl,
+              originalUrl: urlInfo.originalUrl,
+              humanclicks: urlResult.humanclicks,
+              totalclicks: urlResult.totalclicks,
+            };
+          }
+          if (Object.keys(buttonObject).length !== 0) {
+            result.urls.button.push(buttonObject);
+          }
+        }
+      }
+
       for (const urlResult of bizmessageUrlResults) {
         if (ncpResult.bizmessageId !== urlResult.bizmessageId) {
           throw new Error('unreachable!');
@@ -292,31 +305,30 @@ export class BizmessageResultsService {
             totalclicks: urlResult.totalclicks,
           });
         }
-
-        // button
-        if (bizmessage.buttonIdStringList) {
-          for (const button of bizmessage.buttonIdStringList) {
-            const buttonObject = {};
-            for (const key of Object.keys(button)) {
-              if (button[key] === urlResult.idString) {
-                buttonObject[key] = {
-                  idString: urlResult.idString,
-                  shortUrl: urlInfo.shortenUrl,
-                  originalUrl: urlInfo.originalUrl,
-                  humanclicks: urlResult.humanclicks,
-                  totalclicks: urlResult.totalclicks,
-                };
-              }
-            }
-            if (Object.keys(buttonObject).length !== 0) {
-              result.urls.button.push(buttonObject);
-            }
-          }
-        }
       }
       bizmessageResults.push(result);
     }
     return bizmessageResults;
+  }
+
+  async createBizUrlResultEntities(
+    entityManager,
+    bizmessage,
+    bizNcpResultId,
+    user,
+    results,
+  ) {
+    for (const result of results) {
+      const resultEntity = entityManager.create(BizUrlResult, {
+        bizmessage: bizmessage,
+        humanclicks: result.humanclicks,
+        totalclicks: result.totalclicks,
+        idString: result.idString,
+        bizNcpResultId: bizNcpResultId,
+        user: user,
+      });
+      await entityManager.save(resultEntity);
+    }
   }
 
   async bizmessageGroupResult(groupId: number, userId: number): Promise<any> {
@@ -348,6 +360,7 @@ export class BizmessageResultsService {
         return { bizmessage: bizmessage, content: content, result: result };
       }),
     );
+
     return results;
   }
 
