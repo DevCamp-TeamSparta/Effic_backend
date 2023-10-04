@@ -158,6 +158,14 @@ export class UsersService {
     } else {
       const user = await this.usersRepository.createUser(newUser);
       await this.userNcpInfoRepository.saveNcpInfo(user, newUser);
+
+      for (let i = 0; i < hostnumber.length; i++) {
+        const hostnumberDetail = new HostnumberDetail();
+        hostnumberDetail.hostnumber = hostnumber[i];
+        hostnumberDetail.memo = '';
+        hostnumberDetail.userId = user.userId;
+        await this.entityManager.save(hostnumberDetail);
+      }
     }
   }
 
