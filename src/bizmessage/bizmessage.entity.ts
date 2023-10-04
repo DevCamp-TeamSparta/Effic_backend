@@ -24,7 +24,7 @@ export class Bizmessage extends BaseEntity {
   isSent: boolean;
 
   @Column()
-  sentTpye: bizmessageType;
+  sentType: bizmessageType;
 
   @Column({ nullable: true, type: 'jsonb', default: '[]' })
   buttonIdStringList: Array<string>;

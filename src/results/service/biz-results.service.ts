@@ -51,7 +51,7 @@ export class BizmessageResultsService {
       throw new BadRequestException('Invalid request');
     }
 
-    if (bizmessage.sentTpye === bizmessageType.N) {
+    if (bizmessage.sentType === bizmessageType.N) {
       return { success: 0, reserved: bizmessage.receiverList.length, fail: 0 };
     }
 
@@ -131,7 +131,7 @@ export class BizmessageResultsService {
       throw new BadRequestException('bizmessageId is wrong');
     }
 
-    if (bizmessage.sentTpye === bizmessageType.N) {
+    if (bizmessage.sentType === bizmessageType.N) {
       return [];
     }
 
