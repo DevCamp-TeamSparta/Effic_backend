@@ -263,6 +263,31 @@ export class BizmessageResultsService {
         createdAt: ncpResult.createdAt,
       };
 
+      // button
+      if (bizmessageUrlResults.length && bizmessage.buttonIdStringList) {
+        for (const button of bizmessage.buttonIdStringList) {
+          const buttonObject = {};
+          for (const key of Object.keys(button)) {
+            const urlResult = bizmessageUrlResults.find((result) => {
+              return result.idString === button[key];
+            });
+            const urlInfo = await this.shorturlService.findUrlInfoByIdString(
+              button[key],
+            );
+            buttonObject[key] = {
+              idString: urlResult.idString,
+              shortUrl: urlInfo.shortenUrl,
+              originalUrl: urlInfo.originalUrl,
+              humanclicks: urlResult.humanclicks,
+              totalclicks: urlResult.totalclicks,
+            };
+          }
+          if (Object.keys(buttonObject).length !== 0) {
+            result.urls.button.push(buttonObject);
+          }
+        }
+      }
+
       for (const urlResult of bizmessageUrlResults) {
         if (ncpResult.bizmessageId !== urlResult.bizmessageId) {
           throw new Error('unreachable!');
@@ -291,27 +316,6 @@ export class BizmessageResultsService {
             humanclicks: urlResult.humanclicks,
             totalclicks: urlResult.totalclicks,
           });
-        }
-
-        // button
-        if (bizmessage.buttonIdStringList) {
-          for (const button of bizmessage.buttonIdStringList) {
-            const buttonObject = {};
-            for (const key of Object.keys(button)) {
-              if (button[key] === urlResult.idString) {
-                buttonObject[key] = {
-                  idString: urlResult.idString,
-                  shortUrl: urlInfo.shortenUrl,
-                  originalUrl: urlInfo.originalUrl,
-                  humanclicks: urlResult.humanclicks,
-                  totalclicks: urlResult.totalclicks,
-                };
-              }
-            }
-            if (Object.keys(buttonObject).length !== 0) {
-              result.urls.button.push(buttonObject);
-            }
-          }
         }
       }
       bizmessageResults.push(result);
