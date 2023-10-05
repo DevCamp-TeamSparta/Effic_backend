@@ -3,6 +3,7 @@ import { BizmessageController } from './controller/bizmessage.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BizmessageService } from './service/bizmessage.service';
 import {
+  BizmessageAdReceiverListRepository,
   BizmessageContentRepository,
   BizmessageGroupRepository,
   BizmessageRepository,
@@ -24,6 +25,7 @@ import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
     BizmessageRepository,
     BizmessageGroupRepository,
     BizmessageContentRepository,
+    BizmessageAdReceiverListRepository,
     UsersService,
     UsersRepository,
     UserNcpInfoRepository,
@@ -35,6 +37,7 @@ import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
     BizmessageRepository,
     BizmessageGroupRepository,
     BizmessageContentRepository,
+    BizmessageAdReceiverListRepository,
   ],
 })
 export class BizmessageModule {}

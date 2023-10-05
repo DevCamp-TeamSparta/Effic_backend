@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository, DataSource } from 'typeorm';
 import {
   Bizmessage,
+  BizmessageAdReceiverList,
   BizmessageContent,
   BizmessageGroup,
 } from './bizmessage.entity';
@@ -79,5 +80,21 @@ export class BizmessageContentRepository extends Repository<BizmessageContent> {
     bizmessageId: number,
   ): Promise<BizmessageContent> {
     return await this.findOne({ where: { bizmessageId } });
+  }
+}
+
+@Injectable()
+export class BizmessageAdReceiverListRepository extends Repository<BizmessageAdReceiverList> {
+  constructor(private datasource: DataSource) {
+    super(BizmessageAdReceiverList, datasource.createEntityManager());
+  }
+
+  async findAllByUserIdAndSentAt(userId: number, threeDaysAgoDate) {
+    return await this.createQueryBuilder('allReceiver')
+      .where('allReceiver.userId = :userId', { userId })
+      .andWhere('allReceiver.sentAt > :threeDaysAgoDate', {
+        threeDaysAgoDate,
+      })
+      .getMany();
   }
 }

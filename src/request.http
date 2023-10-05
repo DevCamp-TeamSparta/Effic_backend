@@ -753,4 +753,22 @@ Content-Type: application/json
 #   "bizmessageGroupId": 8
 # }
 
+### 피로도 관리 - 수신자 필터링
+Post http://localhost:8000/bizmessage/filter
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTUyODM0MzksImV4cCI6MTY5NTM2OTgzOX0.1VgCXiTmwXFpHTAPnHirAS2Yi2Vr8txr4ngRxhNekMo
+Content-Type: application/json
+
+{
+    "receiverList": ["01799998888", "01999989889", "01899989278"],
+    "day": 1
+}
+
+# {
+#   "filteredReceivers": [
+#     "01799998888",
+#     "01999989889"
+#   ]
+# }
+
+
 ### plusFriendId 확인
