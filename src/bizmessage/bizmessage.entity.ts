@@ -116,6 +116,9 @@ export class BizmessageContent extends BaseEntity {
   @Column()
   sentType: bizmessageType;
 
+  @Column({ type: 'varchar', nullable: false, default: '' })
+  title: string;
+
   @Column({ type: 'jsonb', nullable: false, default: '[]' })
   content: {
     type: string;

@@ -105,6 +105,7 @@ export class BizmessageService {
       user.userId,
       defaultBizmessageDto.bizMessageInfoList,
       defaultBizmessageDto,
+      defaultBizmessageDto.plusFriendId,
       defaultBizmessageDto.receiverList,
       shortButtonLinkList,
       shortImageLink,
@@ -145,6 +146,7 @@ export class BizmessageService {
         userId,
         defaultBizmessageDto.bizMessageInfoList,
         defaultBizmessageDto,
+        defaultBizmessageDto.plusFriendId,
         receiverListForSend,
         shortButtonLinkList,
         shortImageLink,
@@ -179,6 +181,10 @@ export class BizmessageService {
     const messageContent = JSON.parse(messageContents);
 
     // db에 bizmessageinfo 저장
+    const group = await this.bizmessageGroupRepository.createBizmessageGroup(
+      userId,
+    );
+
     const saveBizmessageInfo = await this.saveBizmessageInfo(
       bizmessageType.D,
       userId,
@@ -187,7 +193,9 @@ export class BizmessageService {
       contentIdStringList,
       requestIdList,
       receiverPhones,
+      defaultBizmessageDto.bizMessageInfoList.content,
       messageContent,
+      group.bizmessageGroupId,
       defaultBizmessageDto.plusFriendId,
       defaultBizmessageDto.receiverList,
       [],
@@ -261,11 +269,7 @@ export class BizmessageService {
     const {
       shortButtonLinkList: aTestShortButtonLinkList,
       shortImageLink: aTestShortImageLink,
-    } = await this.makeshortLinks(
-      abTestBizmessageDto.messageInfoList[0].bizMessageInfoList,
-    );
-    console.log(aTestShortButtonLinkList);
-    console.log(aTestShortImageLink);
+    } = await this.makeshortLinks(abTestBizmessageDto.messageInfoList[0]);
 
     for (let i = 0; i < aTestReceiverCount; i++) {
       const receiverListForSend = aTestReceiverList.slice(
@@ -277,12 +281,13 @@ export class BizmessageService {
         userId,
         abTestBizmessageDto.messageInfoList[0].bizMessageInfoList,
         abTestBizmessageDto.messageInfoList[0],
+        abTestBizmessageDto.plusFriendId,
         receiverListForSend,
         aTestShortButtonLinkList,
         aTestShortImageLink,
       );
       takeBody = body;
-      aTestRequestIdList.push(takeBody.reponse.data.requestId);
+      aTestRequestIdList.push(body.response.data.requestId);
     }
     aTestContentIdStringList.push(...takeBody.idStrings);
 
@@ -299,6 +304,10 @@ export class BizmessageService {
       });
     }
 
+    const group = await this.bizmessageGroupRepository.createBizmessageGroup(
+      userId,
+    );
+
     await this.saveBizmessageInfo(
       bizmessageType.A,
       userId,
@@ -307,89 +316,94 @@ export class BizmessageService {
       aTestContentIdStringList,
       aTestRequestIdList,
       receiverPhones.slice(0, aTestReceiverLength),
-      abTestBizmessageDto.messageInfoList[0].bizMessageInfoList,
-      abTestBizmessageDto.messageInfoList[0].plusFriendId,
+      abTestBizmessageDto.messageInfoList[0].bizMessageInfoList.content,
+      abTestBizmessageDto.messageInfoList[0],
+      group.bizmessageGroupId,
+      abTestBizmessageDto.plusFriendId,
       aTestReceiverList,
       abTestBizmessageDto.receiverList.slice(testReceiverAmount),
     );
 
     // b 메세지보내기
-    // const {
-    //   shortButtonLinkList: bTestShortButtonLinkList,
-    //   shortImageLink: bTestShortImageLink,
-    // } = await this.makeshortLinks(abTestBizmessageDto.messageInfoList[1]);
+    const {
+      shortButtonLinkList: bTestShortButtonLinkList,
+      shortImageLink: bTestShortImageLink,
+    } = await this.makeshortLinks(abTestBizmessageDto.messageInfoList[1]);
 
-    // for (let i = 0; i < bTestReceiverCount; i++) {
-    //   const receiverListForSend = bTestReceiverList.slice(
-    //     i * 100,
-    //     (i + 1) * 100,
-    //   );
+    for (let i = 0; i < bTestReceiverCount; i++) {
+      const receiverListForSend = bTestReceiverList.slice(
+        i * 100,
+        (i + 1) * 100,
+      );
 
-    //   const body = await this.makeBody(
-    //     userId,
-    //     abTestBizmessageDto.messageInfoList[1].bizMessageInfoList,
-    //     abTestBizmessageDto.messageInfoList[1],
-    //     receiverListForSend,
-    //     bTestShortButtonLinkList,
-    //     bTestShortImageLink,
-    //   );
-    //   takeBody = body;
-    //   bTestRequestIdList.push(takeBody.reponse.data.requestId);
-    // }
-    // bTestContentIdStringList.push(...takeBody.idStrings);
+      const body = await this.makeBody(
+        userId,
+        abTestBizmessageDto.messageInfoList[1].bizMessageInfoList,
+        abTestBizmessageDto.messageInfoList[1],
+        abTestBizmessageDto.plusFriendId,
+        receiverListForSend,
+        bTestShortButtonLinkList,
+        bTestShortImageLink,
+      );
+      takeBody = body;
+      bTestRequestIdList.push(body.response.data.requestId);
+    }
+    bTestContentIdStringList.push(...takeBody.idStrings);
 
-    // if (bTestShortImageLink) {
-    //   bTestImageIdString.push(bTestShortImageLink.idString);
-    // }
+    if (bTestShortImageLink) {
+      bTestImageIdString.push(bTestShortImageLink.idString);
+    }
 
-    // if (bTestShortButtonLinkList) {
-    //   bTestShortButtonLinkList.forEach((buttonLink) => {
-    //     bTestButtonIdStringList.push({
-    //       mobile: buttonLink.shortbuttonMobile.idString,
-    //       pc: buttonLink.shortbuttonPc.idString,
-    //     });
-    //   });
-    // }
+    if (bTestShortButtonLinkList) {
+      bTestShortButtonLinkList.forEach((buttonLink) => {
+        bTestButtonIdStringList.push({
+          mobile: buttonLink.shortbuttonMobile.idString,
+          pc: buttonLink.shortbuttonPc.idString,
+        });
+      });
+    }
 
-    // const saveBizmessageInfo = await this.saveBizmessageInfo(
-    //   bizmessageType.B,
-    //   userId,
-    //   bTestButtonIdStringList,
-    //   bTestImageIdString,
-    //   bTestContentIdStringList,
-    //   bTestRequestIdList,
-    //   receiverPhones.slice(aTestReceiverLength),
-    //   abTestBizmessageDto.messageInfoList[1].bizMessageInfoList,
-    //   abTestBizmessageDto.messageInfoList[1].plusFriendId,
-    //   bTestReceiverList,
-    //   abTestBizmessageDto.receiverList.slice(testReceiverAmount),
-    // );
+    await this.saveBizmessageInfo(
+      bizmessageType.B,
+      userId,
+      bTestButtonIdStringList,
+      bTestImageIdString,
+      bTestContentIdStringList,
+      bTestRequestIdList,
+      receiverPhones.slice(aTestReceiverLength),
+      abTestBizmessageDto.messageInfoList[1].bizMessageInfoList.content,
+      abTestBizmessageDto.messageInfoList[1],
+      group.bizmessageGroupId,
+      abTestBizmessageDto.plusFriendId,
+      bTestReceiverList,
+      abTestBizmessageDto.receiverList.slice(testReceiverAmount),
+    );
 
-    // // 나머지
-    // const bizmessage = new Bizmessage();
-    // bizmessage.isSent = false;
-    // bizmessage.sentTpye = bizmessageType.N;
-    // bizmessage.userId = userId;
-    // bizmessage.receiverList = receiverPhones.slice(testReceiverAmount);
-    // bizmessage.bizmessageGroupId = saveBizmessageInfo.bizmessageGroupId;
-    // await this.entityManager.save(bizmessage);
+    // 나머지
+    const bizmessage = new Bizmessage();
+    bizmessage.isSent = false;
+    bizmessage.sentType = bizmessageType.N;
+    bizmessage.userId = userId;
+    bizmessage.receiverList = receiverPhones.slice(testReceiverAmount);
+    bizmessage.bizmessageGroupId = group.bizmessageGroupId;
+    await this.entityManager.save(bizmessage);
 
-    // await this.deductedUserMoney(
-    //   userId,
-    //   receiverPhones,
-    //   saveBizmessageInfo.bizmessageGroupId,
-    // );
+    await this.deductedUserMoney(
+      userId,
+      receiverPhones,
+      group.bizmessageGroupId,
+    );
 
-    // await this.saveAdBizmessageRecieverList(
-    //   abTestBizmessageDto.receiverList,
-    //   userId,
-    //   saveBizmessageInfo.bizmessageGroupId,
-    //   new Date(),
-    // );
+    await this.saveAdBizmessageRecieverList(
+      abTestBizmessageDto.receiverList,
+      userId,
+      group.bizmessageGroupId,
+      new Date(),
+    );
 
-    // return {
-    //   bizmessageGroupId: saveBizmessageInfo.bizmessageGroupId,
-    // };
+    return {
+      bizmessageGroupId: group.bizmessageGroupId,
+    };
   }
 
   async makeshortLinks(messageDto) {
@@ -424,6 +438,7 @@ export class BizmessageService {
     userId,
     bizMessageInfoList,
     messageDto,
+    plusFriendId,
     receiverList,
     buttonLink,
     imageLink,
@@ -470,9 +485,8 @@ export class BizmessageService {
       }) || [];
 
     const body = {
-      plusFriendId: messageDto.plusFriendId,
+      plusFriendId: plusFriendId,
       messages: receiverList.map((info) => ({
-        idAd: messageDto.bizMessageInfoList.isAd,
         to: info.phone,
         content: `${this.createMessageWithVariable(newContent, info)}`,
         buttons,
@@ -571,15 +585,13 @@ export class BizmessageService {
     contentIdStringList,
     ncpRequestIdList,
     receiverPhoneList,
+    title,
     messageContent,
+    bizmessageGroupId,
     plusFriendId,
     receiverList,
     remainReceiverList,
   ) {
-    const group = await this.bizmessageGroupRepository.createBizmessageGroup(
-      userId,
-    );
-
     const bizmessage = new Bizmessage();
     bizmessage.isSent = true;
     bizmessage.sentType = bizmessageType;
@@ -589,23 +601,24 @@ export class BizmessageService {
     bizmessage.ncpRequestIdList = ncpRequestIdList;
     bizmessage.receiverList = receiverPhoneList;
     bizmessage.userId = userId;
-    bizmessage.bizmessageGroupId = group.bizmessageGroupId;
+    bizmessage.bizmessageGroupId = bizmessageGroupId;
     await this.entityManager.save(bizmessage);
 
     const bizmessageContent = new BizmessageContent();
     bizmessageContent.bizmessage = bizmessage;
     bizmessageContent.sentType = bizmessageType;
+    bizmessageContent.title = title.slice(0, 10);
     bizmessageContent.content = messageContent;
     bizmessageContent.plusFriendId = plusFriendId;
     bizmessageContent.receiverList = receiverList;
     bizmessageContent.remainReceiverList = remainReceiverList;
-    bizmessageContent.bizmessageGroupId = group.bizmessageGroupId;
+    bizmessageContent.bizmessageGroupId = bizmessageGroupId;
 
     await this.entityManager.save(bizmessageContent);
 
     return {
       bizmessageId: bizmessage.bizmessageId,
-      bizmessageGroupId: group.bizmessageGroupId,
+      bizmessageGroupId: bizmessageGroupId,
     };
   }
 
