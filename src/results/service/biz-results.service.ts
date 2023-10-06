@@ -433,17 +433,12 @@ export class BizmessageResultsService {
   }
 
   // winnerBizmessage 보내기
-  async sendWinnerBizmessage(bizmessage, bizmessageContent, bizmessageId) {
+  async sendWinnerBizmessage(bizmessage, bizmessageContent) {
     const { shortButtonLinkList, shortImageLink } =
       await this.bizmessageService.makeshortLinks(bizmessageContent.content);
 
-    const BizmessageReceiver =
-      await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
-        bizmessageId,
-      );
-
     const requestIdList: string[] = [];
-    const receiverList = BizmessageReceiver.receiverList;
+    const receiverList = bizmessageContent.remainReceiverList;
     const receiverListLength = receiverList.length;
     const receiverCount = Math.ceil(receiverListLength / 100);
     let takeBody;
@@ -455,7 +450,7 @@ export class BizmessageResultsService {
       const receiverListForSend = receiverList.slice(i * 100, (i + 1) * 100);
       const body = await this.bizmessageService.makeBody(
         bizmessage.userId,
-        bizmessageContent.content,
+        bizmessageContent.content.bizMessageInfoList,
         bizmessageContent,
         bizmessageContent.plusFriendId,
         receiverListForSend,
@@ -468,7 +463,7 @@ export class BizmessageResultsService {
     contentIdStringList.push(...takeBody.idStrings);
 
     if (shortImageLink) {
-      imageIdString.push(shortImageLink);
+      imageIdString.push(shortImageLink.idString);
     }
     if (shortButtonLinkList) {
       shortButtonLinkList.forEach((button) => {
@@ -549,20 +544,50 @@ export class BizmessageResultsService {
               bizmessage.bizmessageId,
             );
 
-            for (const result of shortUrlResults) {
-              const resultEntity = this.entityManager.create(BizUrlResult, {
-                bizmessage: bizmessage,
-                humanclicks: result.humanclicks,
-                totalclicks: result.totalclicks,
-                idString: result.idString,
-                bizNcpResultId: bizNcpResultId,
-                user: user,
-              });
-              await this.entityManager.save(resultEntity);
+            if (
+              shortUrlResults.contentArray ||
+              shortUrlResults.imageArray ||
+              shortUrlResults.buttonArray
+            ) {
+              for (const result of shortUrlResults.contentArray) {
+                const resultEntity = this.entityManager.create(BizUrlResult, {
+                  bizmessage: bizmessage,
+                  humanclicks: result.humanclicks,
+                  totalclicks: result.totalclicks,
+                  idString: result.idString,
+                  bizNcpResultId: bizNcpResultId,
+                  user: user,
+                });
+                await this.entityManager.save(resultEntity);
+              }
+              for (const result of shortUrlResults.imageArray) {
+                const resultEntity = this.entityManager.create(BizUrlResult, {
+                  bizmessage: bizmessage,
+                  humanclicks: result.humanclicks,
+                  totalclicks: result.totalclicks,
+                  idString: result.idString,
+                  bizNcpResultId: bizNcpResultId,
+                  user: user,
+                });
+                await this.entityManager.save(resultEntity);
+              }
+              for (const result of shortUrlResults.buttonArray) {
+                for (const key of Object.keys(result)) {
+                  const resultEntity = this.entityManager.create(BizUrlResult, {
+                    bizmessage: bizmessage,
+                    humanclicks: result[key].humanclicks,
+                    totalclicks: result[key].totalclicks,
+                    idString: result[key].idString,
+                    bizNcpResultId: bizNcpResultId,
+                    user: user,
+                  });
+                  await this.entityManager.save(resultEntity);
+                }
+              }
+              console.log(
+                `Short url results for bizmessage ${bizmessage.bizmessageId} saved.`,
+              );
             }
-            console.log(
-              `Short url results for bizmessage ${bizmessage.bizmessageId} saved.`,
-            );
           } catch (error) {
             console.error(
               `Failed to fetch short url results for bizmessage ${bizmessage.bizmessageId}`,
@@ -572,7 +597,7 @@ export class BizmessageResultsService {
         }
       } catch (error) {
         console.log(
-          `Failed to fetch NCP results for message ${bizmessage.bizmessageId}`,
+          `Failed to fetch NCP results for bizmessage ${bizmessage.bizmessageId}`,
           error,
         );
       }
@@ -607,7 +632,6 @@ export class BizmessageResultsService {
           const response = await this.sendWinnerBizmessage(
             bizmessage,
             bizmessageContent,
-            aBizmessageId + 2,
           );
 
           const newBizmessage =
@@ -647,7 +671,6 @@ export class BizmessageResultsService {
           const response = await this.sendWinnerBizmessage(
             bizmessage,
             bizmessageContent,
-            bBizmessageId + 1,
           );
 
           const newBizmessage =
@@ -674,9 +697,12 @@ export class BizmessageResultsService {
           newBizmessageContent.title = bizmessageContent.title;
           await this.bizmessageContentRepository.save(newBizmessageContent);
         }
+        console.log(
+          `A/B test results for bizmessage ${bizmessage.bizmessageId} saved.`,
+        );
       } catch (error) {
         console.error(
-          `Failed to fetch ab test results for message ${bizmessage.bizmessageId}.`,
+          `Failed to fetch ab test results for bizmessage ${bizmessage.bizmessageId}.`,
           error,
         );
       }

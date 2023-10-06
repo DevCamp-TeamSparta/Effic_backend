@@ -170,17 +170,11 @@ export class BizmessageService {
       });
     }
 
-    const messageContents = JSON.stringify({
-      ...defaultBizmessageDto.bizMessageInfoList,
-      ...(defaultBizmessageDto.imageInfo
-        ? { imageInfo: defaultBizmessageDto.imageInfo }
-        : {}),
-      ...(defaultBizmessageDto.buttonInfoList
-        ? { buttonInfoList: defaultBizmessageDto.buttonInfoList }
-        : {}),
-    });
-
-    const messageContent = JSON.parse(messageContents);
+    const messageContent = {
+      bizMessageInfoList: defaultBizmessageDto.bizMessageInfoList,
+      imageInfo: defaultBizmessageDto.imageInfo,
+      buttonInfoList: defaultBizmessageDto.buttonInfoList,
+    };
 
     // db에 bizmessageinfo 저장
     const group = await this.bizmessageGroupRepository.createBizmessageGroup(
