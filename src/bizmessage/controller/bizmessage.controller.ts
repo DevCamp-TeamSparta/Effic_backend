@@ -15,6 +15,7 @@ import * as jwt from 'jsonwebtoken';
 import { UsersService } from 'src/users/service/users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DefaultBizbodyValidationPipe } from '../pipe/defualt-bizbody-validation-pipe';
+import { FilterReceiverDto } from '../dto/filter-receiver.dto';
 
 @Controller('bizmessage')
 export class BizmessageController {
@@ -112,6 +113,27 @@ export class BizmessageController {
       user.userId,
       abTestBizmessageDto,
     );
+  }
+
+  // 피로도 관리 - 수신자 필터링
+  @Post('/filter')
+  async filterReceiver(
+    @Body() filterReceiverDto: FilterReceiverDto,
+    @Headers('Authorization') authorization: string,
+  ) {
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+
+    const email = decodedAccessToken.email;
+
+    const user = await this.usersService.checkBizserviceId(email);
+
+    const filteredReceivers = await this.bizmessageService.filteredReceivers(
+      user.userId,
+      filterReceiverDto,
+    );
+
+    return { filteredReceivers };
   }
 
   // plusFriendId 확인

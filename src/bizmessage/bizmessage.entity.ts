@@ -27,7 +27,7 @@ export class Bizmessage extends BaseEntity {
   sentType: bizmessageType;
 
   @Column({ nullable: true, type: 'jsonb', default: '[]' })
-  buttonIdStringList: Array<string>;
+  buttonIdStringList: Record<string, any>[];
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   imageIdString: Array<string>;
@@ -119,15 +119,18 @@ export class BizmessageContent extends BaseEntity {
   @Column({ type: 'varchar', nullable: false, default: '' })
   title: string;
 
-  @Column({ type: 'jsonb', nullable: false, default: '[]' })
+  @Column({ type: 'jsonb', nullable: false })
   content: {
     type: string;
     content: string;
-    advertiseInfo: boolean;
     contentUrlList?: string[];
     buttonUrl?: string;
     imageUrl?: string;
     reserveTime?: Date;
+    bizMessageInfoList: {
+      content: string;
+      urlList: string[];
+    };
   };
 
   @Column({ type: 'varchar', nullable: false })

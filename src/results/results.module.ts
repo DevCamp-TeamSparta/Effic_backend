@@ -28,6 +28,7 @@ import {
 } from './repository/biz-result.repository';
 import { BizmessageService } from 'src/bizmessage/service/bizmessage.service';
 import {
+  BizmessageAdReceiverListRepository,
   BizmessageContentRepository,
   BizmessageGroupRepository,
   BizmessageRepository,
@@ -51,6 +52,7 @@ import {
     BizmessageContentRepository,
     BizmessageRepository,
     BizmessageUrlResultRepository,
+    BizmessageAdReceiverListRepository,
     MessagesRepository,
     MessageGroupRepo,
     MessagesContentRepository,

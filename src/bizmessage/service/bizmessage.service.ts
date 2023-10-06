@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import {
+  BizmessageAdReceiverListRepository,
   BizmessageContentRepository,
   BizmessageGroupRepository,
   BizmessageRepository,
@@ -26,6 +27,7 @@ export class BizmessageService {
     private readonly bizmessageRepository: BizmessageRepository,
     private readonly bizmessageGroupRepository: BizmessageGroupRepository,
     private readonly bizmessageContentRepository: BizmessageContentRepository,
+    private readonly bizmessageAdReceiverListRepository: BizmessageAdReceiverListRepository,
     private readonly shorturlService: ShorturlService,
     private readonly usersService: UsersService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -168,17 +170,11 @@ export class BizmessageService {
       });
     }
 
-    const messageContents = JSON.stringify({
-      ...defaultBizmessageDto.bizMessageInfoList,
-      ...(defaultBizmessageDto.imageInfo
-        ? { imageInfo: defaultBizmessageDto.imageInfo }
-        : {}),
-      ...(defaultBizmessageDto.buttonInfoList
-        ? { buttonInfoList: defaultBizmessageDto.buttonInfoList }
-        : {}),
-    });
-
-    const messageContent = JSON.parse(messageContents);
+    const messageContent = {
+      bizMessageInfoList: defaultBizmessageDto.bizMessageInfoList,
+      imageInfo: defaultBizmessageDto.imageInfo,
+      buttonInfoList: defaultBizmessageDto.buttonInfoList,
+    };
 
     // db에 bizmessageinfo 저장
     const group = await this.bizmessageGroupRepository.createBizmessageGroup(
@@ -370,7 +366,7 @@ export class BizmessageService {
       bTestImageIdString,
       bTestContentIdStringList,
       bTestRequestIdList,
-      receiverPhones.slice(aTestReceiverLength),
+      receiverPhones.slice(aTestReceiverLength, testReceiverAmount),
       abTestBizmessageDto.messageInfoList[1].bizMessageInfoList.content,
       abTestBizmessageDto.messageInfoList[1],
       group.bizmessageGroupId,
@@ -647,7 +643,7 @@ export class BizmessageService {
     await this.entityManager.save(payment);
   }
 
-  // 피로도 관리
+  // 피로도 관리 - 광고성 문구 수신자 저장
   async saveAdBizmessageRecieverList(
     receiverList,
     userId,
@@ -662,6 +658,28 @@ export class BizmessageService {
       adReceiverList.bizmessageGroupId = bizmessageGroupId;
       await this.entityManager.save(adReceiverList);
     }
+  }
+
+  // 피로도 관리 - 수신자 필터링
+  async filteredReceivers(userId, filterReceiverDto) {
+    const settingDay = filterReceiverDto.day;
+
+    const DaysAgo = new Date();
+    DaysAgo.setDate(DaysAgo.getDate() - settingDay);
+    const DaysAgoDate = DaysAgo.toISOString().slice(0, 10);
+
+    const allReceiverList =
+      await this.bizmessageAdReceiverListRepository.findAllByUserIdAndSentAt(
+        userId,
+        DaysAgoDate,
+      );
+
+    const filterReceiverList = filterReceiverDto.receiverList;
+    const result = filterReceiverList.filter(
+      (x) => !allReceiverList.some((y) => y.phone === x),
+    );
+
+    return result;
   }
 
   // bizmessage info 조회
@@ -702,6 +720,11 @@ export class BizmessageService {
   async findThreeDaysBeforeSend() {
     const bizmessages =
       await this.bizmessageRepository.findThreeDaysBeforeSend();
+    return bizmessages;
+  }
+
+  async findNotSend() {
+    const bizmessages = await this.bizmessageRepository.findNotSend();
     return bizmessages;
   }
 }
