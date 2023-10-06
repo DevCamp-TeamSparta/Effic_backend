@@ -457,7 +457,7 @@ export class BizmessageResultsService {
       const body = await this.bizmessageService.makeBody(
         bizmessage.userId,
         bizmessageContent.content.bizMessageInfoList,
-        bizmessageContent,
+        bizmessageContent.content,
         bizmessageContent.plusFriendId,
         receiverListForSend,
         shortButtonLinkList,
