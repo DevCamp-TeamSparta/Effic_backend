@@ -178,6 +178,26 @@ export class BizmessageResultsService {
     return { contentArray, imageArray, buttonArray };
   }
 
+  async createBizUrlResultEntities(
+    entityManager,
+    bizmessage,
+    bizNcpResultId,
+    user,
+    results,
+  ) {
+    for (const result of results) {
+      const resultEntity = entityManager.create(BizUrlResult, {
+        bizmessage: bizmessage,
+        humanclicks: result.humanclicks,
+        totalclicks: result.totalclicks,
+        idString: result.idString,
+        bizNcpResultId: bizNcpResultId,
+        user: user,
+      });
+      await entityManager.save(resultEntity);
+    }
+  }
+
   // 친구톡 결과조회
   async BizmessageResult(bizmessageId: number, userId: number): Promise<any> {
     const bizmessage =
@@ -201,30 +221,36 @@ export class BizmessageResultsService {
 
     const newBizUrlResult = await this.shortUrlResult(bizmessageId);
 
-    await this.createBizUrlResultEntities(
-      this.entityManager,
-      bizmessage,
-      bizNcpResultId,
-      user,
-      newBizUrlResult.contentArray,
-    );
-
-    await this.createBizUrlResultEntities(
-      this.entityManager,
-      bizmessage,
-      bizNcpResultId,
-      user,
-      newBizUrlResult.imageArray,
-    );
-
-    for (const result of newBizUrlResult.buttonArray) {
+    if (newBizUrlResult.contentArray) {
       await this.createBizUrlResultEntities(
         this.entityManager,
         bizmessage,
         bizNcpResultId,
         user,
-        Object.values(result),
+        newBizUrlResult.contentArray,
       );
+    }
+
+    if (newBizUrlResult.imageArray) {
+      await this.createBizUrlResultEntities(
+        this.entityManager,
+        bizmessage,
+        bizNcpResultId,
+        user,
+        newBizUrlResult.imageArray,
+      );
+    }
+
+    if (newBizUrlResult.buttonArray) {
+      for (const result of newBizUrlResult.buttonArray) {
+        await this.createBizUrlResultEntities(
+          this.entityManager,
+          bizmessage,
+          bizNcpResultId,
+          user,
+          Object.values(result),
+        );
+      }
     }
 
     const bizmessageNcpResults =
@@ -315,26 +341,6 @@ export class BizmessageResultsService {
       bizmessageResults.push(result);
     }
     return bizmessageResults;
-  }
-
-  async createBizUrlResultEntities(
-    entityManager,
-    bizmessage,
-    bizNcpResultId,
-    user,
-    results,
-  ) {
-    for (const result of results) {
-      const resultEntity = entityManager.create(BizUrlResult, {
-        bizmessage: bizmessage,
-        humanclicks: result.humanclicks,
-        totalclicks: result.totalclicks,
-        idString: result.idString,
-        bizNcpResultId: bizNcpResultId,
-        user: user,
-      });
-      await entityManager.save(resultEntity);
-    }
   }
 
   async bizmessageGroupResult(groupId: number, userId: number): Promise<any> {
