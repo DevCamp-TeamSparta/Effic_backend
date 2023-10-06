@@ -5,7 +5,6 @@ import {
   NotFoundException,
   HttpException,
   HttpStatus,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
@@ -20,7 +19,12 @@ import { bizmessageType } from 'src/bizmessage/bizmessage.enum';
 import { BizNcpResult, BizUrlResult } from '../entity/biz-result.entity';
 import * as crypto from 'crypto';
 import axios from 'axios';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import {
+  BizmessageContentRepository,
+  BizmessageRepository,
+} from 'src/bizmessage/bizmessage.repository';
+import { BizmessageContent } from 'src/bizmessage/bizmessage.entity';
 
 @Injectable()
 export class BizmessageResultsService {
@@ -29,8 +33,10 @@ export class BizmessageResultsService {
     private readonly bizmessageService: BizmessageService,
     private readonly usersService: UsersService,
     private readonly shorturlService: ShorturlService,
+    private readonly bizmessageRepository: BizmessageRepository,
     private readonly bizmessageNcpResultsRepository: BizmessageNcpResultsRepository,
     private readonly bizmessageUrlResultsRepository: BizmessageUrlResultRepository,
+    private readonly bizmessageContentRepository: BizmessageContentRepository,
     private readonly urlInfosRepository: ShorturlService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
@@ -364,6 +370,124 @@ export class BizmessageResultsService {
     return results;
   }
 
+  // abTest Url 클릭 수 결과조회
+  async abTestUrlResult(aBizmessageId: number, bBizmessageId: number) {
+    const aBizmessage =
+      await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+        aBizmessageId,
+      );
+    const bBizmessage =
+      await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+        bBizmessageId,
+      );
+    if (!aBizmessage || !bBizmessage) {
+      throw new BadRequestException('bizmessageId is wrong');
+    }
+
+    if (aBizmessage.buttonIdStringList) {
+      const aBizmessagefirstButtonPcAndMobileClicks = await Promise.all([
+        this.shorturlService.getShorturlResult(
+          aBizmessage.buttonIdStringList[0].pc,
+        ),
+        this.shorturlService.getShorturlResult(
+          aBizmessage.buttonIdStringList[0].mobile,
+        ),
+      ]);
+      const bBizmessagefirstButtonPcAndMobileClicks = await Promise.all([
+        this.shorturlService.getShorturlResult(
+          bBizmessage.buttonIdStringList[0].pc,
+        ),
+        this.shorturlService.getShorturlResult(
+          bBizmessage.buttonIdStringList[0].mobile,
+        ),
+      ]);
+
+      const aBizmessageClicks =
+        aBizmessagefirstButtonPcAndMobileClicks[0].humanClicks +
+        aBizmessagefirstButtonPcAndMobileClicks[1].humanClicks;
+
+      const bBizmessageClicks =
+        bBizmessagefirstButtonPcAndMobileClicks[0].humanClicks +
+        bBizmessagefirstButtonPcAndMobileClicks[1].humanClicks;
+
+      return { aBizmessageClicks, bBizmessageClicks };
+    } else if (aBizmessage.imageIdString) {
+      const aBizmessageClicks = await this.shorturlService.getShorturlResult(
+        aBizmessage.imageIdString[0],
+      );
+      const bBizmessageClicks = await this.shorturlService.getShorturlResult(
+        bBizmessage.imageIdString[0],
+      );
+
+      return { aBizmessageClicks, bBizmessageClicks };
+    } else if (aBizmessage.contentIdStringList) {
+      const aBizmessageClicks = await this.shorturlService.getShorturlResult(
+        aBizmessage.contentIdStringList[0],
+      );
+      const bBizmessageClicks = await this.shorturlService.getShorturlResult(
+        bBizmessage.contentIdStringList[0],
+      );
+
+      return { aBizmessageClicks, bBizmessageClicks };
+    }
+  }
+
+  // winnerBizmessage 보내기
+  async sendWinnerBizmessage(bizmessage, bizmessageContent, bizmessageId) {
+    const { shortButtonLinkList, shortImageLink } =
+      await this.bizmessageService.makeshortLinks(bizmessageContent.content);
+
+    const BizmessageReceiver =
+      await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+        bizmessageId,
+      );
+
+    const requestIdList: string[] = [];
+    const receiverList = BizmessageReceiver.receiverList;
+    const receiverListLength = receiverList.length;
+    const receiverCount = Math.ceil(receiverListLength / 100);
+    let takeBody;
+    const imageIdString = [];
+    const contentIdStringList = [];
+    const buttonIdStringList = [];
+
+    for (let i = 0; i < receiverCount; i++) {
+      const receiverListForSend = receiverList.slice(i * 100, (i + 1) * 100);
+      const body = await this.bizmessageService.makeBody(
+        bizmessage.userId,
+        bizmessageContent.content,
+        bizmessageContent,
+        bizmessageContent.plusFriendId,
+        receiverListForSend,
+        shortButtonLinkList,
+        shortImageLink,
+      );
+      takeBody = body;
+      requestIdList.push(body.response.data.requestId);
+    }
+    contentIdStringList.push(...takeBody.idStrings);
+
+    if (shortImageLink) {
+      imageIdString.push(shortImageLink);
+    }
+    if (shortButtonLinkList) {
+      shortButtonLinkList.forEach((button) => {
+        buttonIdStringList.push({
+          mobile: button.shortbuttonMobile.idString,
+          pc: button.shortbuttonPc.idString,
+        });
+      });
+    }
+
+    return {
+      requestIdList: requestIdList,
+      imageIdString: imageIdString,
+      contentIdStringList: contentIdStringList,
+      buttonIdStringList: buttonIdStringList,
+      shortendUrls: takeBody.shortendUrls,
+    };
+  }
+
   // bizmessage 결과 전체 조회
   async allBizmessageGroupResult(userId: number) {
     const user = await this.usersService.findUserByUserId(userId);
@@ -449,6 +573,110 @@ export class BizmessageResultsService {
       } catch (error) {
         console.log(
           `Failed to fetch NCP results for message ${bizmessage.bizmessageId}`,
+          error,
+        );
+      }
+    }
+  }
+
+  // A/B 테스트 결과 polling
+  @Cron(CronExpression.EVERY_5_MINUTES, { name: 'abTestResultPolling' })
+  async handleAbTestResultPolling() {
+    this.logger.log('abTestResultPolling');
+    const bizmessages = await this.bizmessageService.findNotSend();
+
+    for (const bizmessage of bizmessages) {
+      try {
+        const aBizmessageId = bizmessage.bizmessageId - 2;
+        const bBizmessageId = bizmessage.bizmessageId - 1;
+
+        const { aBizmessageClicks, bBizmessageClicks } =
+          await this.abTestUrlResult(aBizmessageId, bBizmessageId);
+
+        if (aBizmessageClicks >= bBizmessageClicks) {
+          const bizmessage =
+            await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+              aBizmessageId,
+            );
+
+          const bizmessageContent =
+            await this.bizmessageService.findOneBizmessageContentByBizmessageId(
+              aBizmessageId,
+            );
+
+          const response = await this.sendWinnerBizmessage(
+            bizmessage,
+            bizmessageContent,
+            aBizmessageId + 2,
+          );
+
+          const newBizmessage =
+            await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+              aBizmessageId + 2,
+            );
+          newBizmessage.isSent = true;
+          newBizmessage.sentType = bizmessageType.A;
+          newBizmessage.buttonIdStringList = response.buttonIdStringList;
+          newBizmessage.contentIdStringList = response.contentIdStringList;
+          newBizmessage.imageIdString = response.imageIdString;
+          newBizmessage.ncpRequestIdList = response.requestIdList;
+          await this.bizmessageRepository.save(newBizmessage);
+
+          const newBizmessageContent = new BizmessageContent();
+          newBizmessageContent.bizmessage = newBizmessage;
+          newBizmessageContent.sentType = bizmessageType.A;
+          newBizmessageContent.content = bizmessageContent.content;
+          newBizmessageContent.plusFriendId = bizmessageContent.plusFriendId;
+          newBizmessageContent.receiverList =
+            bizmessageContent.remainReceiverList;
+          newBizmessageContent.bizmessageGroupId =
+            bizmessageContent.bizmessageGroupId;
+          newBizmessageContent.title = bizmessageContent.title;
+          await this.bizmessageContentRepository.save(newBizmessageContent);
+        } else {
+          const bizmessage =
+            await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+              bBizmessageId,
+            );
+
+          const bizmessageContent =
+            await this.bizmessageService.findOneBizmessageContentByBizmessageId(
+              bBizmessageId,
+            );
+
+          const response = await this.sendWinnerBizmessage(
+            bizmessage,
+            bizmessageContent,
+            bBizmessageId + 1,
+          );
+
+          const newBizmessage =
+            await this.bizmessageService.findOneBizmessageInfoByBizmessageId(
+              bBizmessageId + 1,
+            );
+          newBizmessage.isSent = true;
+          newBizmessage.sentType = bizmessageType.B;
+          newBizmessage.buttonIdStringList = response.buttonIdStringList;
+          newBizmessage.contentIdStringList = response.contentIdStringList;
+          newBizmessage.imageIdString = response.imageIdString;
+          newBizmessage.ncpRequestIdList = response.requestIdList;
+          await this.bizmessageRepository.save(newBizmessage);
+
+          const newBizmessageContent = new BizmessageContent();
+          newBizmessageContent.bizmessage = newBizmessage;
+          newBizmessageContent.sentType = bizmessageType.B;
+          newBizmessageContent.content = bizmessageContent.content;
+          newBizmessageContent.plusFriendId = bizmessageContent.plusFriendId;
+          newBizmessageContent.receiverList =
+            bizmessageContent.remainReceiverList;
+          newBizmessageContent.bizmessageGroupId =
+            bizmessageContent.bizmessageGroupId;
+          newBizmessageContent.title = bizmessageContent.title;
+          await this.bizmessageContentRepository.save(newBizmessageContent);
+        }
+      } catch (error) {
+        console.error(
+          `Failed to fetch ab test results for message ${bizmessage.bizmessageId}.`,
           error,
         );
       }

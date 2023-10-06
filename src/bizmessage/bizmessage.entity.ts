@@ -27,7 +27,7 @@ export class Bizmessage extends BaseEntity {
   sentType: bizmessageType;
 
   @Column({ nullable: true, type: 'jsonb', default: '[]' })
-  buttonIdStringList: Array<string>;
+  buttonIdStringList: Record<string, any>[];
 
   @Column({ array: true, nullable: true, type: 'text', default: [] })
   imageIdString: Array<string>;

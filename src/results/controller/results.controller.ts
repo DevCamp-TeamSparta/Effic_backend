@@ -83,7 +83,7 @@ export class ResultsController {
     return await this.resultsService.shortUrlResult(messageId);
   }
 
-  //test용입니다. 실제로 사용되지 않습니다.
+  // test용입니다. 실제로 사용되지 않습니다.
   @Get('/default/ncp/:messageId')
   async defaultMessageNcpResult(
     @Param('messageId') messageId: number,

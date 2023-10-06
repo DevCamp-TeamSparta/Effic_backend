@@ -372,7 +372,7 @@ export class BizmessageService {
       bTestImageIdString,
       bTestContentIdStringList,
       bTestRequestIdList,
-      receiverPhones.slice(aTestReceiverLength),
+      receiverPhones.slice(aTestReceiverLength, testReceiverAmount),
       abTestBizmessageDto.messageInfoList[1].bizMessageInfoList.content,
       abTestBizmessageDto.messageInfoList[1],
       group.bizmessageGroupId,
@@ -726,6 +726,11 @@ export class BizmessageService {
   async findThreeDaysBeforeSend() {
     const bizmessages =
       await this.bizmessageRepository.findThreeDaysBeforeSend();
+    return bizmessages;
+  }
+
+  async findNotSend() {
+    const bizmessages = await this.bizmessageRepository.findNotSend();
     return bizmessages;
   }
 }
