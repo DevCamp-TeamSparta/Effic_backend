@@ -186,10 +186,10 @@ export class BizmessageImageInfo extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'int' })
   bizmessageImageInfoId: number;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false, default: '' })
   imageId: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false, default: '' })
   previewUrl: string;
 
   @Column({ type: 'boolean', nullable: false, default: false })
