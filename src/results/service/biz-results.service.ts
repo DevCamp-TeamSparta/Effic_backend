@@ -329,17 +329,7 @@ export class BizmessageResultsService {
 
         // image
         if (bizmessage.imageIdString.includes(urlResult.idString)) {
-          const bizmessageContent =
-            await this.bizmessageContentRepository.findOneByBizmessageId(
-              bizmessage.bizmessageId,
-            );
-
-          const imageId = bizmessageContent.content.imageInfo.imageId;
-          const imageInfo =
-            await this.bizmessageService.findOneImageInfoByImageId(imageId);
-
           result.urls.image.push({
-            preivewUrl: imageInfo.previewUrl,
             idString: urlResult.idString,
             shortUrl: urlInfo.shortenUrl,
             originalUrl: urlInfo.originalUrl,
@@ -371,18 +361,68 @@ export class BizmessageResultsService {
       throw new NotFoundException('bizmessages is wrong');
     }
 
+    // const results = await Promise.all(
+    //   bizmessages.map(async (bizmessage) => {
+    //     const [content, result] = await Promise.all([
+    //       this.bizmessageService.findOneBizmessageContentByBizmessageId(
+    //         bizmessage.bizmessageId,
+    //       ),
+    //       this.BizmessageResult(bizmessage.bizmessageId, userId),
+    //     ]);
+    // 지금 content의 출력은 다음과 같음.
+    // BizmessageContent {
+    //   bizmessageContentId: 6,
+    //   bizmessageId: 6,
+    //   sentType: 'Default',
+    //   title: '기본 친구톡 테스트',
+    //   content: {
+    //     imageInfo: {
+    //       imageId: '8ae5c21c8ab6fd22018b1cb174fa00d1',
+    //       imageLink: 'https://app.effic.biz'
+    //     },
+    //     buttonInfoList: [ [Object], [Object] ],
+    //     bizMessageInfoList: { content: '기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!', urlList: [] }
+    //   },
+    //   plusFriendId: '@스파르타코딩클럽',
+    //   receiverList: [
+    //     { name: 'clo', phone: '01036289823' },
+    //     { name: 'clo2', phone: '01848415676' }
+    //   ],
+    //   remainReceiverList: [],
+    //   bizmessageGroupId: 4
+    // }
+
     const results = await Promise.all(
       bizmessages.map(async (bizmessage) => {
-        const [content, result] = await Promise.all([
-          this.bizmessageService.findOneBizmessageContentByBizmessageId(
+        const content =
+          await this.bizmessageService.findOneBizmessageContentByBizmessageId(
             bizmessage.bizmessageId,
-          ),
-          this.BizmessageResult(bizmessage.bizmessageId, userId),
-        ]);
-        return { bizmessage: bizmessage, content: content, result: result };
+          );
+
+        const imageId = content.content.imageInfo.imageId;
+        const imageInfo =
+          await this.bizmessageService.findOneImageInfoByImageId(imageId);
+        const contentWithPreviewUrl = {
+          ...content,
+          content: {
+            ...content.content,
+            imageInfo: {
+              ...content.content.imageInfo,
+              previewUrl: imageInfo.previewUrl,
+            },
+          },
+        };
+        const result = await this.BizmessageResult(
+          bizmessage.bizmessageId,
+          userId,
+        );
+        return {
+          bizmessage: bizmessage,
+          content: contentWithPreviewUrl,
+          result: result,
+        };
       }),
     );
-
     return results;
   }
 
