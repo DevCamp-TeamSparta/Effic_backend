@@ -42,7 +42,7 @@ export class Bizmessage extends BaseEntity {
   receiverList: string[];
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamptz',
     nullable: false,
     default: () => 'CURRENT_TIMESTAMP',
   })
