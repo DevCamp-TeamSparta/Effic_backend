@@ -189,8 +189,18 @@ export class BizmessageImageInfo extends BaseEntity {
   @Column({ type: 'varchar', nullable: false })
   previewUrl: string;
 
+  @Column({ type: 'boolean', nullable: false, default: false })
+  isWide: boolean;
+
   @Column({ type: 'int', nullable: false })
   userId: number;
+
+  @Column({
+    type: 'timestamptz',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.bizmessageImageInfo, {
     onDelete: 'CASCADE',
