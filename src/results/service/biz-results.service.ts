@@ -334,8 +334,6 @@ export class BizmessageResultsService {
               bizmessage.bizmessageId,
             );
 
-          console.log(bizmessageContent);
-
           const imageId = bizmessageContent.content.imageInfo.imageId;
           const imageInfo =
             await this.bizmessageService.findOneImageInfoByImageId(imageId);
