@@ -177,3 +177,24 @@ export class BizmessageAdReceiverList extends BaseEntity {
   @JoinColumn({ name: 'bizmessageGroupId' })
   bizmessageGroup: BizmessageGroup;
 }
+
+@Entity()
+export class BizmessageImageInfo extends BaseEntity {
+  @PrimaryGeneratedColumn({ type: 'int' })
+  bizmessageImageInfoId: number;
+
+  @Column({ type: 'varchar', nullable: false })
+  imageId: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  previewUrl: string;
+
+  @Column({ type: 'int', nullable: false })
+  userId: number;
+
+  @ManyToOne(() => User, (user) => user.bizmessageImageInfo, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+}

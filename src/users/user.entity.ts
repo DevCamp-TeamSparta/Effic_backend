@@ -12,6 +12,7 @@ import { PhonebookList } from 'src/phonebook/phonebook.entity';
 import {
   Bizmessage,
   BizmessageAdReceiverList,
+  BizmessageImageInfo,
 } from 'src/bizmessage/bizmessage.entity';
 import {
   BizNcpResult,
@@ -96,6 +97,11 @@ export class User extends BaseEntity {
     cascade: true,
   })
   bizurlResults: BizUrlResult[];
+
+  @OneToMany(() => BizmessageImageInfo, (imageInfo) => imageInfo.user, {
+    cascade: true,
+  })
+  bizmessageImageInfo: BizmessageImageInfo[];
 }
 
 @Entity()

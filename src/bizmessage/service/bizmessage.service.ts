@@ -5,6 +5,7 @@ import {
   BizmessageAdReceiverListRepository,
   BizmessageContentRepository,
   BizmessageGroupRepository,
+  BizmessageImageInfoRepository,
   BizmessageRepository,
 } from '../bizmessage.repository';
 import { ShorturlService } from '../../shorturl/service/shorturl.service';
@@ -18,6 +19,7 @@ import {
   Bizmessage,
   BizmessageAdReceiverList,
   BizmessageContent,
+  BizmessageImageInfo,
 } from '../bizmessage.entity';
 import { bizmessageType } from '../bizmessage.enum';
 
@@ -28,6 +30,7 @@ export class BizmessageService {
     private readonly bizmessageGroupRepository: BizmessageGroupRepository,
     private readonly bizmessageContentRepository: BizmessageContentRepository,
     private readonly bizmessageAdReceiverListRepository: BizmessageAdReceiverListRepository,
+    private readonly bizmessageImageInfoRepository: BizmessageImageInfoRepository,
     private readonly shorturlService: ShorturlService,
     private readonly usersService: UsersService,
     @InjectEntityManager() private readonly entityManager: EntityManager,
@@ -68,6 +71,15 @@ export class BizmessageService {
         form,
         { headers },
       );
+
+      const imageInfo = new BizmessageImageInfo();
+      imageInfo.imageId = response.data.imageId;
+      imageInfo.previewUrl = response.data.imageUrl;
+      imageInfo.isWide = response.data.isWide;
+      imageInfo.createdAt = response.data.createTime;
+      imageInfo.userId = userId;
+      await this.entityManager.save(imageInfo);
+
       return response.data;
     } catch (error) {
       if (error.response) {

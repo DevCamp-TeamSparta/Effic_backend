@@ -5,6 +5,7 @@ import {
   BizmessageAdReceiverList,
   BizmessageContent,
   BizmessageGroup,
+  BizmessageImageInfo,
 } from './bizmessage.entity';
 
 @Injectable()
@@ -96,5 +97,12 @@ export class BizmessageAdReceiverListRepository extends Repository<BizmessageAdR
         threeDaysAgoDate,
       })
       .getMany();
+  }
+}
+
+@Injectable()
+export class BizmessageImageInfoRepository extends Repository<BizmessageImageInfo> {
+  constructor(private datasource: DataSource) {
+    super(BizmessageImageInfo, datasource.createEntityManager());
   }
 }
