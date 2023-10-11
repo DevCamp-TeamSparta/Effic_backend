@@ -329,7 +329,19 @@ export class BizmessageResultsService {
 
         // image
         if (bizmessage.imageIdString.includes(urlResult.idString)) {
+          const bizmessageContent =
+            await this.bizmessageContentRepository.findOneByBizmessageId(
+              bizmessage.bizmessageId,
+            );
+
+          console.log(bizmessageContent);
+
+          const imageId = bizmessageContent.content.imageInfo.imageId;
+          const imageInfo =
+            await this.bizmessageService.findOneImageInfoByImageId(imageId);
+
           result.urls.image.push({
+            preivewUrl: imageInfo.previewUrl,
             idString: urlResult.idString,
             shortUrl: urlInfo.shortenUrl,
             originalUrl: urlInfo.originalUrl,

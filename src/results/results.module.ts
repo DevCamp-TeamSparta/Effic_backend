@@ -31,6 +31,7 @@ import {
   BizmessageAdReceiverListRepository,
   BizmessageContentRepository,
   BizmessageGroupRepository,
+  BizmessageImageInfoRepository,
   BizmessageRepository,
 } from 'src/bizmessage/bizmessage.repository';
 
@@ -53,6 +54,7 @@ import {
     BizmessageRepository,
     BizmessageUrlResultRepository,
     BizmessageAdReceiverListRepository,
+    BizmessageImageInfoRepository,
     MessagesRepository,
     MessageGroupRepo,
     MessagesContentRepository,

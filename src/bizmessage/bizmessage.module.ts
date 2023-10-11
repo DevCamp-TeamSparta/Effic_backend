@@ -6,6 +6,7 @@ import {
   BizmessageAdReceiverListRepository,
   BizmessageContentRepository,
   BizmessageGroupRepository,
+  BizmessageImageInfoRepository,
   BizmessageRepository,
 } from './bizmessage.repository';
 import { Bizmessage, BizmessageGroup } from './bizmessage.entity';
@@ -26,6 +27,7 @@ import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
     BizmessageGroupRepository,
     BizmessageContentRepository,
     BizmessageAdReceiverListRepository,
+    BizmessageImageInfoRepository,
     UsersService,
     UsersRepository,
     UserNcpInfoRepository,
@@ -38,6 +40,7 @@ import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
     BizmessageGroupRepository,
     BizmessageContentRepository,
     BizmessageAdReceiverListRepository,
+    BizmessageImageInfoRepository,
   ],
 })
 export class BizmessageModule {}

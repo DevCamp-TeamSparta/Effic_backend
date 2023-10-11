@@ -105,4 +105,8 @@ export class BizmessageImageInfoRepository extends Repository<BizmessageImageInf
   constructor(private datasource: DataSource) {
     super(BizmessageImageInfo, datasource.createEntityManager());
   }
+
+  async findOneByImageId(imageId: string): Promise<BizmessageImageInfo> {
+    return await this.findOne({ where: { imageId } });
+  }
 }

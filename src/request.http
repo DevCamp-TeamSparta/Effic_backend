@@ -505,7 +505,7 @@ Content-Type: application/json
     "plusFriendId": "@스파르타코딩클럽",
     "bizMessageInfoList": {"content": "기본 친구톡 테스트 \nEffic을 무료로 사용해보세요!", "urlList": []},
     "receiverList": [{"phone": "01036289823", "name": "clo"}, {"phone": "01848415676", "name": "clo2"}],
-    "imageInfo": {"imageId": "8ae5c21e8ab7022c018abab5f34f000a", "imageLink": "https://app.effic.biz"},
+    "imageInfo": {"imageId": "8ae5c21c8ab6fd22018b1cb174fa00d1", "imageLink": "https://app.effic.biz"},
     "buttonInfoList": [{"type": "WL", "name": "히히💕", "linkMobile" : "https://www.naver.com", "linkPc": "https://app.effic.biz"}, {"type": "WL", "name": "하하", "linkMobile" : "https://www.google.com", "linkPc": "https://app.effic.biz"}]
 }
 
@@ -560,7 +560,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # }
 
 ### 친구톡 결과조회
-Get http://localhost:8000/results/group/bizmessage/15
+Get http://localhost:8000/results/group/bizmessage/4
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
 # [

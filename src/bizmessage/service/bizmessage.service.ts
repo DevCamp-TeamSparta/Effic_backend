@@ -739,4 +739,12 @@ export class BizmessageService {
     const bizmessages = await this.bizmessageRepository.findNotSend();
     return bizmessages;
   }
+
+  // imageInfo 조회
+  async findOneImageInfoByImageId(imageId) {
+    const imageInfo = await this.bizmessageImageInfoRepository.findOneByImageId(
+      imageId,
+    );
+    return imageInfo;
+  }
 }

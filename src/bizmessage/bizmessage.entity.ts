@@ -123,7 +123,10 @@ export class BizmessageContent extends BaseEntity {
   content: {
     type: string;
     content: string;
-    contentUrlList?: string[];
+    imageInfo?: {
+      imageId: string;
+      imageLink: string;
+    };
     buttonUrl?: string;
     imageUrl?: string;
     reserveTime?: Date;
