@@ -399,19 +399,24 @@ export class BizmessageResultsService {
             bizmessage.bizmessageId,
           );
 
-        const imageId = content.content.imageInfo.imageId;
-        const imageInfo =
-          await this.bizmessageService.findOneImageInfoByImageId(imageId);
-        const contentWithPreviewUrl = {
-          ...content,
-          content: {
-            ...content.content,
-            imageInfo: {
-              ...content.content.imageInfo,
-              previewUrl: imageInfo.previewUrl,
+        let contentWithPreviewUrl;
+        if (content.content.imageInfo) {
+          const imageId = content.content.imageInfo.imageId;
+          const imageInfo =
+            await this.bizmessageService.findOneImageInfoByImageId(imageId);
+          contentWithPreviewUrl = {
+            ...content,
+            content: {
+              ...content.content,
+              imageInfo: {
+                ...content.content.imageInfo,
+                previewUrl: imageInfo.previewUrl,
+              },
             },
-          },
-        };
+          };
+        } else {
+          contentWithPreviewUrl = content;
+        }
         const result = await this.BizmessageResult(
           bizmessage.bizmessageId,
           userId,
