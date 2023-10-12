@@ -369,7 +369,7 @@ export class BizmessageResultsService {
           );
 
         let contentWithPreviewUrl;
-        if (content.content.imageInfo) {
+        if (content?.content.imageInfo) {
           const imageId = content.content.imageInfo.imageId;
           const imageInfo =
             await this.bizmessageService.findOneImageInfoByImageId(imageId);
@@ -379,7 +379,7 @@ export class BizmessageResultsService {
               ...content.content,
               imageInfo: {
                 ...content.content.imageInfo,
-                previewUrl: imageInfo.previewUrl,
+                previewUrl: imageInfo?.previewUrl,
               },
             },
           };
