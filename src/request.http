@@ -1,10 +1,10 @@
 ### Create User
 POST http://localhost:8000/users/signup
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjk1NjI3ODk5LCJleHAiOjE2OTU3MTQyOTl9.YmP-aYte4C0P36wBwdRRX7nrTsnJ6wJNm9sS_ils8o8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsbzNAc3BhcnRhLmNvbSIsImlhdCI6MTY5NzEwMTUzNSwiZXhwIjoxNjk3MTg3OTM1fQ.OLBwDaopgVUFW4AA7eCX0Izt4fjIy2OBN7owz2RK-Yo
 Content-Type: application/json
 
 {
-    "email": "clo@sparta.com",
+    "email": "clo3@sparta.com",
     "name": "clo",
     "accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
     "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ### update User-info
 Patch http://localhost:8000/users/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImVtYWlsIjoiY2xvM0BzcGFydGEuY29tIiwiaWF0IjoxNjkzMzg4NTk3LCJleHAiOjE2OTM0NzQ5OTd9.Gb7okqJIgwjQVd2MRmuUwle2h0jntllfzLMYp-gKOcQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTcxMDE4MjUsImV4cCI6MTY5NzE4ODIyNX0.aHCW8OhRNzXnd1P--7i1nxzh7cPgvL8Ad8d9MhdgS-Q
 Content-Type: application/json
 
 {
@@ -72,10 +72,10 @@ Content-Type: application/json
 
 {
     "hostnumber": "15228016",
-    "accessKey":,
-    "secretKey":,
-    "serviceId":,
-    "advertiseInfo": false,
+	"accessKey": "dw1eiSLRQ6Nj2bAOlzsB",
+    "serviceId": "ncp:sms:kr:260423710982:spartacodingclub",
+    "secretKey": "x5zzaAzozM5h0k36cROO6LEuUMyRqP0di1eWXHJu",
+    "advertiseInfo": false
 }
 
 ### dafault message result - shortio
@@ -101,12 +101,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0Bzc
 Content-Type: application/json
 
 {
-    "money": 1000,
+    "money": 100000000000,
     "paymentMethod": "card"
 }
 
-### result - messageId
-Get http://localhost:8000/results/group/1
+### result - messagegroupId
+Get http://localhost:8000/results/group/6
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNsb0BzcGFydGEuY29tIiwiaWF0IjoxNjkzOTgxNTY4LCJleHAiOjE2OTQwNjc5Njh9.wtd6CLkethnPASO_aN5lJ1nz1rq6vxWS0A2y6K1gzdQ
 
@@ -124,19 +124,17 @@ Content-Type: application/json
     "receiverList": [{"phone": "01036289823", "name": "clo", "grade": "A"},{"phone": "01936289823", "name": "clo2", "grade": "B"},{"phone": "01836289823", "name": "clo3", "grade": "A"},{"phone": "01736289823", "name": "clo4", "grade": "C"},{"phone": "01636289823", "name": "clo5", "grade": "B"},{"phone": "01536289823", "name": "clo6", "grade": "D"},{"phone": "01899989278", "name": "clo7", "grade": "B"},{"phone": "01899989279", "name": "clo8", "grade": "B"},{"phone": "01899989288", "name": "clo9", "grade": "B"},{"phone": "01899989458", "name": "clo10", "grade": "B"}]
 }
 
-### money - 사용 금액 내역 (userId)
+### money - 사용 금액 내역 
 Get http://localhost:8000/results/payment/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTMzNzcyNDMsImV4cCI6MTY5MzQ2MzY0M30._PYhQqklOQ24kA2aY5Bdo8Ro6pePYMQq3ENftSRRskM
-Content-Type: application/json
 
-### money - 충전 금액 내역 (userId)
+### money - 충전 금액 내역 
 Get http://localhost:8000/payments/me
-Authorization:
-Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTMzNzcyNDMsImV4cCI6MTY5MzQ2MzY0M30._PYhQqklOQ24kA2aY5Bdo8Ro6pePYMQq3ENftSRRskM
 
 ### slack - 환불 메세지 보내기
 Post http://localhost:8000/payments/refund
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTMyOTkyNjQsImV4cCI6MTY5MzM4NTY2NH0.IO67KL7OkKU0x4cy79jLdF_Qytdwp6sR-WEFNqFyX1w
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTcxMTEyMjMsImV4cCI6MTY5NzE5NzYyM30.MqY0bUDdT1YdYK-mzD_SDOFyBGXiXB-1oxopytBxytI
 Content-Type: application/json
 
 {
@@ -283,7 +281,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # }
 
 ### 주소록 멤버 삭제
-Delete http://localhost:8000/phonebook/3/2
+Delete http://localhost:8000/phonebook/1/5
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTQ2NzkyMDEsImV4cCI6MTY5NDc2NTYwMX0.UY9eeBrGyqHdAy6WCf1UyM0ro1QfQ-a9wqykaiY4MRg
 
 # {
@@ -560,7 +558,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtY
 # }
 
 ### 친구톡 결과조회
-Get http://localhost:8000/results/group/bizmessage/5
+Get http://localhost:8000/results/group/bizmessage/8
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImVtYWlsIjoiY2xvQHNwYXJ0YS5jb20iLCJpYXQiOjE2OTU2MDc4NzYsImV4cCI6MTY5NTY5NDI3Nn0.D3I7SWWuuYULbDvJm2NCczLPGRR3lbixO2sQrgS9Q60
 
 # [
