@@ -44,6 +44,7 @@ export class ResultsController {
     return await this.resultsService.messageResult(messageId);
   }
 
+  // 메세지 결과 조회
   @Get('/group/:groupId')
   async messageGroupResults(
     @Param('groupId') groupId: number,
