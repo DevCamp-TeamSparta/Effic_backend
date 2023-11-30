@@ -2,7 +2,7 @@ name: cicd
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, develop]
 
 jobs:
   build:
@@ -35,8 +35,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: ssh connect & production (dev)
-        if: github.ref == 'refs/heads/dev'
+      - name: ssh connect & production (develop)
+        if: github.ref == 'refs/heads/develop'
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.HOST_DEV }}
