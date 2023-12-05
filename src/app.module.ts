@@ -12,6 +12,7 @@ import { PhonebookModule } from './phonebook/phonebook.module';
 import { AuthGuard } from './auth.guard';
 import { BizmessageModule } from './bizmessage/bizmessage.module';
 import { ShorturlModule } from './shorturl/shorturl.module';
+import { SegmentModule } from './segment/segment.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ShorturlModule } from './shorturl/shorturl.module';
     PhonebookModule,
     BizmessageModule,
     ShorturlModule,
+    SegmentModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],
