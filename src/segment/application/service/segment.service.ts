@@ -6,6 +6,7 @@ import {
 } from '../port/out/create-segment.port';
 import { CreateSegmentDto } from '../port/in/dto/create-segment.dto';
 import { Segment } from 'src/segment/domain/segment';
+import { UpdateSegmentQueryDto } from '../port/in/dto/update-segment.dto';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -25,12 +26,15 @@ export class SegmentService implements ISegmentUseCase {
     return segmentDetails;
   }
 
-  // async updateSegmentQuery(dto: UpdateSegmentQueryDto) {
-  //   // return type?
+  async updateSegmentQuery(dto: UpdateSegmentQueryDto): Promise<Segment> {
+    const { segmentId, segmentQuery } = dto;
+    const segment = await this.createSegmentPort.getSegmentDetails(segmentId);
+    if (!segment) throw new Error('Segment not found');
 
-  // }
+    segment.updateSegmentQuery(segmentQuery);
 
-  // async getUserQuery(uuid: string): Promise<UserQuery> {
-  //   return this.createUserQueryPort.getUserQueryFromEfficDB(uuid);
-  // }
+    await this.createSegmentPort.saveSegmentToEfficDB(segment);
+
+    return segment;
+  }
 }

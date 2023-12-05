@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Inject, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Post, Put } from '@nestjs/common';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
+import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment.dto';
 import {
   ISegmentUseCase,
   ISegmentUseCaseSymbol,
@@ -14,6 +15,7 @@ export class SegmentController {
   ) {}
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async createSegment(@Body() dto: CreateSegmentDto) {
     return this.segmentUseCase.createUserQuery(dto);
   }
@@ -25,10 +27,11 @@ export class SegmentController {
     return this.segmentUseCase.getSegmentDetails(segmentId);
   }
 
-  // @Put()
-  // async updateSegmentQuery(@Body() dto: updateSegmentQueryDto) {
-  //   return this.segmentUseCase.updateSegmentQuery(dto);
-  // }
+  @Put()
+  @HttpCode(HttpStatus.CREATED)
+  async updateSegmentQuery(@Body() dto: UpdateSegmentQueryDto) {
+    return this.segmentUseCase.updateSegmentQuery(dto);
+  }
 
   // @Get()
   // async getSegment(@Body('uuid') uuid: string) {
