@@ -20,6 +20,16 @@ export class SegmentService implements ISegmentUseCase {
     return this.createSegmentPort.saveSegmentToEfficDB(newSegment);
   }
 
+  async getSegmentDetails(segmentId: number): Promise<Segment> {
+    const segmentDetails = this.createSegmentPort.getSegmentDetails(segmentId);
+    return segmentDetails;
+  }
+
+  // async updateSegmentQuery(dto: UpdateSegmentQueryDto) {
+  //   // return type?
+
+  // }
+
   // async getUserQuery(uuid: string): Promise<UserQuery> {
   //   return this.createUserQueryPort.getUserQueryFromEfficDB(uuid);
   // }

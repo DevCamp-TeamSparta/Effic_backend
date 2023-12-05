@@ -22,6 +22,22 @@ export class SegmentRepository implements ICreateSegmentPort {
     return savedSegmentOrmEntity;
   }
 
+  async getSegmentDetails(segmentId: number): Promise<Segment> {
+    const segmentOrmEntity = await this.segmentRepository.findOneBy({
+      id: segmentId,
+    });
+    if (!segmentOrmEntity) throw new Error('Segment not found');
+
+    const segment = SegmentMapper.mapToUserQuery(segmentOrmEntity);
+
+    return segment;
+  }
+
+  // async updateSegmentQuery(
+  //   segmentId: number,
+  //   segmentQuery: string,
+  // ): Promise<void> {}
+
   // async getUserQueryFromEfficDB(uuid: string): Promise<UserQuery> {
   //   console.log(uuid);
   //   const userQueryOrmEntity = await this.userQueryRepository.findOneBy({

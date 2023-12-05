@@ -12,4 +12,8 @@ export class Segment {
     this.segmentDescription = segmentDescription;
     this.segmentQuery = segmentQuery;
   }
+
+  public updateSegmentQuery(newQuery: string | null): void {
+    this.segmentQuery = newQuery;
+  }
 }
