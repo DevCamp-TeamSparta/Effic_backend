@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ICreateSegmentPort } from 'src/segment/application/port/out/create-segment.port';
 import { SegmentOrmEntity } from './segment.orm.entity';
 import { Segment } from 'src/segment/domain/segment';
 import { SegmentMapper } from './segment.mapper';
+import { ISegmentPort } from 'src/segment/application/port/out/segment.port';
 
 @Injectable()
-export class SegmentRepository implements ICreateSegmentPort {
+export class SegmentRepository implements ISegmentPort {
   constructor(
     @InjectRepository(SegmentOrmEntity)
     private readonly segmentRepository: Repository<SegmentOrmEntity>,
