@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
 import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment.dto';
 import {
