@@ -13,6 +13,7 @@ import { AuthGuard } from './auth.guard';
 import { BizmessageModule } from './bizmessage/bizmessage.module';
 import { ShorturlModule } from './shorturl/shorturl.module';
 import { SegmentModule } from './segment/segment.module';
+import { ClientDbModule } from './client-db/client-db.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SegmentModule } from './segment/segment.module';
     BizmessageModule,
     ShorturlModule,
     SegmentModule,
+    ClientDbModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],

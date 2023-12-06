@@ -38,3 +38,5 @@ lerna-debug.log*
 .env
 
 request.http
+
+client-db.config.txt
