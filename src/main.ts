@@ -14,12 +14,15 @@ async function bootstrap() {
       transform: true, // 네트워크를 통해 받는 페이로드가 DTO 클래스에 따라 지정된 개체로 자동 변환되도록 하는 옵션
     }),
   );
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:3000', // 클라이언트 측 URL 허용
+    methods: 'GET,POST,PUT,DELETE', // 허용할 HTTP 메서드
+    allowedHeaders: 'Content-Type,Authorization', // 허용할 헤더
+    credentials: true, // 쿠키 및 인증과 관련된 헤더 허용
+  });
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
 
   await app.listen(3000);
 }
 bootstrap();
-
-
