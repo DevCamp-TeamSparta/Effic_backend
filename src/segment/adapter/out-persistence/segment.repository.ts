@@ -50,4 +50,9 @@ export class SegmentRepository implements ISegmentPort {
     const updatedSegment = SegmentMapper.mapToUserQuery(segmentOrmEntity);
     return updatedSegment;
   }
+
+  /** To do: user 기능과 연결 후 구현  */
+  async getSegmentNames(userId) {
+    // userId에 해당하는 segment의 segmentNames을 검색
+  }
 }

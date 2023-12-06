@@ -9,6 +9,7 @@ export interface ISegmentUseCase {
     updateSegmentQueryDto: UpdateSegmentQueryDto,
   ): Promise<Segment>;
   excuteSegmentQuery(segmentId: number): Promise<any>;
+  // getSegmentName(segmentId: number): Promise<any>;
 }
 
 export const ISegmentUseCaseSymbol = Symbol('ISegmentUseCaseSymbol');

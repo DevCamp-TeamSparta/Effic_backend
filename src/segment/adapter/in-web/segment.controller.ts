@@ -47,4 +47,11 @@ export class SegmentController {
   async excuteSegmentQuery(@Body('segmentId') segmentId: number): Promise<any> {
     return this.segmentUseCase.excuteSegmentQuery(segmentId);
   }
+
+  /** To do: userId에 해당하는 segment의 segmentName을 return */
+  @Get()
+  @HttpCode(HttpStatus.CREATED)
+  async getSegmentNames(@Body('segmentId') segmentId: number) {
+    // return this.segmentUseCase.createUserQuery(dto);
+  }
 }
