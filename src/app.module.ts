@@ -14,6 +14,7 @@ import { BizmessageModule } from './bizmessage/bizmessage.module';
 import { ShorturlModule } from './shorturl/shorturl.module';
 import { SegmentModule } from './segment/segment.module';
 import { ClientDbModule } from './client-db/client-db.module';
+import { TargetModule } from './target/target.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ClientDbModule } from './client-db/client-db.module';
     ShorturlModule,
     SegmentModule,
     ClientDbModule,
+    TargetModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],

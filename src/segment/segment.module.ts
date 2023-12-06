@@ -20,5 +20,6 @@ import { ISegmentPortSymbol } from './application/port/out/segment.port';
       useClass: SegmentService,
     },
   ],
+  exports: [ISegmentPortSymbol],
 })
 export class SegmentModule {}
