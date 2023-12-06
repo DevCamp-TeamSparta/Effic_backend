@@ -51,8 +51,12 @@ export class SegmentRepository implements ISegmentPort {
     return updatedSegment;
   }
 
-  /** To do: user 기능과 연결 후 구현  */
-  async getSegmentNames(userId) {
-    // userId에 해당하는 segment의 segmentNames을 검색
+  /** To do: user 기능과 연결 필요 */
+  async getSegmentNames(): Promise<string[]> {
+    const segments = await this.segmentRepository.find();
+
+    // 각 세그먼트의 이름만 추출하여 배열로 반환
+    const segmentNames = segments.map((segment) => segment.segmentName);
+    return segmentNames;
   }
 }

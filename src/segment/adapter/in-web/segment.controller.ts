@@ -48,10 +48,10 @@ export class SegmentController {
     return this.segmentUseCase.excuteSegmentQuery(segmentId);
   }
 
-  /** To do: userId에 해당하는 segment의 segmentName을 return */
+  /** To do: userId에 해당하는 segment의 segmentName을 return하도록 수정 */
   @Get('/segmentNames')
-  @HttpCode(HttpStatus.CREATED)
-  async getSegmentNames(@Body('segmentId') segmentId: number) {
-    // return this.segmentUseCase.createUserQuery(dto);
+  @HttpCode(HttpStatus.OK)
+  async getSegmentNames() {
+    return this.segmentUseCase.getSegmentNames();
   }
 }
