@@ -1,5 +1,3 @@
-import { transcode } from 'buffer';
-
 export class Target {
   public targetName: string;
   public targetPhoneNumber: string;

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ITargetPort } from 'src/target/application/port/out/target.port';
-import { Repository } from 'typeorm';
-import { TargetOrmEntity } from './target.orm.entity';
-import { TargetMapper } from './target.mapper';
+import { Repository, In } from 'typeorm';
+import { TargetOrmEntity } from '../entity/target.orm.entity';
+import { TargetMapper } from '../mapper/target.mapper';
 import { Target } from 'src/target/domain/target';
 
 @Injectable()
@@ -38,5 +38,11 @@ export class TargetRepository implements ITargetPort {
     await this.targetRepository.save(targetOrmEntity);
 
     return;
+  }
+
+  async removeTargetsByNames(names: string[]): Promise<void> {
+    await this.targetRepository.delete({
+      targetName: In(names),
+    });
   }
 }

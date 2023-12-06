@@ -8,11 +8,16 @@ import { SegmentModule } from 'src/segment/segment.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 import { ITargetPortSymbol } from './application/port/out/target.port';
-import { TargetRepository } from './adapter/out-persistence/target.repository';
-import { TargetOrmEntity } from './adapter/out-persistence/target.orm.entity';
+import { TargetRepository } from './adapter/out-persistence/repository/target.repository';
+import { TargetOrmEntity } from './adapter/out-persistence/entity/target.orm.entity';
+import { ISmsPortSymbol } from './application/port/out/sms.port';
+import { SmsRepository } from './adapter/out-persistence/repository/sms.repository';
+import { SmsOrmEntity } from './adapter/out-persistence/entity/sms.orm.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SegmentOrmEntity, TargetOrmEntity])],
+  imports: [
+    TypeOrmModule.forFeature([SegmentOrmEntity, TargetOrmEntity, SmsOrmEntity]),
+  ],
   controllers: [TargetController],
   providers: [
     {
@@ -26,6 +31,10 @@ import { TargetOrmEntity } from './adapter/out-persistence/target.orm.entity';
     {
       provide: ITargetPortSymbol,
       useClass: TargetRepository,
+    },
+    {
+      provide: ISmsPortSymbol,
+      useClass: SmsRepository,
     },
   ],
 })
