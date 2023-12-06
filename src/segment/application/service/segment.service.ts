@@ -37,9 +37,10 @@ export class SegmentService implements ISegmentUseCase {
 
     segment.updateSegmentQuery(segmentQuery);
 
-    await this.segmentPort.saveSegmentToEfficDB(segment);
-
-    return segment;
+    return await this.segmentPort.updateSegmentQuery(
+      segmentId,
+      segment.segmentQuery,
+    );
   }
 
   async excuteSegmentQuery(segmentId: number) {

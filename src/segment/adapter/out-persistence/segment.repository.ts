@@ -33,30 +33,21 @@ export class SegmentRepository implements ISegmentPort {
     return segment;
   }
 
-  // async updateSegmentQuery(
-  //   segmentId: number,
-  //   segmentQuery: string,
-  // ): Promise<void> {}
+  async updateSegmentQuery(
+    segmentId: number,
+    segmentQuery: string,
+  ): Promise<Segment> {
+    const segmentOrmEntity = await this.segmentRepository.findOneBy({
+      id: segmentId,
+    });
 
-  // async getUserQueryFromEfficDB(uuid: string): Promise<UserQuery> {
-  //   console.log(uuid);
-  //   const userQueryOrmEntity = await this.userQueryRepository.findOneBy({
-  //     uuid,
-  //   });
+    if (!segmentOrmEntity) throw new Error('Segment not found');
 
-  //   const userQueryOrmEntity2 = await this.userQueryRepository.find();
+    segmentOrmEntity.segmentQuery = segmentQuery;
 
-  //   console.log(userQueryOrmEntity2);
+    await this.segmentRepository.save(segmentOrmEntity);
 
-  //   if (!userQueryOrmEntity) {
-  //     throw new Error('UserQuery not found');
-  //   }
-
-  //   return UserQueryMapper.mapToUserQuery(userQueryOrmEntity);
-  // }
-
-  // excuteUserQueryToTargetDB(userQuery: UserQuery) {
-  //   // 입력받은 userQuery를 TargetDB에서 실행
-  //   // 실행 결과를 return
-  // }
+    const updatedSegment = SegmentMapper.mapToUserQuery(segmentOrmEntity);
+    return updatedSegment;
+  }
 }
