@@ -54,4 +54,10 @@ export class SegmentController {
   async getSegmentNames() {
     return this.segmentUseCase.getSegmentNames();
   }
+
+  @Get('/column')
+  @HttpCode(HttpStatus.OK)
+  async getSegmentColumn(@Body('columnName') columnName: string) {
+    return this.segmentUseCase.getSegmentColumn(columnName);
+  }
 }

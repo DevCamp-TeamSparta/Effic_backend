@@ -59,4 +59,13 @@ export class SegmentRepository implements ISegmentPort {
     const segmentNames = segments.map((segment) => segment.segmentName);
     return segmentNames;
   }
+
+  async getSegmentColumn(columnName: string): Promise<any[]> {
+    const result = await this.segmentRepository
+      .createQueryBuilder('segment')
+      .select(`segment.${columnName}`)
+      .getRawMany();
+
+    return result.map((item) => item[`segment_${columnName}`]);
+  }
 }
