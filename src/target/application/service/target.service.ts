@@ -13,6 +13,14 @@ import { ITargetPort, ITargetPortSymbol } from '../port/out/target.port';
 import { FilterTargetDto } from '../port/in/dto/filter-target.dto';
 import { SmsTargetDto } from '../port/in/dto/sms-target.dto';
 import { ISmsPort, ISmsPortSymbol } from '../port/out/sms.port';
+import * as crypto from 'crypto';
+import axios from 'axios';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
+const SECRET_KEY = process.env.NAVER_SECRET_KEY;
+const SMS_SERVICE_ID = process.env.NAVER_SMS_SERVICE_ID;
 
 @Injectable()
 export class TargetService implements ITargetUseCase {
@@ -81,5 +89,67 @@ export class TargetService implements ITargetUseCase {
     const { smsContent, senderNumber } = smsTargetDto;
 
     await this.smsPort.saveSms(smsContent, senderNumber);
+  }
+
+  private makeSignature(): string {
+    const message = [];
+    const hmac = crypto.createHmac('sha256', SECRET_KEY);
+    const space = ' ';
+    const newLine = '\n';
+    const method = 'POST';
+    const timestamp = Date.now().toString();
+    message.push(method);
+    message.push(space);
+    message.push(`/sms/v2/services/${SMS_SERVICE_ID}/messages`);
+    message.push(newLine);
+    message.push(timestamp);
+    message.push(newLine);
+    message.push(ACCESS_KEY_ID);
+    //message 배열에 위의 내용들을 담아준 후에
+    const signature = hmac.update(message.join('')).digest('base64');
+    //message.join('') 으로 만들어진 string 을 hmac 에 담고, base64로 인코딩
+    return signature.toString();
+  }
+
+  async smsTest(content: string, phoneNumber: number): Promise<void> {
+    const body = {
+      type: 'SMS',
+      countryCode: '82',
+      from: '15228016', // 발신자 번호
+      content: `'${content}'`,
+      messages: [
+        {
+          to: phoneNumber, // 수신자 번호
+        },
+      ],
+    };
+    const options = {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-ncp-iam-access-key': ACCESS_KEY_ID,
+        'x-ncp-apigw-timestamp': Date.now().toString(),
+        'x-ncp-apigw-signature-v2': this.makeSignature(),
+      },
+    };
+    axios
+      .post(
+        `https://sens.apigw.ntruss.com/sms/v2/services/${SMS_SERVICE_ID}/messages`,
+        body,
+        options,
+      )
+      .then(async (res) => {
+        // 성공 이벤트
+        console.log(res.data);
+      })
+      .catch((err) => {
+        console.error(err.response.data);
+        // Error code : 200인 경우, 다시 같은 번호, 내용으로 메세지 보내기
+        if (err.response?.data?.error?.errorCode === '200') {
+          console.log(`Retrying SMS for phone number: ${phoneNumber}`);
+          return this.smsTest(content, phoneNumber);
+        }
+      });
+
+    return;
   }
 }

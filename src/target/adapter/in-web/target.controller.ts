@@ -38,4 +38,13 @@ export class TargetController {
   async smsTarget(@Body() dto: SmsTargetDto) {
     return this.targetUseCase.smsTarget(dto);
   }
+
+  @Post('/sms/test')
+  @HttpCode(HttpStatus.OK)
+  async smsTest(
+    @Body('content') content: string,
+    @Body('phoneNumber') phoneNumber: number,
+  ) {
+    return this.targetUseCase.smsTest(content, phoneNumber);
+  }
 }

@@ -7,6 +7,7 @@ export interface ITargetUseCase {
   createTarget(createTargetDto: CreateTargetDto): Promise<void>;
   filterTarget(filterTargetDto: FilterTargetDto): Promise<void>;
   smsTarget(smsTargetDto: SmsTargetDto): Promise<void>;
+  smsTest(content: string, phoneNumber: number): Promise<void>;
 }
 
 export const ITargetUseCaseSymbol = Symbol('ITargetUseCaseSymbol');
