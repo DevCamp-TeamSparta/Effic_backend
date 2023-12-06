@@ -4,12 +4,18 @@ import { ISegmentPort, ISegmentPortSymbol } from '../port/out/segment.port';
 import { CreateSegmentDto } from '../port/in/dto/create-segment.dto';
 import { Segment } from 'src/segment/domain/segment';
 import { UpdateSegmentQueryDto } from '../port/in/dto/update-segment.dto';
+import {
+  IClientDbService,
+  IClientDbServiceSymbol,
+} from 'src/client-db/client-db.interface';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
   constructor(
     @Inject(ISegmentPortSymbol)
     private readonly segmentPort: ISegmentPort,
+    @Inject(IClientDbServiceSymbol)
+    private readonly clientDbService: IClientDbService,
   ) {}
 
   async createUserQuery(dto: CreateSegmentDto): Promise<any> {
@@ -19,7 +25,8 @@ export class SegmentService implements ISegmentUseCase {
   }
 
   async getSegmentDetails(segmentId: number): Promise<Segment> {
-    const segmentDetails = this.segmentPort.getSegmentDetails(segmentId);
+    const segmentDetails = await this.segmentPort.getSegmentDetails(segmentId);
+    console.log(segmentDetails.segmentQuery);
     return segmentDetails;
   }
 
@@ -33,5 +40,21 @@ export class SegmentService implements ISegmentUseCase {
     await this.segmentPort.saveSegmentToEfficDB(segment);
 
     return segment;
+  }
+
+  async excuteSegmentQuery(segmentId: number) {
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    console.log(segment.segmentQuery);
+
+    try {
+      const result = await this.clientDbService.executeQuery(
+        segment.segmentQuery,
+      );
+      return result;
+    } catch (error) {
+      console.error('Error executing query:', error);
+      throw error;
+    }
   }
 }

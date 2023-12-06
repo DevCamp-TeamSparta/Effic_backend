@@ -42,9 +42,9 @@ export class SegmentController {
     return this.segmentUseCase.updateSegmentQuery(dto);
   }
 
-  // @Get()
-  // async getSegment(@Body('uuid') uuid: string) {
-  //   console.log(uuid);
-  //   return this.createUserQueryUseCase.getUserQuery(uuid);
-  // }
+  @Get('/query')
+  @HttpCode(HttpStatus.OK)
+  async excuteSegmentQuery(@Body('segmentId') segmentId: number): Promise<any> {
+    return this.segmentUseCase.excuteSegmentQuery(segmentId);
+  }
 }

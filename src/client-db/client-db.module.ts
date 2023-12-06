@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ClientDbController } from './client-db.controller';
 import { ClientDbService } from './client-db.service';
 import { IClientDbServiceSymbol } from './client-db.interface';
 
+@Global()
 @Module({
   controllers: [ClientDbController],
   providers: [
@@ -11,5 +12,6 @@ import { IClientDbServiceSymbol } from './client-db.interface';
       useClass: ClientDbService,
     },
   ],
+  exports: [IClientDbServiceSymbol],
 })
 export class ClientDbModule {}
