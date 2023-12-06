@@ -36,7 +36,7 @@ export class SegmentController {
     return this.segmentUseCase.getSegmentDetails(segmentId);
   }
 
-  @Put()
+  @Put('/query')
   @HttpCode(HttpStatus.CREATED)
   async updateSegmentQuery(@Body() dto: UpdateSegmentQueryDto) {
     return this.segmentUseCase.updateSegmentQuery(dto);
