@@ -29,7 +29,7 @@ export class SegmentController {
     return this.segmentUseCase.createUserQuery(dto);
   }
 
-  @Get('/detail')
+  @Post('/detail')
   async getSegmentDetails(
     @Body('segmentId') segmentId: number,
   ): Promise<Segment> {
@@ -42,7 +42,7 @@ export class SegmentController {
     return this.segmentUseCase.updateSegmentQuery(dto);
   }
 
-  @Get('/query')
+  @Post('/query')
   @HttpCode(HttpStatus.OK)
   async excuteSegmentQuery(@Body('segmentId') segmentId: number): Promise<any> {
     return this.segmentUseCase.excuteSegmentQuery(segmentId);
@@ -55,7 +55,7 @@ export class SegmentController {
     return this.segmentUseCase.getSegmentNames();
   }
 
-  @Get('/column')
+  @Post('/column')
   @HttpCode(HttpStatus.OK)
   async getSegmentColumn(@Body('columnName') columnName: string) {
     return this.segmentUseCase.getSegmentColumn(columnName);
