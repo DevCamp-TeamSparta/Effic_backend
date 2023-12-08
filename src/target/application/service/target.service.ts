@@ -16,6 +16,7 @@ import * as crypto from 'crypto';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { CreateTargetTrigger1Dto } from '../port/in/dto/create-target-trigger1.dto';
+import { CreateTargetTrigger2Dto } from '../port/in/dto/create-target-trigger2.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -54,6 +55,30 @@ export class TargetService implements ITargetUseCase {
         customerName: customer.CustomerName,
         phoneNumber: customer.PhoneNumber,
         sendDateTime: sendDateTime.toISOString(), // ISO 8601 형식
+      };
+    });
+
+    for (const target of targets) {
+      await this.targetPort.saveTarget(target, false);
+    }
+  }
+
+  async createTargetTrigger2(
+    createTargetTrigger2Dto: CreateTargetTrigger2Dto,
+  ): Promise<void> {
+    const { segmentId, sendDateTime } = createTargetTrigger2Dto;
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    const excuteQuery = segment.segmentQuery;
+
+    const queryResult = await this.clientDbService.executeQuery(excuteQuery);
+
+    const targets = queryResult.map((customer) => {
+      return {
+        customerName: customer.CustomerName,
+        phoneNumber: customer.PhoneNumber,
+        sendDateTime: sendDateTime,
       };
     });
 

@@ -7,6 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreateTargetTrigger1Dto } from 'src/target/application/port/in/dto/create-target-trigger1.dto';
+import { CreateTargetTrigger2Dto } from 'src/target/application/port/in/dto/create-target-trigger2.dto';
 import { FilterTargetDto } from 'src/target/application/port/in/dto/filter-target.dto';
 import { SmsTargetDto } from 'src/target/application/port/in/dto/sms-target.dto';
 import {
@@ -25,6 +26,12 @@ export class TargetController {
   @HttpCode(HttpStatus.CREATED)
   async createSegmentTrigger1(@Body() dto: CreateTargetTrigger1Dto) {
     return this.targetUseCase.createTargetTrigger1(dto);
+  }
+
+  @Post('/trigger2')
+  @HttpCode(HttpStatus.CREATED)
+  async createSegmentTrigger2(@Body() dto: CreateTargetTrigger2Dto) {
+    return this.targetUseCase.createTargetTrigger2(dto);
   }
 
   @Post('/filter')
