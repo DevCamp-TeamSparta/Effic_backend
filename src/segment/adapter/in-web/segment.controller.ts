@@ -73,4 +73,10 @@ export class SegmentController {
   async getSegmentTables(@Body() dto: GetSegmentDetailsDto) {
     return this.segmentUseCase.getSegmentTables(dto);
   }
+
+  @Post('/columns')
+  @HttpCode(HttpStatus.OK)
+  async getSegmentColumns(@Body() dto: GetSegmentDetailsDto) {
+    return this.segmentUseCase.getSegmentColumns(dto);
+  }
 }

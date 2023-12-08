@@ -88,4 +88,13 @@ export class SegmentService implements ISegmentUseCase {
 
     return result.map((row) => row['TABLE_NAME']);
   }
+
+  async getSegmentColumns(dto: GetSegmentDetailsDto): Promise<any[]> {
+    const { databaseName, tableName } = dto;
+
+    const query = `SELECT column_name FROM information_schema.columns WHERE table_schema = '${databaseName}' AND table_name = '${tableName}';`;
+    const result = await this.clientDbService.executeQuery(query);
+
+    return result.map((row) => row['COLUMN_NAME']);
+  }
 }
