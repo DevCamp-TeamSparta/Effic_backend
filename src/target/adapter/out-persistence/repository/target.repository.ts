@@ -40,9 +40,9 @@ export class TargetRepository implements ITargetPort {
     return;
   }
 
-  async removeTargetsByNames(names: string[]): Promise<void> {
+  async removeTargetsByPhoneNumbers(phoneNumbers: string[]): Promise<void> {
     await this.targetRepository.delete({
-      targetName: In(names),
+      targetPhoneNumber: In(phoneNumbers),
     });
   }
 }

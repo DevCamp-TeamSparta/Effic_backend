@@ -93,25 +93,17 @@ export class TargetService implements ITargetUseCase {
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
     let excuteQuery = segment.segmentQuery;
 
-    console.log(columnName); // AgreeToMarketing
-    console.log(filterData); // 0
-    console.log(excuteQuery); // SELECT * FROM spartadb.customer;
-
     excuteQuery = excuteQuery.trim().slice(0, -1);
 
-    const filterQuery = `${excuteQuery} WHERE ${columnName} = ${filterData};`;
-
-    console.log(filterQuery);
+    const filterQuery = `${excuteQuery} WHERE ${columnName} = '${filterData}';`;
 
     const queryResult = await this.clientDbService.executeQuery(filterQuery);
 
-    const filterNames = queryResult.map((entry) => entry.CustomerName);
+    const filterPhoneNumbers = queryResult.map((entry) => entry.PhoneNumber);
 
-    // console.log(filterNames);
-
-    // target 테이블에서 filterNames에 해당하는 이름인 레코드를 제거
-    await this.targetPort.removeTargetsByNames(filterNames);
+    await this.targetPort.removeTargetsByPhoneNumbers(filterPhoneNumbers);
   }
+
   async smsTarget(smsTargetDto: SmsTargetDto): Promise<void> {
     const { smsContent, senderNumber } = smsTargetDto;
 
