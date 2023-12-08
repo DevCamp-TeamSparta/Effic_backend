@@ -8,6 +8,7 @@ import {
   IClientDbService,
   IClientDbServiceSymbol,
 } from 'src/client-db/client-db.interface';
+import { GetSegmentRecordsDto } from '../port/in/dto/get-segment-records.dto';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -65,5 +66,17 @@ export class SegmentService implements ISegmentUseCase {
 
   async getSegmentColumn(columnName: string): Promise<any> {
     return await this.segmentPort.getSegmentColumn(columnName);
+  }
+
+  async getSegmentRecords(dto: GetSegmentRecordsDto): Promise<any[]> {
+    const { databaseName, tableName, columnName } = dto;
+
+    const useDatabaseQuery = `USE ${databaseName};`;
+    await this.clientDbService.executeQuery(useDatabaseQuery);
+
+    const query = `SELECT ${columnName} FROM ${tableName};`;
+    const result = await this.clientDbService.executeQuery(query);
+
+    return result.map((row) => row[columnName]);
   }
 }
