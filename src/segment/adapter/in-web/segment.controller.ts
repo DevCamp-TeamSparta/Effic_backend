@@ -9,7 +9,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
-import { GetSegmentRecordsDto } from 'src/segment/application/port/in/dto/get-segment-records.dto';
+import { GetSegmentDetailsDto } from 'src/segment/application/port/in/dto/get-segment-details.dto';
 import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment.dto';
 import {
   ISegmentUseCase,
@@ -64,7 +64,7 @@ export class SegmentController {
 
   @Post('/records')
   @HttpCode(HttpStatus.OK)
-  async getSegmentRecords(@Body() dto: GetSegmentRecordsDto) {
+  async getSegmentRecords(@Body() dto: GetSegmentDetailsDto) {
     return this.segmentUseCase.getSegmentRecords(dto);
   }
 }

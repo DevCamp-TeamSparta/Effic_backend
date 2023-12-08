@@ -1,4 +1,4 @@
-export interface GetSegmentRecordsDto {
+export interface GetSegmentDetailsDto {
   databaseName: string;
   tableName: string;
   columnName: string;
