@@ -83,7 +83,7 @@ export class TargetService implements ITargetUseCase {
     });
 
     for (const target of targets) {
-      await this.targetPort.saveTarget(target, false);
+      await this.targetPort.saveTarget(target, true);
     }
   }
 
