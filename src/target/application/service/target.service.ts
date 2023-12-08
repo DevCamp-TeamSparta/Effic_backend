@@ -4,7 +4,6 @@ import {
   IClientDbService,
   IClientDbServiceSymbol,
 } from 'src/client-db/client-db.interface';
-import { CreateTargetDto } from '../port/in/dto/create-target.dto';
 import {
   ISegmentPort,
   ISegmentPortSymbol,
@@ -16,6 +15,7 @@ import { ISmsPort, ISmsPortSymbol } from '../port/out/sms.port';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
+import { CreateTargetTrigger1Dto } from '../port/in/dto/create-target-trigger1.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -35,8 +35,10 @@ export class TargetService implements ITargetUseCase {
     private readonly smsPort: ISmsPort,
   ) {}
 
-  async createTarget(createTargetDto: CreateTargetDto): Promise<void> {
-    const { segmentId, timeColumnName, sendTime } = createTargetDto;
+  async createTargetTrigger1(
+    createTargetTrigger1Dto: CreateTargetTrigger1Dto,
+  ): Promise<void> {
+    const { segmentId, timeColumnName, sendTime } = createTargetTrigger1Dto;
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
@@ -80,7 +82,7 @@ export class TargetService implements ITargetUseCase {
 
     const filterNames = queryResult.map((entry) => entry.CustomerName);
 
-    console.log(filterNames); // [ '김민준', '이서윤', '박지호', '정하은', '최준서' ]
+    // console.log(filterNames);
 
     // target 테이블에서 filterNames에 해당하는 이름인 레코드를 제거
     await this.targetPort.removeTargetsByNames(filterNames);

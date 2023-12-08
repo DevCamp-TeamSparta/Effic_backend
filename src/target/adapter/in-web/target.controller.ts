@@ -6,7 +6,7 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
-import { CreateTargetDto } from 'src/target/application/port/in/dto/create-target.dto';
+import { CreateTargetTrigger1Dto } from 'src/target/application/port/in/dto/create-target-trigger1.dto';
 import { FilterTargetDto } from 'src/target/application/port/in/dto/filter-target.dto';
 import { SmsTargetDto } from 'src/target/application/port/in/dto/sms-target.dto';
 import {
@@ -21,10 +21,10 @@ export class TargetController {
     private readonly targetUseCase: ITargetUseCase,
   ) {}
 
-  @Post()
+  @Post('/trigger1')
   @HttpCode(HttpStatus.CREATED)
-  async createSegment(@Body() dto: CreateTargetDto) {
-    return this.targetUseCase.createTarget(dto);
+  async createSegmentTrigger1(@Body() dto: CreateTargetTrigger1Dto) {
+    return this.targetUseCase.createTargetTrigger1(dto);
   }
 
   @Post('/filter')

@@ -1,10 +1,11 @@
-import { Target } from 'src/target/domain/target';
-import { CreateTargetDto } from './dto/create-target.dto';
-import { FilterTargetDto } from './dto/filter-target.dto';
 import { SmsTargetDto } from './dto/sms-target.dto';
+import { FilterTargetDto } from './dto/filter-target.dto';
+import { CreateTargetTrigger1Dto } from './dto/create-target-trigger1.dto';
 
 export interface ITargetUseCase {
-  createTarget(createTargetDto: CreateTargetDto): Promise<void>;
+  createTargetTrigger1(
+    createTargetTrigger1Dto: CreateTargetTrigger1Dto,
+  ): Promise<void>;
   filterTarget(filterTargetDto: FilterTargetDto): Promise<void>;
   smsTarget(smsTargetDto: SmsTargetDto): Promise<void>;
   smsTest(content: string, phoneNumber: number): Promise<void>;
