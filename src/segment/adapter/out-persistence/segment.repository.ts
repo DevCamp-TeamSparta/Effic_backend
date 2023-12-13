@@ -64,8 +64,11 @@ export class SegmentRepository implements ISegmentPort {
     const result = await this.segmentRepository
       .createQueryBuilder('segment')
       .select(`segment.${columnName}`)
+      .addSelect('segment.id')
       .getRawMany();
 
-    return result.map((item) => item[`segment_${columnName}`]);
+    // console.log(result);
+
+    return result;
   }
 }
