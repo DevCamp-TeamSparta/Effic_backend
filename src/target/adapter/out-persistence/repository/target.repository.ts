@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ITargetPort } from 'src/target/application/port/out/target.port';
-import { Repository, In } from 'typeorm';
+import { Repository, In, Not } from 'typeorm';
 import { TargetOrmEntity } from '../entity/target.orm.entity';
 import { TargetMapper } from '../mapper/target.mapper';
 import { Target } from 'src/target/domain/target';
@@ -40,9 +40,18 @@ export class TargetRepository implements ITargetPort {
     return;
   }
 
-  async removeTargetsByPhoneNumbers(phoneNumbers: string[]): Promise<void> {
-    await this.targetRepository.delete({
-      targetPhoneNumber: In(phoneNumbers),
-    });
+  async removeTargetsByPhoneNumbers(
+    phoneNumbers: string[],
+    excludeFilterData: boolean,
+  ): Promise<void> {
+    if (excludeFilterData) {
+      await this.targetRepository.delete({
+        targetPhoneNumber: In(phoneNumbers),
+      });
+    } else {
+      await this.targetRepository.delete({
+        targetPhoneNumber: Not(In(phoneNumbers)),
+      });
+    }
   }
 }

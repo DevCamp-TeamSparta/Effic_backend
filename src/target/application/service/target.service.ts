@@ -88,7 +88,8 @@ export class TargetService implements ITargetUseCase {
   }
 
   async filterTarget(filterTargetDto: FilterTargetDto): Promise<void> {
-    const { segmentId, columnName, filterData } = filterTargetDto;
+    const { segmentId, columnName, filterData, excludeFilterData } =
+      filterTargetDto;
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
     let excuteQuery = segment.segmentQuery;
@@ -97,11 +98,18 @@ export class TargetService implements ITargetUseCase {
 
     const filterQuery = `${excuteQuery} WHERE ${columnName} = '${filterData}';`;
 
+    // console.log(filterQuery);
+
     const queryResult = await this.clientDbService.executeQuery(filterQuery);
+
+    // console.log(queryResult);
 
     const filterPhoneNumbers = queryResult.map((entry) => entry.PhoneNumber);
 
-    await this.targetPort.removeTargetsByPhoneNumbers(filterPhoneNumbers);
+    await this.targetPort.removeTargetsByPhoneNumbers(
+      filterPhoneNumbers,
+      excludeFilterData,
+    );
   }
 
   async smsTarget(smsTargetDto: SmsTargetDto): Promise<void> {

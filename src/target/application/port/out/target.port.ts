@@ -7,7 +7,10 @@ export interface ITargetPort {
     },
     isRecurringTarget: boolean,
   ): Promise<void>;
-  removeTargetsByPhoneNumbers(phoneNumbers: string[]): Promise<void>;
+  removeTargetsByPhoneNumbers(
+    phoneNumbers: string[],
+    excludeFilterData: boolean,
+  ): Promise<void>;
 }
 
 export const ITargetPortSymbol = Symbol('ITargetPortSymbol');
