@@ -18,7 +18,7 @@ async function bootstrap() {
     origin: 'http://localhost:3000', // 클라이언트 측 URL 허용
     methods: 'GET,POST,PUT,DELETE', // 허용할 HTTP 메서드
     allowedHeaders: 'Content-Type,Authorization', // 허용할 헤더
-    credentials: true, // 쿠키 및 인증과 관련된 헤더 허용
+    credentials: true,
   });
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
