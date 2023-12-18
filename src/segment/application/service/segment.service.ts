@@ -60,7 +60,7 @@ export class SegmentService implements ISegmentUseCase {
     }
   }
 
-  async getSegmentNames(): Promise<string[]> {
+  async getSegmentNames(): Promise<{ id: number; name: string }[]> {
     return await this.segmentPort.getSegmentNames();
   }
 

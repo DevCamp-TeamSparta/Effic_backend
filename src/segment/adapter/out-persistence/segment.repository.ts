@@ -52,12 +52,15 @@ export class SegmentRepository implements ISegmentPort {
   }
 
   /** To do: user 기능과 연결 필요 */
-  async getSegmentNames(): Promise<string[]> {
+  async getSegmentNames(): Promise<{ id: number; name: string }[]> {
     const segments = await this.segmentRepository.find();
 
-    // 각 세그먼트의 이름만 추출하여 배열로 반환
-    const segmentNames = segments.map((segment) => segment.segmentName);
-    return segmentNames;
+    const segmentIdandNames = segments.map((segment) => ({
+      id: segment.id,
+      name: segment.segmentName,
+    }));
+
+    return segmentIdandNames;
   }
 
   async getSegmentColumn(columnName: string): Promise<any[]> {

@@ -10,7 +10,7 @@ export interface ISegmentUseCase {
     updateSegmentQueryDto: UpdateSegmentQueryDto,
   ): Promise<Segment>;
   excuteSegmentQuery(segmentId: number): Promise<any>;
-  getSegmentNames(): Promise<string[]>;
+  getSegmentNames(): Promise<{ id: number; name: string }[]>;
   getSegmentColumn(columnName: string): Promise<any>;
   getSegmentRecords(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentTables(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;

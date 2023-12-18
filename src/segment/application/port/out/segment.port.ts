@@ -5,7 +5,7 @@ export interface ISegmentPort {
   saveSegmentToEfficDB(segment: Segment): Promise<SegmentOrmEntity>;
   updateSegmentQuery(segmentId: number, segmentQuery: string): Promise<Segment>;
   getSegmentDetails(segmentId: number): Promise<Segment>;
-  getSegmentNames(): Promise<string[]>;
+  getSegmentNames(): Promise<{ id: number; name: string }[]>;
   getSegmentColumn(columnName: string): Promise<any[]>;
 }
 
