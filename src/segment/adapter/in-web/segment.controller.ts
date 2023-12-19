@@ -79,4 +79,12 @@ export class SegmentController {
   async getSegmentColumns(@Body() dto: GetSegmentDetailsDto) {
     return this.segmentUseCase.getSegmentColumns(dto);
   }
+
+  @Post('/filter-query/no-filter')
+  @HttpCode(HttpStatus.CREATED)
+  async createFilterQueryWhenNoFilter(
+    @Body('segmentId') segmentId: number,
+  ): Promise<void> {
+    return this.segmentUseCase.createFilterQueryWhenNoFilter(segmentId);
+  }
 }

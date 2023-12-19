@@ -13,4 +13,7 @@ export class SegmentOrmEntity {
 
   @Column({ nullable: true })
   segmentQuery: string | null;
+
+  @Column({ nullable: true })
+  filterQuery: string | null;
 }

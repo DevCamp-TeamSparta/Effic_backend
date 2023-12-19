@@ -15,6 +15,7 @@ export interface ISegmentUseCase {
   getSegmentRecords(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentTables(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentColumns(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
+  createFilterQueryWhenNoFilter(segmentId: number): Promise<void>;
 }
 
 export const ISegmentUseCaseSymbol = Symbol('ISegmentUseCaseSymbol');

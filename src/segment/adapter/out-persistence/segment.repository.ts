@@ -74,4 +74,23 @@ export class SegmentRepository implements ISegmentPort {
 
     return result;
   }
+
+  async updateFilterQuery(
+    segmentId: number,
+    filterQuery: string,
+  ): Promise<Segment> {
+    const segmentOrmEntity = await this.segmentRepository.findOneBy({
+      id: segmentId,
+    });
+
+    if (!segmentOrmEntity) {
+      throw new Error('Segment not found');
+    }
+
+    segmentOrmEntity.filterQuery = filterQuery;
+
+    await this.segmentRepository.save(segmentOrmEntity);
+
+    return SegmentMapper.mapToUserQuery(segmentOrmEntity);
+  }
 }

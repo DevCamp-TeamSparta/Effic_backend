@@ -7,6 +7,7 @@ export interface ISegmentPort {
   getSegmentDetails(segmentId: number): Promise<Segment>;
   getSegmentNames(): Promise<{ id: number; name: string }[]>;
   getSegmentColumn(columnName: string): Promise<any[]>;
+  updateFilterQuery(segmentId: number, filterQuery: string): Promise<Segment>;
 }
 
 export const ISegmentPortSymbol = Symbol('ISegmentPortSymbol');

@@ -7,6 +7,7 @@ export class SegmentMapper {
       segment.segmentName,
       segment.segmentDescription,
       segment.segmentQuery,
+      segment.filterQuery,
     );
     return SegmentEntity;
   }
@@ -16,6 +17,7 @@ export class SegmentMapper {
     segmentEntity.segmentName = segment.segmentName;
     segmentEntity.segmentDescription = segment.segmentDescription;
     segmentEntity.segmentQuery = segment.segmentQuery;
+    segmentEntity.filterQuery = segment.filterQuery;
 
     return segmentEntity;
   }

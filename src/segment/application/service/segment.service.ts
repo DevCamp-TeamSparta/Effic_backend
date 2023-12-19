@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ISegmentUseCase } from '../port/in/segment.use-case';
 import { ISegmentPort, ISegmentPortSymbol } from '../port/out/segment.port';
 import { CreateSegmentDto } from '../port/in/dto/create-segment.dto';
@@ -21,7 +21,7 @@ export class SegmentService implements ISegmentUseCase {
 
   async createUserQuery(dto: CreateSegmentDto): Promise<any> {
     const { segmentName, segmentDescription } = dto;
-    const newSegment = new Segment(segmentName, segmentDescription, null);
+    const newSegment = new Segment(segmentName, segmentDescription, null, null);
     return this.segmentPort.saveSegmentToEfficDB(newSegment);
   }
 
@@ -96,5 +96,18 @@ export class SegmentService implements ISegmentUseCase {
     const result = await this.clientDbService.executeQuery(query);
 
     return result.map((row) => row['COLUMN_NAME']);
+  }
+
+  async createFilterQueryWhenNoFilter(segmentId: number): Promise<void> {
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    if (segment.filterQuery)
+      throw new HttpException(
+        'Filter Query가 이미 존재합니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    await this.segmentPort.updateFilterQuery(segmentId, segment.segmentQuery);
+
+    return;
   }
 }
