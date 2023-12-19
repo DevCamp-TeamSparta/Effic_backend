@@ -113,6 +113,14 @@ export class SegmentService implements ISegmentUseCase {
   }
 
   async createFilterQuery(dto: CreateFilterQueryDto): Promise<any> {
+    const { filterType } = dto;
+
+    if (filterType === 'value_based') return this.applyValueBasedFilter(dto);
+    if (filterType === 'recent_message')
+      return this.applyRecentMessageFilter(dto);
+  }
+
+  private async applyValueBasedFilter(dto: CreateFilterQueryDto): Promise<any> {
     const { segmentId, columnName, value, excludeValue } = dto;
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
@@ -146,5 +154,12 @@ export class SegmentService implements ISegmentUseCase {
       modifiedQuery,
       modifiedQueryResult,
     };
+  }
+
+  private async applyRecentMessageFilter(
+    dto: CreateFilterQueryDto,
+  ): Promise<any> {
+    console.log(dto);
+    console.log('피로도 관리 filter 구현');
   }
 }
