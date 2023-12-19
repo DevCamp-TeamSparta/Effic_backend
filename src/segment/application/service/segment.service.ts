@@ -9,6 +9,7 @@ import {
   IClientDbServiceSymbol,
 } from 'src/client-db/client-db.interface';
 import { GetSegmentDetailsDto } from '../port/in/dto/get-segment-details.dto';
+import { CreateFilterQueryDto } from '../port/in/dto/create-filter-query.dto';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -109,5 +110,41 @@ export class SegmentService implements ISegmentUseCase {
     await this.segmentPort.updateFilterQuery(segmentId, segment.segmentQuery);
 
     return;
+  }
+
+  async createFilterQuery(dto: CreateFilterQueryDto): Promise<any> {
+    const { segmentId, columnName, value, excludeValue } = dto;
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    let modifiedQuery = segment.filterQuery.trim();
+    if (modifiedQuery.endsWith(';')) {
+      modifiedQuery = modifiedQuery.slice(0, -1);
+    }
+
+    const hasWhereClause = modifiedQuery.toUpperCase().includes(' WHERE ');
+
+    const condition = excludeValue
+      ? `${columnName} NOT LIKE '%${value}%'`
+      : `${columnName} LIKE '%${value}%'`;
+
+    if (hasWhereClause) {
+      modifiedQuery += ` AND ${condition}`;
+    } else {
+      modifiedQuery += ` WHERE ${condition}`;
+    }
+
+    modifiedQuery += ';';
+
+    await this.segmentPort.updateFilterQuery(segmentId, modifiedQuery);
+
+    const modifiedQueryResult = await this.clientDbService.executeQuery(
+      modifiedQuery,
+    );
+
+    return {
+      modifiedQuery,
+      modifiedQueryResult,
+    };
   }
 }

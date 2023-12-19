@@ -8,6 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { CreateFilterQueryDto } from 'src/segment/application/port/in/dto/create-filter-query.dto';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
 import { GetSegmentDetailsDto } from 'src/segment/application/port/in/dto/get-segment-details.dto';
 import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment.dto';
@@ -86,5 +87,11 @@ export class SegmentController {
     @Body('segmentId') segmentId: number,
   ): Promise<void> {
     return this.segmentUseCase.createFilterQueryWhenNoFilter(segmentId);
+  }
+
+  @Post('/filter-query')
+  @HttpCode(HttpStatus.CREATED)
+  async createFilterQuery(@Body() dto: CreateFilterQueryDto): Promise<void> {
+    return this.segmentUseCase.createFilterQuery(dto);
   }
 }
