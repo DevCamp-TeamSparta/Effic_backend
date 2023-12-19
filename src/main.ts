@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { json, urlencoded } from 'express';
+import 'dotenv/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,8 +15,11 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  const corsOrigins = process.env.CORS_ORIGINS?.split(',') || [];
+
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: corsOrigins,
     methods: 'GET,POST,PUT,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
     credentials: true,
