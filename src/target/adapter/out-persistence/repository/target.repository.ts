@@ -31,7 +31,7 @@ export class TargetRepository implements ITargetPort {
     );
 
     const targetOrmEntity = TargetMapper.mapToTargetOrmEntity(domainTarget);
-    await this.targetRepository.save(targetOrmEntity);
-    return;
+    const savedEntity = await this.targetRepository.save(targetOrmEntity);
+    return savedEntity;
   }
 }

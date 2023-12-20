@@ -1,3 +1,5 @@
+import { TargetOrmEntity } from 'src/target/adapter/out-persistence/entity/target.orm.entity';
+
 export interface ITargetPort {
   saveTarget(
     targetData: {
@@ -6,7 +8,7 @@ export interface ITargetPort {
       reservedAt: Date | null;
     },
     sentStatus: boolean,
-  ): Promise<void>;
+  ): Promise<TargetOrmEntity>;
 }
 
 export const ITargetPortSymbol = Symbol('ITargetPortSymbol');

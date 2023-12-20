@@ -212,9 +212,12 @@ export class TargetService implements ITargetUseCase {
         reservedAt: null,
       };
 
-      await this.targetPort.saveTarget(targetData, false);
+      const savedEntity = await this.targetPort.saveTarget(targetData, false);
 
-      createdTargets.push(targetData);
+      createdTargets.push({
+        ...targetData,
+        targetId: savedEntity.targetId,
+      });
     }
 
     return createdTargets;

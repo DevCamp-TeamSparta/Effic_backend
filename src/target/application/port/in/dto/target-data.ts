@@ -3,4 +3,5 @@ interface TargetData {
   messageContent: string;
   receiverNumber: string;
   reservedAt: Date | null;
+  targetId: number;
 }
