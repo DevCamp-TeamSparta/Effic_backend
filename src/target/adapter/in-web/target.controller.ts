@@ -6,6 +6,7 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
+import { CreateMessageContentDto } from 'src/target/application/port/in/dto/create-message-content.dto';
 import { CreateTargetTrigger1Dto } from 'src/target/application/port/in/dto/create-target-trigger1.dto';
 import { CreateTargetTrigger2Dto } from 'src/target/application/port/in/dto/create-target-trigger2.dto';
 import { FilterTargetDto } from 'src/target/application/port/in/dto/filter-target.dto';
@@ -53,5 +54,13 @@ export class TargetController {
     @Body('phoneNumber') phoneNumber: number,
   ) {
     return this.targetUseCase.smsTest(content, phoneNumber);
+  }
+
+  @Post('/messageContent')
+  @HttpCode(HttpStatus.CREATED)
+  async createMessageContent(
+    @Body() dto: CreateMessageContentDto,
+  ): Promise<TargetData[]> {
+    return this.targetUseCase.createMessageContent(dto);
   }
 }

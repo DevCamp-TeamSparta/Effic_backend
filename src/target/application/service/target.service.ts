@@ -17,6 +17,7 @@ import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { CreateTargetTrigger1Dto } from '../port/in/dto/create-target-trigger1.dto';
 import { CreateTargetTrigger2Dto } from '../port/in/dto/create-target-trigger2.dto';
+import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -105,11 +106,6 @@ export class TargetService implements ITargetUseCase {
     // console.log(queryResult);
 
     const filterPhoneNumbers = queryResult.map((entry) => entry.PhoneNumber);
-
-    await this.targetPort.removeTargetsByPhoneNumbers(
-      filterPhoneNumbers,
-      excludeFilterData,
-    );
   }
 
   async smsTarget(smsTargetDto: SmsTargetDto): Promise<void> {
@@ -178,5 +174,49 @@ export class TargetService implements ITargetUseCase {
       });
 
     return;
+  }
+
+  async createMessageContent(
+    dto: CreateMessageContentDto,
+  ): Promise<TargetData[]> {
+    const {
+      segmentId,
+      messageTitle,
+      messageContentTemplate,
+      receiverNumberColumnName,
+    } = dto;
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    const queryResult = await this.clientDbService.executeQuery(
+      segment.filterQuery,
+    );
+
+    const createdTargets: TargetData[] = [];
+
+    for (const record of queryResult) {
+      let messageContent = messageContentTemplate;
+      for (const key in record) {
+        if (record.hasOwnProperty(key)) {
+          const value = record[key] || '';
+          const placeholder = new RegExp(`\\$\\{${key}\\}`, 'g');
+          messageContent = messageContent.replace(placeholder, value);
+        }
+      }
+
+      const receiverNumber = record[receiverNumberColumnName];
+      const targetData = {
+        messageTitle: messageTitle,
+        messageContent: messageContent,
+        receiverNumber: receiverNumber,
+        reservedAt: null,
+      };
+
+      await this.targetPort.saveTarget(targetData, false);
+
+      createdTargets.push(targetData);
+    }
+
+    return createdTargets;
   }
 }

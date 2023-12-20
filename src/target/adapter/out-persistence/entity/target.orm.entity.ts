@@ -5,21 +5,18 @@ export class TargetOrmEntity {
   @PrimaryGeneratedColumn()
   targetId: number;
 
-  @Column()
-  targetName: string;
+  @Column({ nullable: true })
+  messageTitle: string;
 
   @Column()
-  targetPhoneNumber: string;
+  messageContent: string;
 
   @Column()
-  sendDateTime: Date;
+  receiverNumber: string;
+
+  @Column({ nullable: true })
+  reservedAt: Date | null;
 
   @Column()
   sentStatus: boolean;
-
-  @Column()
-  isRecurringTarget: boolean;
-
-  @Column()
-  smsId: number;
 }

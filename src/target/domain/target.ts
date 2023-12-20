@@ -1,15 +1,21 @@
 export class Target {
-  public targetName: string;
-  public targetPhoneNumber: string;
-  public sendDateTime: Date;
+  public messageTitle: string;
+  public messageContent: string;
+  public reservedAt: Date | null;
+  public sentStatus: boolean;
+  public receiverNumber: string;
 
   constructor(
-    targetName: string,
-    targetPhoneNumber: string,
-    sendDateTime: Date,
+    messageTitle: string,
+    messageContent: string,
+    reservedAt: Date | null,
+    receiverNumber: string,
+    sentStatus = false,
   ) {
-    this.targetName = targetName;
-    this.targetPhoneNumber = targetPhoneNumber;
-    this.sendDateTime = sendDateTime;
+    this.messageTitle = messageTitle;
+    this.messageContent = messageContent;
+    this.reservedAt = reservedAt;
+    this.sentStatus = sentStatus;
+    this.receiverNumber = receiverNumber;
   }
 }

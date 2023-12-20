@@ -2,25 +2,23 @@ import { Target } from 'src/target/domain/target';
 import { TargetOrmEntity } from '../entity/target.orm.entity';
 
 export class TargetMapper {
-  static mapToTarget(target: TargetOrmEntity) {
-    const TargetEntity = new Target(
-      target.targetName,
-      target.targetPhoneNumber,
-      target.sendDateTime,
+  static mapToTarget(targetOrm: TargetOrmEntity): Target {
+    return new Target(
+      targetOrm.messageTitle,
+      targetOrm.messageContent,
+      targetOrm.reservedAt,
+      targetOrm.receiverNumber,
+      targetOrm.sentStatus,
     );
-    return TargetEntity;
   }
 
-  static mapToTargetOrmEntity(target: Target) {
-    const targetEntity = new TargetOrmEntity();
-    targetEntity.targetName = target.targetName;
-    targetEntity.targetPhoneNumber = target.targetPhoneNumber;
-    targetEntity.sendDateTime = target.sendDateTime;
-
-    targetEntity.sentStatus = false;
-    targetEntity.isRecurringTarget = false;
-    targetEntity.smsId = 1; // FK 조건으로 인해 미리 넣어두기
-
-    return targetEntity;
+  static mapToTargetOrmEntity(target: Target): TargetOrmEntity {
+    const targetOrm = new TargetOrmEntity();
+    targetOrm.messageTitle = target.messageTitle;
+    targetOrm.messageContent = target.messageContent;
+    targetOrm.reservedAt = target.reservedAt;
+    targetOrm.sentStatus = target.sentStatus;
+    targetOrm.receiverNumber = target.receiverNumber;
+    return targetOrm;
   }
 }

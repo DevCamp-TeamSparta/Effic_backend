@@ -1,15 +1,11 @@
 export interface ITargetPort {
   saveTarget(
     targetData: {
-      customerName: string;
-      phoneNumber: string;
-      sendDateTime: Date;
+      messageTitle: string;
+      messageContent: string;
+      reservedAt: Date | null;
     },
-    isRecurringTarget: boolean,
-  ): Promise<void>;
-  removeTargetsByPhoneNumbers(
-    phoneNumbers: string[],
-    excludeFilterData: boolean,
+    sentStatus: boolean,
   ): Promise<void>;
 }
 

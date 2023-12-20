@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ITargetPort } from 'src/target/application/port/out/target.port';
-import { Repository, In, Not } from 'typeorm';
+import { Repository } from 'typeorm';
 import { TargetOrmEntity } from '../entity/target.orm.entity';
 import { TargetMapper } from '../mapper/target.mapper';
 import { Target } from 'src/target/domain/target';
@@ -15,43 +15,23 @@ export class TargetRepository implements ITargetPort {
 
   async saveTarget(
     targetData: {
-      customerName: string;
-      phoneNumber: string;
-      sendDateTime: Date;
+      messageTitle: string;
+      messageContent: string;
+      receiverNumber: string;
+      reservedAt: Date | null;
     },
-    isRecurringTarget: boolean,
+    sentStatus: boolean,
   ) {
     const domainTarget = new Target(
-      targetData.customerName,
-      targetData.phoneNumber,
-      targetData.sendDateTime,
+      targetData.messageTitle,
+      targetData.messageContent,
+      targetData.reservedAt,
+      targetData.receiverNumber,
+      sentStatus,
     );
 
     const targetOrmEntity = TargetMapper.mapToTargetOrmEntity(domainTarget);
-
-    // Set additional properties
-    targetOrmEntity.sentStatus = false;
-    targetOrmEntity.isRecurringTarget = isRecurringTarget;
-    targetOrmEntity.smsId = 1; // smsId는 우선 1, 다 같은 문자 메세지 내용으로 통일
-
-    // 데이터베이스에 저장
     await this.targetRepository.save(targetOrmEntity);
-
     return;
-  }
-
-  async removeTargetsByPhoneNumbers(
-    phoneNumbers: string[],
-    excludeFilterData: boolean,
-  ): Promise<void> {
-    if (excludeFilterData) {
-      await this.targetRepository.delete({
-        targetPhoneNumber: In(phoneNumbers),
-      });
-    } else {
-      await this.targetRepository.delete({
-        targetPhoneNumber: Not(In(phoneNumbers)),
-      });
-    }
   }
 }

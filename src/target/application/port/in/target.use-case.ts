@@ -2,6 +2,7 @@ import { SmsTargetDto } from './dto/sms-target.dto';
 import { FilterTargetDto } from './dto/filter-target.dto';
 import { CreateTargetTrigger1Dto } from './dto/create-target-trigger1.dto';
 import { CreateTargetTrigger2Dto } from './dto/create-target-trigger2.dto';
+import { CreateMessageContentDto } from './dto/create-message-content.dto';
 
 export interface ITargetUseCase {
   createTargetTrigger1(
@@ -13,6 +14,7 @@ export interface ITargetUseCase {
   filterTarget(filterTargetDto: FilterTargetDto): Promise<void>;
   smsTarget(smsTargetDto: SmsTargetDto): Promise<void>;
   smsTest(content: string, phoneNumber: number): Promise<void>;
+  createMessageContent(dto: CreateMessageContentDto): Promise<TargetData[]>;
 }
 
 export const ITargetUseCaseSymbol = Symbol('ITargetUseCaseSymbol');
