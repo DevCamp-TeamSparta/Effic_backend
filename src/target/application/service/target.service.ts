@@ -18,6 +18,7 @@ import * as dotenv from 'dotenv';
 import { CreateTargetTrigger1Dto } from '../port/in/dto/create-target-trigger1.dto';
 import { CreateTargetTrigger2Dto } from '../port/in/dto/create-target-trigger2.dto';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
+import { CreateTargetReservationTime } from '../port/in/dto/create-target-reservation-time.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -221,5 +222,28 @@ export class TargetService implements ITargetUseCase {
     }
 
     return createdTargets;
+  }
+
+  async createTargetReservationTime(
+    dto: CreateTargetReservationTime,
+  ): Promise<void> {
+    const {
+      targetIds,
+      segmentId,
+      timeColumnName,
+      receiverNumberColumnName,
+      delayDays,
+      reservationTime,
+    } = dto;
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    console.log(segment.filterQuery);
+
+    const queryResult = await this.clientDbService.executeQuery(
+      segment.filterQuery,
+    );
+
+    console.log(queryResult);
   }
 }
