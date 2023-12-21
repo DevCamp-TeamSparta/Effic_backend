@@ -5,12 +5,15 @@ import { SegmentOrmEntity } from './segment.orm.entity';
 import { Segment } from 'src/segment/domain/segment';
 import { SegmentMapper } from './segment.mapper';
 import { ISegmentPort } from 'src/segment/application/port/out/segment.port';
+import { MessageHistoryOrmEntity } from './message-history.orm.entity';
 
 @Injectable()
 export class SegmentRepository implements ISegmentPort {
   constructor(
     @InjectRepository(SegmentOrmEntity)
     private readonly segmentRepository: Repository<SegmentOrmEntity>,
+    @InjectRepository(MessageHistoryOrmEntity)
+    private readonly messageHistoryRepository: Repository<MessageHistoryOrmEntity>,
   ) {}
 
   async saveSegmentToEfficDB(segment: Segment): Promise<SegmentOrmEntity> {
@@ -92,5 +95,22 @@ export class SegmentRepository implements ISegmentPort {
     await this.segmentRepository.save(segmentOrmEntity);
 
     return SegmentMapper.mapToUserQuery(segmentOrmEntity);
+  }
+
+  async saveMessageHistory(
+    phoneNumber: string,
+    content: string,
+    deliveredAt: string,
+  ): Promise<MessageHistoryOrmEntity> {
+    const deliveredAtDate = new Date(deliveredAt);
+
+    const messageHistoryEntity = new MessageHistoryOrmEntity();
+    messageHistoryEntity.phoneNumber = phoneNumber;
+    messageHistoryEntity.content = content;
+    messageHistoryEntity.deliveredAt = deliveredAtDate;
+
+    const savedMessageHistoryOrmEntity =
+      await this.messageHistoryRepository.save(messageHistoryEntity);
+    return savedMessageHistoryOrmEntity;
   }
 }

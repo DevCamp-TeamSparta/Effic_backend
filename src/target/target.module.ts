@@ -13,10 +13,16 @@ import { TargetOrmEntity } from './adapter/out-persistence/entity/target.orm.ent
 import { ISmsPortSymbol } from './application/port/out/sms.port';
 import { SmsRepository } from './adapter/out-persistence/repository/sms.repository';
 import { SmsOrmEntity } from './adapter/out-persistence/entity/sms.orm.entity';
+import { MessageHistoryOrmEntity } from 'src/segment/adapter/out-persistence/message-history.orm.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SegmentOrmEntity, TargetOrmEntity, SmsOrmEntity]),
+    TypeOrmModule.forFeature([
+      SegmentOrmEntity,
+      TargetOrmEntity,
+      SmsOrmEntity,
+      MessageHistoryOrmEntity,
+    ]),
   ],
   controllers: [TargetController],
   providers: [

@@ -6,9 +6,12 @@ import { ISegmentUseCaseSymbol } from './application/port/in/segment.use-case';
 import { SegmentService } from './application/service/segment.service';
 import { SegmentOrmEntity } from './adapter/out-persistence/segment.orm.entity';
 import { ISegmentPortSymbol } from './application/port/out/segment.port';
+import { MessageHistoryOrmEntity } from './adapter/out-persistence/message-history.orm.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SegmentOrmEntity])],
+  imports: [
+    TypeOrmModule.forFeature([SegmentOrmEntity, MessageHistoryOrmEntity]),
+  ],
   controllers: [SegmentController],
   providers: [
     {

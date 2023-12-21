@@ -138,6 +138,10 @@ export class TargetService implements ITargetUseCase {
 
   async smsTest(dto: SmsTestDto): Promise<void> {
     const { content, phoneNumber } = dto;
+
+    if (typeof phoneNumber == 'number')
+      throw new Error('send string type phoneNumber');
+
     const body = {
       type: 'SMS',
       countryCode: '82',
@@ -165,7 +169,13 @@ export class TargetService implements ITargetUseCase {
       )
       .then(async (res) => {
         // 성공 이벤트
-        console.log(res.data);
+        if (res.status === 202) {
+          const messageHistory = await this.segmentPort.saveMessageHistory(
+            phoneNumber,
+            content,
+            res.data.requestTime,
+          );
+        }
       })
       .catch((err) => {
         console.error(err.response.data);

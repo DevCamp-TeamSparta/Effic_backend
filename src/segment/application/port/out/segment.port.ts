@@ -1,3 +1,4 @@
+import { MessageHistoryOrmEntity } from 'src/segment/adapter/out-persistence/message-history.orm.entity';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 import { Segment } from 'src/segment/domain/segment';
 
@@ -8,6 +9,11 @@ export interface ISegmentPort {
   getSegmentNames(): Promise<{ id: number; name: string }[]>;
   getSegmentColumn(columnName: string): Promise<any[]>;
   updateFilterQuery(segmentId: number, filterQuery: string): Promise<Segment>;
+  saveMessageHistory(
+    phoneNumber: string,
+    content: string,
+    deliveredAt: string,
+  ): Promise<MessageHistoryOrmEntity>;
 }
 
 export const ISegmentPortSymbol = Symbol('ISegmentPortSymbol');
