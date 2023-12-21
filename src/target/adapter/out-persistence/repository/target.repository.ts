@@ -67,4 +67,43 @@ export class TargetRepository implements ITargetPort {
     target.reservedAt = reservedAt;
     await this.targetRepository.save(target);
   }
+
+  async getTargetData(targetId: number): Promise<TargetOrmEntity | null> {
+    const target = await this.targetRepository.findOne({
+      where: { targetId },
+    });
+    return target;
+  }
+
+  async createTarget(targetData: {
+    messageTitle: string;
+    messageContent: string;
+    receiverNumber: string;
+    reservedAt: Date | null;
+    sentStatus: boolean;
+  }): Promise<TargetOrmEntity> {
+    const domainTarget = new Target(
+      targetData.messageTitle,
+      targetData.messageContent,
+      targetData.reservedAt,
+      targetData.receiverNumber,
+      targetData.sentStatus,
+    );
+
+    const targetOrmEntity = TargetMapper.mapToTargetOrmEntity(domainTarget);
+    const savedEntity = await this.targetRepository.save(targetOrmEntity);
+    return savedEntity;
+  }
+
+  async deleteTarget(targetId: number): Promise<void> {
+    const target = await this.targetRepository.findOne({
+      where: { targetId },
+    });
+
+    if (!target) {
+      throw new Error(`Target with ID ${targetId} not found`);
+    }
+
+    await this.targetRepository.remove(target);
+  }
 }

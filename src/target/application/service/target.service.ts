@@ -18,7 +18,7 @@ import * as dotenv from 'dotenv';
 import { CreateTargetTrigger1Dto } from '../port/in/dto/create-target-trigger1.dto';
 import { CreateTargetTrigger2Dto } from '../port/in/dto/create-target-trigger2.dto';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
-import { CreateTargetReservationTime } from '../port/in/dto/create-target-schedule-delayed.dto';
+import { CreateTargetReservationTimeDto } from '../port/in/dto/create-target-reservation-time.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -225,7 +225,7 @@ export class TargetService implements ITargetUseCase {
   }
 
   async createTargetReservationTime(
-    dto: CreateTargetReservationTime,
+    dto: CreateTargetReservationTimeDto,
   ): Promise<void> {
     const {
       targetIds,
@@ -265,5 +265,123 @@ export class TargetService implements ITargetUseCase {
       if (targetId)
         await this.targetPort.updateTargetReservationTime(targetId, tempTime);
     }
+  }
+
+  async createTargetReservationTime2(
+    dto: CreateTargetReservationTimeDto,
+  ): Promise<void> {
+    const {
+      targetIds,
+      segmentId,
+      timeColumnName,
+      receiverNumberColumnName,
+      delayDays,
+      reservationTime,
+      endDate,
+      isRecurring,
+      weekDays,
+    } = dto;
+
+    const reservationTimeDate = new Date(reservationTime);
+    const endDateObj = new Date(endDate);
+
+    const targetReceiverMap = await this.targetPort.getReceiverNumbers(
+      targetIds,
+    );
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    const queryResult = await this.clientDbService.executeQuery(
+      segment.filterQuery,
+    );
+
+    if (isRecurring) {
+      for (const record of queryResult) {
+        const targetReceiverNumber = record[receiverNumberColumnName];
+        const targetId = targetReceiverMap[targetReceiverNumber];
+
+        const reservationDateTimeList = this.getReservationDates(
+          weekDays,
+          endDateObj,
+          reservationTimeDate,
+        );
+
+        const targetData = await this.targetPort.getTargetData(targetId);
+
+        for (const reservationDateTime of reservationDateTimeList) {
+          const newRecord = {
+            ...targetData,
+            reservedAt: reservationDateTime,
+          };
+          await this.targetPort.createTarget(newRecord);
+        }
+
+        await this.targetPort.deleteTarget(targetId);
+      }
+    }
+
+    if (!isRecurring) {
+      for (const record of queryResult) {
+        const tempTime = new Date(record[timeColumnName]);
+
+        tempTime.setDate(tempTime.getDate() + delayDays);
+
+        tempTime.setHours(
+          reservationTimeDate.getHours(),
+          reservationTimeDate.getMinutes(),
+          reservationTimeDate.getSeconds(),
+        );
+
+        const targetReceiverNumber = record[receiverNumberColumnName];
+        const targetId = targetReceiverMap[targetReceiverNumber];
+
+        if (targetId)
+          await this.targetPort.updateTargetReservationTime(targetId, tempTime);
+      }
+    }
+  }
+
+  private getReservationDates(
+    weekDays: string[],
+    endDate: Date,
+    reservationTime: Date,
+  ) {
+    const today = new Date();
+
+    endDate.setDate(endDate.getDate() + 1);
+    const reservationDates = this.getDatesStartToLast(today, endDate, weekDays);
+    const timeString = reservationTime.toISOString().split('T')[1];
+
+    const dateTimeReservations = reservationDates.map((date) => {
+      const dateTimeString = date + 'T' + timeString;
+      return new Date(dateTimeString);
+    });
+
+    return dateTimeReservations;
+  }
+
+  private getDatesStartToLast(
+    startDate: Date,
+    endDate: Date,
+    weekDays: string[],
+  ) {
+    const result = [];
+    const currentDate = startDate;
+
+    while (currentDate <= endDate) {
+      const dayOfWeek = this.getDayOfWeek(currentDate);
+
+      if (weekDays.includes(dayOfWeek)) {
+        result.push(currentDate.toISOString().split('T')[0]);
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return result;
+  }
+
+  private getDayOfWeek(date: Date) {
+    const week = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    return week[date.getDay()];
   }
 }

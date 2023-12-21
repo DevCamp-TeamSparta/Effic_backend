@@ -7,7 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CreateMessageContentDto } from 'src/target/application/port/in/dto/create-message-content.dto';
-import { CreateTargetReservationTime } from 'src/target/application/port/in/dto/create-target-schedule-delayed.dto';
+import { CreateTargetReservationTimeDto } from 'src/target/application/port/in/dto/create-target-reservation-time.dto';
 import { CreateTargetTrigger1Dto } from 'src/target/application/port/in/dto/create-target-trigger1.dto';
 import { CreateTargetTrigger2Dto } from 'src/target/application/port/in/dto/create-target-trigger2.dto';
 import { FilterTargetDto } from 'src/target/application/port/in/dto/filter-target.dto';
@@ -68,8 +68,8 @@ export class TargetController {
   @Post('/reservation-time')
   @HttpCode(HttpStatus.CREATED)
   async createTargetReservationTime(
-    @Body() dto: CreateTargetReservationTime,
+    @Body() dto: CreateTargetReservationTimeDto,
   ): Promise<void> {
-    return this.targetUseCase.createTargetReservationTime(dto);
+    return this.targetUseCase.createTargetReservationTime2(dto);
   }
 }

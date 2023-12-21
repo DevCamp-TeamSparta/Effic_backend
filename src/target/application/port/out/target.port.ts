@@ -14,6 +14,15 @@ export interface ITargetPort {
     targetId: number,
     reservedAt: Date,
   ): Promise<void>;
+  deleteTarget(targetId: number): Promise<void>;
+  createTarget(targetData: {
+    messageTitle: string;
+    messageContent: string;
+    receiverNumber: string;
+    reservedAt: Date | null;
+    sentStatus: boolean;
+  }): Promise<TargetOrmEntity>;
+  getTargetData(targetId: number): Promise<TargetOrmEntity | null>;
 }
 
 export const ITargetPortSymbol = Symbol('ITargetPortSymbol');
