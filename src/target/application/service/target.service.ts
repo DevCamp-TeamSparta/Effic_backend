@@ -283,7 +283,6 @@ export class TargetService implements ITargetUseCase {
     } = dto;
 
     const reservationTimeDate = new Date(reservationTime);
-    const endDateObj = new Date(endDate);
 
     const targetReceiverMap = await this.targetPort.getReceiverNumbers(
       targetIds,
@@ -296,6 +295,7 @@ export class TargetService implements ITargetUseCase {
     );
 
     if (isRecurring) {
+      const endDateObj = new Date(endDate);
       for (const record of queryResult) {
         const targetReceiverNumber = record[receiverNumberColumnName];
         const targetId = targetReceiverMap[targetReceiverNumber];
