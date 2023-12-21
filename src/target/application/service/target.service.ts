@@ -19,6 +19,7 @@ import { CreateTargetTrigger1Dto } from '../port/in/dto/create-target-trigger1.d
 import { CreateTargetTrigger2Dto } from '../port/in/dto/create-target-trigger2.dto';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from '../port/in/dto/create-target-reservation-time.dto';
+import { SmsTestDto } from '../port/in/dto/sms-test.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -135,7 +136,8 @@ export class TargetService implements ITargetUseCase {
     return signature.toString();
   }
 
-  async smsTest(content: string, phoneNumber: number): Promise<void> {
+  async smsTest(dto: SmsTestDto): Promise<void> {
+    const { content, phoneNumber } = dto;
     const body = {
       type: 'SMS',
       countryCode: '82',
@@ -170,7 +172,7 @@ export class TargetService implements ITargetUseCase {
         // Error code : 200인 경우, 다시 같은 번호, 내용으로 메세지 보내기
         if (err.response?.data?.error?.errorCode === '200') {
           console.log(`Retrying SMS for phone number: ${phoneNumber}`);
-          return this.smsTest(content, phoneNumber);
+          return this.smsTest(dto);
         }
       });
 
