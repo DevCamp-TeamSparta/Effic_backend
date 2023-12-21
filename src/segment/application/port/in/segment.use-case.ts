@@ -2,7 +2,7 @@ import { Segment } from 'src/segment/domain/segment';
 import { CreateSegmentDto } from './dto/create-segment.dto';
 import { UpdateSegmentQueryDto } from './dto/update-segment.dto';
 import { GetSegmentDetailsDto } from './dto/get-segment-details.dto';
-import { CreateFilterQueryDto } from './dto/create-filter-query.dto';
+import { CreateFilterQueryByVariableValueDto } from './dto/create-filter-query-by-variable-value.dto';
 
 export interface ISegmentUseCase {
   createUserQuery(createSegmentDto: CreateSegmentDto): Promise<Segment>;
@@ -17,7 +17,9 @@ export interface ISegmentUseCase {
   getSegmentTables(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentColumns(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   createFilterQueryWhenNoFilter(segmentId: number): Promise<void>;
-  createFilterQuery(createFilterQueryDto: CreateFilterQueryDto): Promise<any>;
+  createFilterQueryByVariableValue(
+    createFilterQueryDto: CreateFilterQueryByVariableValueDto,
+  ): Promise<any>;
 }
 
 export const ISegmentUseCaseSymbol = Symbol('ISegmentUseCaseSymbol');

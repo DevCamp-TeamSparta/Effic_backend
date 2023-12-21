@@ -9,7 +9,7 @@ import {
   IClientDbServiceSymbol,
 } from 'src/client-db/client-db.interface';
 import { GetSegmentDetailsDto } from '../port/in/dto/get-segment-details.dto';
-import { CreateFilterQueryDto } from '../port/in/dto/create-filter-query.dto';
+import { CreateFilterQueryByVariableValueDto } from '../port/in/dto/create-filter-query-by-variable-value.dto';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -112,7 +112,9 @@ export class SegmentService implements ISegmentUseCase {
     return;
   }
 
-  async createFilterQuery(dto: CreateFilterQueryDto): Promise<any> {
+  async createFilterQueryByVariableValue(
+    dto: CreateFilterQueryByVariableValueDto,
+  ): Promise<any> {
     const { segmentId, columnName, value, excludeValue } = dto;
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
@@ -146,12 +148,5 @@ export class SegmentService implements ISegmentUseCase {
       modifiedQuery,
       modifiedQueryResult,
     };
-  }
-
-  private async applyRecentMessageFilter(
-    dto: CreateFilterQueryDto,
-  ): Promise<any> {
-    console.log(dto);
-    console.log('피로도 관리 filter 구현');
   }
 }
