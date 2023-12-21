@@ -8,6 +8,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { CreateFilterQueryByFatigueLevelDto } from 'src/segment/application/port/in/dto/create-filter-query-by-fatigue-level.dto';
 import { CreateFilterQueryByVariableValueDto } from 'src/segment/application/port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
 import { GetSegmentDetailsDto } from 'src/segment/application/port/in/dto/get-segment-details.dto';
@@ -95,5 +96,13 @@ export class SegmentController {
     @Body() dto: CreateFilterQueryByVariableValueDto,
   ): Promise<void> {
     return this.segmentUseCase.createFilterQueryByVariableValue(dto);
+  }
+
+  @Post('/filter-query/fatigue-level')
+  @HttpCode(HttpStatus.CREATED)
+  async createFilterQueryByFatigueLevel(
+    @Body() dto: CreateFilterQueryByFatigueLevelDto,
+  ): Promise<void> {
+    return this.segmentUseCase.createFilterQueryByFatigueLevel(dto);
   }
 }

@@ -14,6 +14,9 @@ export interface ISegmentPort {
     content: string,
     deliveredAt: string,
   ): Promise<MessageHistoryOrmEntity>;
+  getMessageHistoryByPhoneNumber(
+    phoneNumber: string,
+  ): Promise<MessageHistoryOrmEntity[]>;
 }
 
 export const ISegmentPortSymbol = Symbol('ISegmentPortSymbol');

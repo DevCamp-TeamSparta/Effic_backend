@@ -115,4 +115,16 @@ export class SegmentRepository implements ISegmentPort {
       await this.messageHistoryRepository.save(messageHistoryEntity);
     return savedMessageHistoryOrmEntity;
   }
+
+  async getMessageHistoryByPhoneNumber(
+    phoneNumber: string,
+  ): Promise<MessageHistoryOrmEntity[]> {
+    const formattedPhoneNumber = phoneNumber.replace(/-/g, '').slice(1);
+
+    const messageHistoryResult = await this.messageHistoryRepository.find({
+      where: { phoneNumber: formattedPhoneNumber },
+    });
+
+    return messageHistoryResult;
+  }
 }

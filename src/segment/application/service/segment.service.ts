@@ -10,6 +10,7 @@ import {
 } from 'src/client-db/client-db.interface';
 import { GetSegmentDetailsDto } from '../port/in/dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from '../port/in/dto/create-filter-query-by-variable-value.dto';
+import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter-query-by-fatigue-level.dto';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -148,5 +149,62 @@ export class SegmentService implements ISegmentUseCase {
       modifiedQuery,
       modifiedQueryResult,
     };
+  }
+
+  async createFilterQueryByFatigueLevel(
+    dto: CreateFilterQueryByFatigueLevelDto,
+  ): Promise<void> {
+    const { segmentId, receiverNumberColumnName, fatigueLevelDays } = dto;
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    const queryResult = await this.clientDbService.executeQuery(
+      segment.filterQuery,
+    );
+    const phoneNumbers = queryResult.map(
+      (row) => row[receiverNumberColumnName],
+    );
+
+    const excludePhoneNumbers = [];
+    const currentDate = new Date();
+
+    for (const phoneNumber of phoneNumbers) {
+      const messageHistoryResults =
+        await this.segmentPort.getMessageHistoryByPhoneNumber(phoneNumber);
+
+      for (const messageHistory of messageHistoryResults) {
+        const deliveredAt = new Date(messageHistory.deliveredAt);
+        if (
+          currentDate.getTime() - deliveredAt.getTime() <
+          fatigueLevelDays * 24 * 60 * 60 * 1000
+        ) {
+          excludePhoneNumbers.push(phoneNumber);
+          break;
+        }
+      }
+    }
+
+    let modifiedQuery = segment.filterQuery.trim();
+    if (modifiedQuery.endsWith(';')) {
+      modifiedQuery = modifiedQuery.slice(0, -1);
+    }
+
+    const hasWhereClause = modifiedQuery.toUpperCase().includes(' WHERE ');
+
+    if (excludePhoneNumbers.length > 0) {
+      const exclusionCondition = excludePhoneNumbers
+        .map((num) => `${receiverNumberColumnName} != '${num}'`)
+        .join(' AND ');
+
+      if (hasWhereClause) {
+        modifiedQuery += ` AND (${exclusionCondition})`;
+      } else {
+        modifiedQuery += ` WHERE (${exclusionCondition})`;
+      }
+    }
+
+    modifiedQuery += ';';
+
+    await this.segmentPort.updateFilterQuery(segmentId, modifiedQuery);
   }
 }
