@@ -9,6 +9,11 @@ export interface ITargetPort {
     },
     sentStatus: boolean,
   ): Promise<TargetOrmEntity>;
+  getReceiverNumbers(targetIds: number[]): Promise<any>;
+  updateTargetReservationTime(
+    targetId: number,
+    reservedAt: Date,
+  ): Promise<void>;
 }
 
 export const ITargetPortSymbol = Symbol('ITargetPortSymbol');

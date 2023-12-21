@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, RequestMapping } from '@nestjs/common';
 import { ITargetUseCase } from '../port/in/target.use-case';
 import {
   IClientDbService,
@@ -18,7 +18,7 @@ import * as dotenv from 'dotenv';
 import { CreateTargetTrigger1Dto } from '../port/in/dto/create-target-trigger1.dto';
 import { CreateTargetTrigger2Dto } from '../port/in/dto/create-target-trigger2.dto';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
-import { CreateTargetReservationTime } from '../port/in/dto/create-target-reservation-time.dto';
+import { CreateTargetReservationTime } from '../port/in/dto/create-target-schedule-delayed.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -236,14 +236,34 @@ export class TargetService implements ITargetUseCase {
       reservationTime,
     } = dto;
 
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+    const reservationTimeDate = new Date(reservationTime);
 
-    console.log(segment.filterQuery);
+    const targetReceiverMap = await this.targetPort.getReceiverNumbers(
+      targetIds,
+    );
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
     const queryResult = await this.clientDbService.executeQuery(
       segment.filterQuery,
     );
 
-    console.log(queryResult);
+    for (const record of queryResult) {
+      const tempTime = new Date(record[timeColumnName]);
+
+      tempTime.setDate(tempTime.getDate() + delayDays);
+
+      tempTime.setHours(
+        reservationTimeDate.getHours(),
+        reservationTimeDate.getMinutes(),
+        reservationTimeDate.getSeconds(),
+      );
+
+      const targetReceiverNumber = record[receiverNumberColumnName];
+      const targetId = targetReceiverMap[targetReceiverNumber];
+
+      if (targetId)
+        await this.targetPort.updateTargetReservationTime(targetId, tempTime);
+    }
   }
 }
