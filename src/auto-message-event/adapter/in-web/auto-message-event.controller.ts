@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Inject,
@@ -26,5 +27,11 @@ export class AutoMessageEventController {
     @Body() dto: CreateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity> {
     return this.autoMessageEventUseCase.createAutoMessageEvent(dto);
+  }
+
+  @Get('/all')
+  @HttpCode(HttpStatus.OK)
+  async getAllAutoMessageEvents(): Promise<any> {
+    return this.autoMessageEventUseCase.getAllAutoMessageEvents();
   }
 }

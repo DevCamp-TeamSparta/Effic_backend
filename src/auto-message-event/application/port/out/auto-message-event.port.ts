@@ -5,6 +5,7 @@ export interface IAutoMessageEventPort {
   saveAutoMessageEvent(
     autoMessageEvent: AutoMessageEvent,
   ): Promise<AutoMessageEventOrmEntity>;
+  getAllAutoMessageEvents(): Promise<any>;
 }
 
 export const IAutoMessageEventPortSymbol = Symbol(

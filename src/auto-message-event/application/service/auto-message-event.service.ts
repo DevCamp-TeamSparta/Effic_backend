@@ -32,4 +32,8 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
 
     return this.autoMessageEventPort.saveAutoMessageEvent(newAutoMessageEvent);
   }
+
+  async getAllAutoMessageEvents(): Promise<any> {
+    return await this.autoMessageEventPort.getAllAutoMessageEvents();
+  }
 }

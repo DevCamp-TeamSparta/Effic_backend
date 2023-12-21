@@ -5,6 +5,7 @@ export interface IAutoMessageEventUseCase {
   createAutoMessageEvent(
     dto: CreateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity>;
+  getAllAutoMessageEvents(): Promise<any>;
 }
 
 export const IAutoMessageEventUseCaseSymbol = Symbol(

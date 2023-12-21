@@ -23,4 +23,8 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
       await this.autoMessageEventRepository.save(autoMessageEventOrmEntity);
     return savedAutoMessageEventOrmEntity;
   }
+
+  async getAllAutoMessageEvents(): Promise<AutoMessageEvent[]> {
+    return await this.autoMessageEventRepository.find();
+  }
 }
