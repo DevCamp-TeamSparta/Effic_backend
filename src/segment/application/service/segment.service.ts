@@ -113,14 +113,6 @@ export class SegmentService implements ISegmentUseCase {
   }
 
   async createFilterQuery(dto: CreateFilterQueryDto): Promise<any> {
-    const { filterType } = dto;
-
-    if (filterType === 'value_based') return this.applyValueBasedFilter(dto);
-    if (filterType === 'recent_message')
-      return this.applyRecentMessageFilter(dto);
-  }
-
-  private async applyValueBasedFilter(dto: CreateFilterQueryDto): Promise<any> {
     const { segmentId, columnName, value, excludeValue } = dto;
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);

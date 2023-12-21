@@ -3,5 +3,4 @@ export interface CreateFilterQueryDto {
   columnName: string;
   value: string;
   excludeValue: boolean;
-  filterType: string;
 }
