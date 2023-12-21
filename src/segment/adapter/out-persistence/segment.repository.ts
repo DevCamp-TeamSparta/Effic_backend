@@ -16,18 +16,21 @@ export class SegmentRepository implements ISegmentPort {
     private readonly messageHistoryRepository: Repository<MessageHistoryOrmEntity>,
   ) {}
 
-  async saveSegmentToEfficDB(segment: Segment): Promise<SegmentOrmEntity> {
+  async saveSegment(segment: Segment): Promise<SegmentOrmEntity> {
+    console.log(segment);
     const segmentOrmEntity = SegmentMapper.mapToSegmentOrmEntity(segment);
+    console.log('segmentOrmEntity: ', segmentOrmEntity);
 
     const savedSegmentOrmEntity = await this.segmentRepository.save(
       segmentOrmEntity,
     );
+    console.log('savedSegmentOrmEntity: ', savedSegmentOrmEntity);
     return savedSegmentOrmEntity;
   }
 
   async getSegmentDetails(segmentId: number): Promise<Segment> {
     const segmentOrmEntity = await this.segmentRepository.findOneBy({
-      id: segmentId,
+      segmentId,
     });
     if (!segmentOrmEntity) throw new Error('Segment not found');
 
@@ -41,7 +44,7 @@ export class SegmentRepository implements ISegmentPort {
     segmentQuery: string,
   ): Promise<Segment> {
     const segmentOrmEntity = await this.segmentRepository.findOneBy({
-      id: segmentId,
+      segmentId,
     });
 
     if (!segmentOrmEntity) throw new Error('Segment not found');
@@ -59,7 +62,7 @@ export class SegmentRepository implements ISegmentPort {
     const segments = await this.segmentRepository.find();
 
     const segmentIdandNames = segments.map((segment) => ({
-      id: segment.id,
+      id: segment.segmentId,
       name: segment.segmentName,
     }));
 
@@ -83,7 +86,7 @@ export class SegmentRepository implements ISegmentPort {
     filterQuery: string,
   ): Promise<Segment> {
     const segmentOrmEntity = await this.segmentRepository.findOneBy({
-      id: segmentId,
+      segmentId,
     });
 
     if (!segmentOrmEntity) {

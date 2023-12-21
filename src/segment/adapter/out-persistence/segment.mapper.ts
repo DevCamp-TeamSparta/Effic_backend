@@ -6,6 +6,8 @@ export class SegmentMapper {
     const SegmentEntity = new Segment(
       segment.segmentName,
       segment.segmentDescription,
+      segment.createdAt,
+      segment.updatedAt,
       segment.segmentQuery,
       segment.filterQuery,
     );
@@ -18,6 +20,7 @@ export class SegmentMapper {
     segmentEntity.segmentDescription = segment.segmentDescription;
     segmentEntity.segmentQuery = segment.segmentQuery;
     segmentEntity.filterQuery = segment.filterQuery;
+    segmentEntity.createdAt = segment.createdAt;
 
     return segmentEntity;
   }

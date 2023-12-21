@@ -21,10 +21,17 @@ export class SegmentService implements ISegmentUseCase {
     private readonly clientDbService: IClientDbService,
   ) {}
 
-  async createUserQuery(dto: CreateSegmentDto): Promise<any> {
-    const { segmentName, segmentDescription } = dto;
-    const newSegment = new Segment(segmentName, segmentDescription, null, null);
-    return this.segmentPort.saveSegmentToEfficDB(newSegment);
+  async createSegment(dto: CreateSegmentDto): Promise<any> {
+    const { segmentName, segmentDescription, createdAt, updatedAt } = dto;
+    const newSegment = new Segment(
+      segmentName,
+      segmentDescription,
+      createdAt,
+      null,
+      null,
+      null,
+    );
+    return this.segmentPort.saveSegment(newSegment);
   }
 
   async getSegmentDetails(segmentId: number): Promise<Segment> {

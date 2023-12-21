@@ -29,7 +29,7 @@ export class SegmentController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createSegment(@Body() dto: CreateSegmentDto) {
-    return this.segmentUseCase.createUserQuery(dto);
+    return this.segmentUseCase.createSegment(dto);
   }
 
   @Post('/detail')

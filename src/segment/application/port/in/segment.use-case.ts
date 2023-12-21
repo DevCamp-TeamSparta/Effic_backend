@@ -6,7 +6,7 @@ import { CreateFilterQueryByVariableValueDto } from './dto/create-filter-query-b
 import { CreateFilterQueryByFatigueLevelDto } from './dto/create-filter-query-by-fatigue-level.dto';
 
 export interface ISegmentUseCase {
-  createUserQuery(createSegmentDto: CreateSegmentDto): Promise<Segment>;
+  createSegment(createSegmentDto: CreateSegmentDto): Promise<Segment>;
   getSegmentDetails(segmentId: number): Promise<Segment>;
   updateSegmentQuery(
     updateSegmentQueryDto: UpdateSegmentQueryDto,

@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('Segment')
 export class SegmentOrmEntity {
   @PrimaryGeneratedColumn()
-  id: number;
+  segmentId: number;
 
   @Column()
   segmentName: string;
@@ -16,4 +16,10 @@ export class SegmentOrmEntity {
 
   @Column({ nullable: true })
   filterQuery: string | null;
+
+  @Column({ nullable: true })
+  createdAt: Date;
+
+  @Column({ nullable: true })
+  updatedAt: Date;
 }
