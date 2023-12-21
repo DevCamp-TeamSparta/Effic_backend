@@ -15,6 +15,7 @@ import { ShorturlModule } from './shorturl/shorturl.module';
 import { SegmentModule } from './segment/segment.module';
 import { ClientDbModule } from './client-db/client-db.module';
 import { TargetModule } from './target/target.module';
+import { AutoMessageEventModule } from './auto-message-event/auto-message-event.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TargetModule } from './target/target.module';
     SegmentModule,
     ClientDbModule,
     TargetModule,
+    AutoMessageEventModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],
