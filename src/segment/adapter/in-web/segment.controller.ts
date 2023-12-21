@@ -89,7 +89,7 @@ export class SegmentController {
     return this.segmentUseCase.createFilterQueryWhenNoFilter(segmentId);
   }
 
-  @Post('/filter-query')
+  @Post('/filter-query/variable-value')
   @HttpCode(HttpStatus.CREATED)
   async createFilterQuery(@Body() dto: CreateFilterQueryDto): Promise<void> {
     return this.segmentUseCase.createFilterQuery(dto);
