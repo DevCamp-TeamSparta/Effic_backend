@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAutoMessageEventDto } from '../port/in/dto/create-auto-message-event.dto';
 import { AutoMessageEvent } from 'src/auto-message-event/domain/auto-message-event';
 import { IAutoMessageEventUseCase } from '../port/in/auto-message-event.use-case';
@@ -7,6 +7,7 @@ import {
   IAutoMessageEventPortSymbol,
 } from '../port/out/auto-message-event.port';
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
+import { UpdateAutoMessageEventDto } from '../port/in/dto/update-auto-message-event.dto';
 
 @Injectable()
 export class AutoMessageEventService implements IAutoMessageEventUseCase {
@@ -35,5 +36,30 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
 
   async getAllAutoMessageEvents(): Promise<any> {
     return await this.autoMessageEventPort.getAllAutoMessageEvents();
+  }
+
+  async updateAutoMessageEvent(
+    dto: UpdateAutoMessageEventDto,
+  ): Promise<AutoMessageEventOrmEntity> {
+    const { autoMessageEventId, autoMessageEventName, scheduledEndDate } = dto;
+
+    const existingEvent =
+      await this.autoMessageEventPort.getAutoMessageEventById(
+        autoMessageEventId,
+      );
+    if (!existingEvent) throw new NotFoundException();
+
+    if (autoMessageEventName !== undefined) {
+      existingEvent.autoMessageEventName = autoMessageEventName;
+    }
+    if (scheduledEndDate !== undefined) {
+      existingEvent.scheduledEndDate = scheduledEndDate;
+    }
+
+    return await this.autoMessageEventPort.updateAutoMessageEventById(
+      autoMessageEventId,
+      autoMessageEventName,
+      scheduledEndDate,
+    );
   }
 }

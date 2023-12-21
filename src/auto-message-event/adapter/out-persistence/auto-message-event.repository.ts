@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IAutoMessageEventPort } from 'src/auto-message-event/application/port/out/auto-message-event.port';
 import { Repository } from 'typeorm';
@@ -26,5 +26,39 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
 
   async getAllAutoMessageEvents(): Promise<AutoMessageEvent[]> {
     return await this.autoMessageEventRepository.find();
+  }
+
+  async getAutoMessageEventById(
+    autoMessageEventId: number,
+  ): Promise<AutoMessageEventOrmEntity> {
+    return await this.autoMessageEventRepository.findOneBy({
+      autoMessageEventId,
+    });
+  }
+
+  async updateAutoMessageEventById(
+    autoMessageEventId: number,
+    autoMessageEventName?: string,
+    scheduledEndDate?: Date,
+  ): Promise<AutoMessageEventOrmEntity> {
+    const autoMessageEventOrmEntity =
+      await this.autoMessageEventRepository.findOneBy({
+        autoMessageEventId,
+      });
+
+    if (!autoMessageEventOrmEntity) throw new NotFoundException();
+
+    if (autoMessageEventName) {
+      autoMessageEventOrmEntity.autoMessageEventName = autoMessageEventName;
+    }
+
+    if (scheduledEndDate) {
+      autoMessageEventOrmEntity.scheduledEndDate = scheduledEndDate;
+    }
+
+    const updatedAutoMessageEventOrmEntity =
+      await this.autoMessageEventRepository.save(autoMessageEventOrmEntity);
+
+    return updatedAutoMessageEventOrmEntity;
   }
 }

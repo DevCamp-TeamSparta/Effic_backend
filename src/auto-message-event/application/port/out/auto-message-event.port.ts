@@ -6,6 +6,14 @@ export interface IAutoMessageEventPort {
     autoMessageEvent: AutoMessageEvent,
   ): Promise<AutoMessageEventOrmEntity>;
   getAllAutoMessageEvents(): Promise<any>;
+  getAutoMessageEventById(
+    autoMessageEventId: number,
+  ): Promise<AutoMessageEventOrmEntity>;
+  updateAutoMessageEventById(
+    autoMessageEventId: number,
+    autoMessageEventName?: string,
+    scheduledEndDate?: Date,
+  ): Promise<AutoMessageEventOrmEntity>;
 }
 
 export const IAutoMessageEventPortSymbol = Symbol(
