@@ -109,6 +109,8 @@ export class SegmentRepository implements ISegmentPort {
     messageHistoryEntity.content = content;
     messageHistoryEntity.deliveredAt = deliveredAtDate;
 
+    await this.messageHistoryRepository.delete({ phoneNumber: phoneNumber });
+
     const savedMessageHistoryOrmEntity =
       await this.messageHistoryRepository.save(messageHistoryEntity);
     return savedMessageHistoryOrmEntity;
