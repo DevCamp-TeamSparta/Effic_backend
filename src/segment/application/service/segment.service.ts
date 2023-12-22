@@ -36,7 +36,6 @@ export class SegmentService implements ISegmentUseCase {
 
   async getSegmentDetails(segmentId: number): Promise<Segment> {
     const segmentDetails = await this.segmentPort.getSegmentDetails(segmentId);
-    console.log(segmentDetails.segmentQuery);
     return segmentDetails;
   }
 

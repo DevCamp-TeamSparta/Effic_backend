@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  ParseIntPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -34,7 +35,7 @@ export class SegmentController {
 
   @Post('/detail')
   async getSegmentDetails(
-    @Body('segmentId') segmentId: number,
+    @Body('segmentId', ParseIntPipe) segmentId: number,
   ): Promise<Segment> {
     return this.segmentUseCase.getSegmentDetails(segmentId);
   }
