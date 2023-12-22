@@ -17,14 +17,11 @@ export class SegmentRepository implements ISegmentPort {
   ) {}
 
   async saveSegment(segment: Segment): Promise<SegmentOrmEntity> {
-    console.log(segment);
     const segmentOrmEntity = SegmentMapper.mapToSegmentOrmEntity(segment);
-    console.log('segmentOrmEntity: ', segmentOrmEntity);
 
     const savedSegmentOrmEntity = await this.segmentRepository.save(
       segmentOrmEntity,
     );
-    console.log('savedSegmentOrmEntity: ', savedSegmentOrmEntity);
     return savedSegmentOrmEntity;
   }
 
