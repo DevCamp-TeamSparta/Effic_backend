@@ -12,6 +12,7 @@ import {
 import { CreateFilterQueryByFatigueLevelDto } from 'src/segment/application/port/in/dto/create-filter-query-by-fatigue-level.dto';
 import { CreateFilterQueryByVariableValueDto } from 'src/segment/application/port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
+import { GetSegmentColumnDto } from 'src/segment/application/port/in/dto/get-segment-column.dto';
 import { GetSegmentDetailsDto } from 'src/segment/application/port/in/dto/get-segment-details.dto';
 import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment-query.dto';
 import {
@@ -63,8 +64,8 @@ export class SegmentController {
 
   @Post('/column')
   @HttpCode(HttpStatus.OK)
-  async getSegmentColumn(@Body('columnName') columnName: string) {
-    return this.segmentUseCase.getSegmentColumn(columnName);
+  async getSegmentColumn(@Body() dto: GetSegmentColumnDto) {
+    return this.segmentUseCase.getSegmentColumn(dto);
   }
 
   @Post('/records')

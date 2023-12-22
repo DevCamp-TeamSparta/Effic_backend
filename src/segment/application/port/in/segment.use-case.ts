@@ -4,6 +4,7 @@ import { UpdateSegmentQueryDto } from './dto/update-segment-query.dto';
 import { GetSegmentDetailsDto } from './dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from './dto/create-filter-query-by-variable-value.dto';
 import { CreateFilterQueryByFatigueLevelDto } from './dto/create-filter-query-by-fatigue-level.dto';
+import { GetSegmentColumnDto } from './dto/get-segment-column.dto';
 
 export interface ISegmentUseCase {
   createSegment(createSegmentDto: CreateSegmentDto): Promise<Segment>;
@@ -13,7 +14,7 @@ export interface ISegmentUseCase {
   ): Promise<Segment>;
   excuteSegmentQuery(segmentId: number): Promise<any>;
   getSegmentNames(): Promise<{ id: number; name: string }[]>;
-  getSegmentColumn(columnName: string): Promise<any>;
+  getSegmentColumn(dto: GetSegmentColumnDto);
   getSegmentRecords(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentTables(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentColumns(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;

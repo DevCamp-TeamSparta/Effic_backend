@@ -11,6 +11,7 @@ import {
 import { GetSegmentDetailsDto } from '../port/in/dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from '../port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter-query-by-fatigue-level.dto';
+import { GetSegmentColumnDto } from '../port/in/dto/get-segment-column.dto';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -72,7 +73,8 @@ export class SegmentService implements ISegmentUseCase {
     return await this.segmentPort.getSegmentNames();
   }
 
-  async getSegmentColumn(columnName: string): Promise<any> {
+  async getSegmentColumn(dto: GetSegmentColumnDto): Promise<any> {
+    const { columnName } = dto;
     return await this.segmentPort.getSegmentColumn(columnName);
   }
 
