@@ -252,62 +252,100 @@ export class TargetService implements ITargetUseCase {
     } = dto;
 
     const reservationTimeDate = new Date(reservationTime);
-
     const targetReceiverMap = await this.targetPort.getReceiverNumbers(
       targetIds,
     );
-
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
-
     const queryResult = await this.clientDbService.executeQuery(
       segment.filterQuery,
     );
 
     if (isRecurring) {
-      const endDateObj = new Date(endDate);
-      for (const record of queryResult) {
-        const targetReceiverNumber = record[receiverNumberColumnName];
-        const targetId = targetReceiverMap[targetReceiverNumber];
+      await this.handleRecurringReservations(
+        queryResult,
+        targetReceiverMap,
+        receiverNumberColumnName,
+        weekDays,
+        endDate,
+        reservationTimeDate,
+      );
+    } else {
+      await this.handleNonRecurringReservations(
+        queryResult,
+        targetReceiverMap,
+        timeColumnName,
+        receiverNumberColumnName,
+        delayDays,
+        reservationTimeDate,
+      );
+    }
+  }
 
-        const reservationDateTimeList = this.getReservationDates(
-          weekDays,
-          endDateObj,
-          reservationTimeDate,
-        );
+  private async handleRecurringReservations(
+    queryResult: any[],
+    targetReceiverMap: Record<string, number>,
+    receiverNumberColumnName: string,
+    weekDays: string[],
+    endDate: Date,
+    reservationTimeDate: Date,
+  ): Promise<void> {
+    const endDateObj = new Date(endDate);
+    for (const record of queryResult) {
+      const targetReceiverNumber = record[receiverNumberColumnName];
+      const targetId = targetReceiverMap[targetReceiverNumber];
+      const reservationDateTimeList = this.getReservationDates(
+        weekDays,
+        endDateObj,
+        reservationTimeDate,
+      );
 
-        const targetData = await this.targetPort.getTargetData(targetId);
+      const targetData = await this.targetPort.getTargetData(targetId);
+      for (const reservationDateTime of reservationDateTimeList) {
+        const newRecord = { ...targetData, reservedAt: reservationDateTime };
+        await this.targetPort.createTarget(newRecord);
+      }
 
-        for (const reservationDateTime of reservationDateTimeList) {
-          const newRecord = {
-            ...targetData,
-            reservedAt: reservationDateTime,
-          };
-          await this.targetPort.createTarget(newRecord);
-        }
+      await this.targetPort.deleteTarget(targetId);
+    }
+  }
 
-        await this.targetPort.deleteTarget(targetId);
+  private async handleNonRecurringReservations(
+    queryResult: any[],
+    targetReceiverMap: Record<string, number>,
+    timeColumnName: string,
+    receiverNumberColumnName: string,
+    delayDays: number,
+    reservationTimeDate: Date,
+  ): Promise<void> {
+    for (const record of queryResult) {
+      const tempTime = this.calculateNonRecurringTime(
+        record,
+        timeColumnName,
+        delayDays,
+        reservationTimeDate,
+      );
+      const targetReceiverNumber = record[receiverNumberColumnName];
+      const targetId = targetReceiverMap[targetReceiverNumber];
+      if (targetId) {
+        await this.targetPort.updateTargetReservationTime(targetId, tempTime);
       }
     }
+  }
 
-    if (!isRecurring) {
-      for (const record of queryResult) {
-        const tempTime = new Date(record[timeColumnName]);
-
-        tempTime.setDate(tempTime.getDate() + delayDays);
-
-        tempTime.setHours(
-          reservationTimeDate.getHours(),
-          reservationTimeDate.getMinutes(),
-          reservationTimeDate.getSeconds(),
-        );
-
-        const targetReceiverNumber = record[receiverNumberColumnName];
-        const targetId = targetReceiverMap[targetReceiverNumber];
-
-        if (targetId)
-          await this.targetPort.updateTargetReservationTime(targetId, tempTime);
-      }
-    }
+  private calculateNonRecurringTime(
+    record: any,
+    timeColumnName: string,
+    delayDays: number,
+    reservationTimeDate: Date,
+  ): Date {
+    const tempTime = new Date(record[timeColumnName]);
+    tempTime.setDate(tempTime.getDate() + delayDays);
+    tempTime.setHours(
+      reservationTimeDate.getHours(),
+      reservationTimeDate.getMinutes(),
+      reservationTimeDate.getSeconds(),
+    );
+    return tempTime;
   }
 
   private getReservationDates(
