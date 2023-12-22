@@ -246,49 +246,6 @@ export class TargetService implements ITargetUseCase {
       receiverNumberColumnName,
       delayDays,
       reservationTime,
-    } = dto;
-
-    const reservationTimeDate = new Date(reservationTime);
-
-    const targetReceiverMap = await this.targetPort.getReceiverNumbers(
-      targetIds,
-    );
-
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
-
-    const queryResult = await this.clientDbService.executeQuery(
-      segment.filterQuery,
-    );
-
-    for (const record of queryResult) {
-      const tempTime = new Date(record[timeColumnName]);
-
-      tempTime.setDate(tempTime.getDate() + delayDays);
-
-      tempTime.setHours(
-        reservationTimeDate.getHours(),
-        reservationTimeDate.getMinutes(),
-        reservationTimeDate.getSeconds(),
-      );
-
-      const targetReceiverNumber = record[receiverNumberColumnName];
-      const targetId = targetReceiverMap[targetReceiverNumber];
-
-      if (targetId)
-        await this.targetPort.updateTargetReservationTime(targetId, tempTime);
-    }
-  }
-
-  async createTargetReservationTime2(
-    dto: CreateTargetReservationTimeDto,
-  ): Promise<void> {
-    const {
-      targetIds,
-      segmentId,
-      timeColumnName,
-      receiverNumberColumnName,
-      delayDays,
-      reservationTime,
       endDate,
       isRecurring,
       weekDays,

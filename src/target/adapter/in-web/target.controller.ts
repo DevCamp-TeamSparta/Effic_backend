@@ -71,6 +71,6 @@ export class TargetController {
   async createTargetReservationTime(
     @Body() dto: CreateTargetReservationTimeDto,
   ): Promise<void> {
-    return this.targetUseCase.createTargetReservationTime2(dto);
+    return this.targetUseCase.createTargetReservationTime(dto);
   }
 }
