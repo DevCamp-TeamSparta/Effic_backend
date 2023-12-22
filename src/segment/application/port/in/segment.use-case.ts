@@ -1,6 +1,6 @@
 import { Segment } from 'src/segment/domain/segment';
 import { CreateSegmentDto } from './dto/create-segment.dto';
-import { UpdateSegmentQueryDto } from './dto/update-segment.dto';
+import { UpdateSegmentQueryDto } from './dto/update-segment-query.dto';
 import { GetSegmentDetailsDto } from './dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from './dto/create-filter-query-by-variable-value.dto';
 import { CreateFilterQueryByFatigueLevelDto } from './dto/create-filter-query-by-fatigue-level.dto';

@@ -13,7 +13,7 @@ import { CreateFilterQueryByFatigueLevelDto } from 'src/segment/application/port
 import { CreateFilterQueryByVariableValueDto } from 'src/segment/application/port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
 import { GetSegmentDetailsDto } from 'src/segment/application/port/in/dto/get-segment-details.dto';
-import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment.dto';
+import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment-query.dto';
 import {
   ISegmentUseCase,
   ISegmentUseCaseSymbol,

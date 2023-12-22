@@ -3,7 +3,7 @@ import { ISegmentUseCase } from '../port/in/segment.use-case';
 import { ISegmentPort, ISegmentPortSymbol } from '../port/out/segment.port';
 import { CreateSegmentDto } from '../port/in/dto/create-segment.dto';
 import { Segment } from 'src/segment/domain/segment';
-import { UpdateSegmentQueryDto } from '../port/in/dto/update-segment.dto';
+import { UpdateSegmentQueryDto } from '../port/in/dto/update-segment-query.dto';
 import {
   IClientDbService,
   IClientDbServiceSymbol,
