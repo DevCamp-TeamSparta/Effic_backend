@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as mysql from 'mysql2/promise';
 import { IClientDbService } from './client-db.interface';
 
@@ -35,7 +35,10 @@ export class ClientDbService implements IClientDbService {
   }
 
   async executeQuery(query: string): Promise<any> {
-    if (!this.connectionPool) throw new Error('connectionPool error');
+    if (!this.connectionPool)
+      throw new InternalServerErrorException(
+        'Connection pool is not initialized',
+      );
     try {
       const connection = await this.connectionPool.getConnection();
       const ping = await connection.ping();
