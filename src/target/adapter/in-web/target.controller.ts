@@ -58,7 +58,7 @@ export class TargetController {
     return this.targetUseCase.smsTest(dto);
   }
 
-  @Post('/messageContent')
+  @Post('/message-content')
   @HttpCode(HttpStatus.CREATED)
   async createMessageContent(
     @Body() dto: CreateMessageContentDto,
