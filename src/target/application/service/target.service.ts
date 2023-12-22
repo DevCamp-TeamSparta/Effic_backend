@@ -252,9 +252,10 @@ export class TargetService implements ITargetUseCase {
     } = dto;
 
     const reservationTimeDate = new Date(reservationTime);
-    const targetReceiverMap = await this.targetPort.getReceiverNumbers(
+    const phoneNumberToTargetIdMap = await this.targetPort.getReceiverNumbers(
       targetIds,
     );
+
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
     const queryResult = await this.clientDbService.executeQuery(
       segment.filterQuery,
@@ -263,7 +264,7 @@ export class TargetService implements ITargetUseCase {
     if (isRecurring) {
       await this.handleRecurringReservations(
         queryResult,
-        targetReceiverMap,
+        phoneNumberToTargetIdMap,
         receiverNumberColumnName,
         weekDays,
         endDate,
@@ -272,7 +273,7 @@ export class TargetService implements ITargetUseCase {
     } else {
       await this.handleNonRecurringReservations(
         queryResult,
-        targetReceiverMap,
+        phoneNumberToTargetIdMap,
         timeColumnName,
         receiverNumberColumnName,
         delayDays,
@@ -283,7 +284,7 @@ export class TargetService implements ITargetUseCase {
 
   private async handleRecurringReservations(
     queryResult: any[],
-    targetReceiverMap: Record<string, number>,
+    phoneNumberToTargetIdMap: Record<string, number>,
     receiverNumberColumnName: string,
     weekDays: string[],
     endDate: Date,
@@ -292,7 +293,7 @@ export class TargetService implements ITargetUseCase {
     const endDateObj = new Date(endDate);
     for (const record of queryResult) {
       const targetReceiverNumber = record[receiverNumberColumnName];
-      const targetId = targetReceiverMap[targetReceiverNumber];
+      const targetId = phoneNumberToTargetIdMap[targetReceiverNumber];
       const reservationDateTimeList = this.getReservationDates(
         weekDays,
         endDateObj,
@@ -311,7 +312,7 @@ export class TargetService implements ITargetUseCase {
 
   private async handleNonRecurringReservations(
     queryResult: any[],
-    targetReceiverMap: Record<string, number>,
+    phoneNumberToTargetIdMap: Record<string, number>,
     timeColumnName: string,
     receiverNumberColumnName: string,
     delayDays: number,
@@ -325,7 +326,7 @@ export class TargetService implements ITargetUseCase {
         reservationTimeDate,
       );
       const targetReceiverNumber = record[receiverNumberColumnName];
-      const targetId = targetReceiverMap[targetReceiverNumber];
+      const targetId = phoneNumberToTargetIdMap[targetReceiverNumber];
       if (targetId) {
         await this.targetPort.updateTargetReservationTime(targetId, tempTime);
       }
