@@ -11,6 +11,7 @@ import {
   IClientDbService,
   IClientDbServiceSymbol,
 } from './client-db.interface';
+import { ConnectToDatabaseDto } from './connect-to-db.dto';
 
 @Controller('client-db')
 export class ClientDbController {
@@ -21,21 +22,9 @@ export class ClientDbController {
 
   @Post('/connect')
   @HttpCode(HttpStatus.OK)
-  async connectToDatabase(
-    @Body()
-    connectionDetails: {
-      host: string;
-      user: string;
-      password: string;
-      database: string;
-      port: number;
-    },
-  ) {
-    await this.clientDbService.connectToDb(connectionDetails);
+  async connectToDatabase(@Body() dto: ConnectToDatabaseDto) {
+    await this.clientDbService.connectToDb(dto);
     const isConnected = await this.clientDbService.testConnection();
-    if (!isConnected) {
-      throw new Error('Failed to connect to database');
-    }
   }
 
   @Get('/test')
