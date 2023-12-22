@@ -48,7 +48,9 @@ export class SegmentController {
 
   @Post('/query')
   @HttpCode(HttpStatus.OK)
-  async excuteSegmentQuery(@Body('segmentId') segmentId: number): Promise<any> {
+  async excuteSegmentQuery(
+    @Body('segmentId', ParseIntPipe) segmentId: number,
+  ): Promise<any> {
     return this.segmentUseCase.excuteSegmentQuery(segmentId);
   }
 
