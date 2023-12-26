@@ -23,24 +23,6 @@ export class UsersController {
   private logger = new Logger('UsersController');
   constructor(private usersService: UsersService) {}
 
-  @Post('/login')
-  async loginUser(@Body() createUserDto: CreateUserDto): Promise<object> {
-    this.logger.verbose('User login');
-    return this.usersService.checkUserInfoWithToken(createUserDto);
-  }
-
-  @Post('/refresh')
-  async refresh(@Headers('Authorization') authorization: string) {
-    this.logger.verbose('User refresh');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
-    const user = await this.usersService.checkUserInfo(email);
-    const { accessToken: newAccessToken } =
-      await this.usersService.generateTokens(user);
-    return { accessToken: newAccessToken };
-  }
-
   @Post('/signup')
   async createUser(
     @Body(new UserBodyValidationPipe()) createUserDto: CreateUserDto,
@@ -92,6 +74,24 @@ export class UsersController {
       accessToken,
       point,
     };
+  }
+
+  @Post('/login')
+  async loginUser(@Body() createUserDto: CreateUserDto): Promise<object> {
+    this.logger.verbose('User login');
+    return this.usersService.checkUserInfoWithToken(createUserDto);
+  }
+
+  @Post('/refresh')
+  async refresh(@Headers('Authorization') authorization: string) {
+    this.logger.verbose('User refresh');
+    const accessToken = authorization.split(' ')[1];
+    const decodedAccessToken: any = jwt.decode(accessToken);
+    const email = decodedAccessToken.email;
+    const user = await this.usersService.checkUserInfo(email);
+    const { accessToken: newAccessToken } =
+      await this.usersService.generateTokens(user);
+    return { accessToken: newAccessToken };
   }
 
   @Patch('/me')
