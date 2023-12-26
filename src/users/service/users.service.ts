@@ -39,6 +39,7 @@ export class UsersService {
 
       return { email, accessToken };
     } catch (error) {
+      /**dummyUser를 왜 생성하는지 파악하지 못함 */
       console.error(error);
       if (error instanceof NotFoundException) {
         const dummyUser = new User();
