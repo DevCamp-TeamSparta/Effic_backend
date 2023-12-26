@@ -111,18 +111,13 @@ export class UsersController {
     await this.usersService.updateUser(email, authorization, updateUserDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/logout')
-  async logout(@Headers('Authorization') authorization: string) {
+  async logout(@Req() req) {
     this.logger.verbose('User logout');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-
-    if (decodedAccessToken) {
-      const user = await this.usersService.checkUserInfo(
-        decodedAccessToken.email,
-      );
-      await this.usersService.logout(user);
-    }
+    const email = req.payload.email;
+    const user = await this.usersService.checkUserInfo(email);
+    await this.usersService.logout(user);
   }
 
   // 마이페이지
