@@ -21,15 +21,17 @@ export class UsersRepository extends Repository<User> {
   async createUser(createUSerInfo: CreateUserDto): Promise<User> {
     const { email, name, hostnumber, advertisementOpt } = createUSerInfo;
 
-    const extractedHostnumbers = hostnumber.map((hostnumber) =>
-      hostnumber.replace(/\D/g, ''),
-    );
+    /**임시 주석 처리 */
+    // const extractedHostnumbers = hostnumber.map((hostnumber) =>
+    //   hostnumber.replace(/\D/g, ''),
+    // );
 
     const addedPoint = 3000;
     const newUser = this.create({
       email: email,
       name: name,
-      hostnumber: extractedHostnumbers,
+      // hostnumber: extractedHostnumbers,  /**임시 주석 처리 */
+      hostnumber: hostnumber,
       isNcp: true, // 추후에 ncp가 아닌 다른서비스를 이용할 경우 변경해야함
       advertisementOpt: advertisementOpt,
       point: addedPoint,
@@ -78,16 +80,18 @@ export class UserNcpInfoRepository extends Repository<UserNcpInfo> {
     const { accessKey, serviceId, secretKey, advertiseNumber, hostnumber } =
       createUSerInfo;
 
-    const extractedHostnumbers = hostnumber.map((hostnumber) =>
-      hostnumber.replace(/\D/g, ''),
-    );
+    /**임시 주석 처리 */
+    // const extractedHostnumbers = hostnumber.map((hostnumber) =>
+    //   hostnumber.replace(/\D/g, ''),
+    // );
 
     const newUserNcpInfo = this.create({
       accessKey: accessKey,
       serviceId: serviceId,
       secretKey: secretKey,
       advertiseNumber: advertiseNumber,
-      hostnumber: extractedHostnumbers,
+      // hostnumber: extractedHostnumbers, /**임시 주석 처리 */
+      hostnumber,
       userId: userId.userId,
     });
 
