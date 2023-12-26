@@ -7,6 +7,8 @@ import {
   Patch,
   Headers,
   Logger,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from '../service/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -17,6 +19,10 @@ import * as jwt from 'jsonwebtoken';
 import { UserBodyValidationPipe } from '../pipe/user-body-validation-pipe';
 import { AuthGuard } from 'src/auth.guard';
 import { UpdatePlusFriendDto } from '../dto/update-plusFriend.dto';
+import {
+  AccessTokenGuard,
+  RefreshTokenGuard,
+} from 'src/auth/guards/auth.guard';
 
 @Controller('users')
 export class UsersController {
@@ -82,12 +88,11 @@ export class UsersController {
     return this.usersService.checkUserInfoWithToken(email);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/refresh')
-  async refresh(@Headers('Authorization') authorization: string) {
+  async refresh(@Req() req) {
     this.logger.verbose('User refresh');
-    const accessToken = authorization.split(' ')[1];
-    const decodedAccessToken: any = jwt.decode(accessToken);
-    const email = decodedAccessToken.email;
+    const email = req.payload.email;
     const user = await this.usersService.checkUserInfo(email);
     const { accessToken: newAccessToken } =
       await this.usersService.generateTokens(user);

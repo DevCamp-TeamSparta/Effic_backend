@@ -16,6 +16,7 @@ import { SegmentModule } from './segment/segment.module';
 import { ClientDbModule } from './client-db/client-db.module';
 import { TargetModule } from './target/target.module';
 import { AutoMessageEventModule } from './auto-message-event/auto-message-event.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AutoMessageEventModule } from './auto-message-event/auto-message-event.
     ClientDbModule,
     TargetModule,
     AutoMessageEventModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, AuthGuard],
