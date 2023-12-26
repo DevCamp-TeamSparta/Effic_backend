@@ -77,9 +77,9 @@ export class UsersController {
   }
 
   @Post('/login')
-  async loginUser(@Body() createUserDto: CreateUserDto): Promise<object> {
+  async loginUser(@Body('email') email: string): Promise<object> {
     this.logger.verbose('User login');
-    return this.usersService.checkUserInfoWithToken(createUserDto);
+    return this.usersService.checkUserInfoWithToken(email);
   }
 
   @Post('/refresh')

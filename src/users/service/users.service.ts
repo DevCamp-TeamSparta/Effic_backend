@@ -31,9 +31,7 @@ export class UsersService {
     return user;
   }
 
-  async checkUserInfoWithToken(createUserDto) {
-    const email = createUserDto.email;
-
+  async checkUserInfoWithToken(email: string) {
     try {
       const user = await this.checkUserInfo(email);
       const { accessToken, refreshToken } = await this.generateTokens(user);
