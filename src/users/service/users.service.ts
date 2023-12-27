@@ -31,6 +31,12 @@ export class UsersService {
     return user;
   }
 
+  /**
+   * 사용자 이메일의 [이메일 인증하기] 버튼을 클릭하면 호출되는 API
+   * - 회원가입한 사용자인 경우 accessToken, refreshToken을 발행해서 return
+   * - 회원가입을 하지 않은 사용자인 경우 accessToken만 임시 발행
+   *     - 사용자의 이메일을 인증하는 방법으로 accessToken을 사용한 것
+   */
   async checkUserInfoWithToken(email: string) {
     try {
       const user = await this.checkUserInfo(email);
@@ -39,7 +45,6 @@ export class UsersService {
 
       return { email, accessToken };
     } catch (error) {
-      /**dummyUser를 왜 생성하는지 파악하지 못함 */
       console.error(error);
       if (error instanceof NotFoundException) {
         const dummyUser = new User();
