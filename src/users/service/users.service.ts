@@ -135,16 +135,15 @@ export class UsersService {
     advertiseNumber: string[],
     point: number,
   ) {
-    /**임시 주석 처리 */
-    // this.checkAccessToken(null, `Bearer ${token}`);
-    // const payload = jwt.decode(token);
-    // if (typeof payload === 'string') {
-    //   throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
-    // }
-    // const headerEmail = payload.email;
-    // if (headerEmail !== email) {
-    //   throw new HttpException('Email is not valid', HttpStatus.BAD_REQUEST);
-    // }
+    this.checkAccessToken(null, `Bearer ${token}`);
+    const payload = jwt.decode(token);
+    if (typeof payload === 'string') {
+      throw new HttpException('Token is not valid', HttpStatus.BAD_REQUEST);
+    }
+    const headerEmail = payload.email;
+    if (headerEmail !== email) {
+      throw new HttpException('Email is not valid', HttpStatus.BAD_REQUEST);
+    }
     const user = await this.usersRepository.findOneByEmail(email);
 
     const newUser = {
