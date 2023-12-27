@@ -27,7 +27,7 @@ export class CreateSegmentDto {
   @IsOptional()
   updatedAt?: Date;
 
-  @IsNumber()
-  @IsNotEmpty()
-  userId: number;
+  @IsString()
+  @IsOptional()
+  email?: string;
 }

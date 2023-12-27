@@ -7,6 +7,13 @@ import { SegmentService } from './application/service/segment.service';
 import { SegmentOrmEntity } from './adapter/out-persistence/segment.orm.entity';
 import { ISegmentPortSymbol } from './application/port/out/segment.port';
 import { MessageHistoryOrmEntity } from './adapter/out-persistence/message-history.orm.entity';
+import { JwtService } from '@nestjs/jwt';
+import { AuthService } from 'src/auth/service/auth.service';
+import { UsersService } from 'src/users/service/users.service';
+import {
+  UserNcpInfoRepository,
+  UsersRepository,
+} from 'src/users/users.repository';
 
 @Module({
   imports: [
@@ -14,6 +21,11 @@ import { MessageHistoryOrmEntity } from './adapter/out-persistence/message-histo
   ],
   controllers: [SegmentController],
   providers: [
+    JwtService,
+    AuthService,
+    UsersService,
+    UsersRepository,
+    UserNcpInfoRepository,
     {
       provide: ISegmentPortSymbol,
       useClass: SegmentRepository,

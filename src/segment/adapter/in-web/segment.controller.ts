@@ -8,7 +8,10 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
+import { AccessTokenGuard } from 'src/auth/guards/auth.guard';
 import { CreateFilterQueryByFatigueLevelDto } from 'src/segment/application/port/in/dto/create-filter-query-by-fatigue-level.dto';
 import { CreateFilterQueryByVariableValueDto } from 'src/segment/application/port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
@@ -28,9 +31,11 @@ export class SegmentController {
     private readonly segmentUseCase: ISegmentUseCase,
   ) {}
 
+  @UseGuards(AccessTokenGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createSegment(@Body() dto: CreateSegmentDto) {
+  async createSegment(@Req() req, @Body() dto: CreateSegmentDto) {
+    dto.email = req.payload.email;
     return this.segmentUseCase.createSegment(dto);
   }
 

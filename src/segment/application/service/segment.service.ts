@@ -12,6 +12,7 @@ import { GetSegmentDetailsDto } from '../port/in/dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from '../port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter-query-by-fatigue-level.dto';
 import { GetSegmentColumnDto } from '../port/in/dto/get-segment-column.dto';
+import { UsersService } from 'src/users/service/users.service';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -20,10 +21,11 @@ export class SegmentService implements ISegmentUseCase {
     private readonly segmentPort: ISegmentPort,
     @Inject(IClientDbServiceSymbol)
     private readonly clientDbService: IClientDbService,
+    private usersService: UsersService,
   ) {}
 
   async createSegment(dto: CreateSegmentDto): Promise<any> {
-    const { segmentName, segmentDescription, createdAt, userId } = dto;
+    const { segmentName, segmentDescription, createdAt, email } = dto;
     const newSegment = new Segment(
       segmentName,
       segmentDescription,
@@ -32,7 +34,8 @@ export class SegmentService implements ISegmentUseCase {
       null,
       null,
     );
-    return this.segmentPort.saveSegment(newSegment, userId);
+    const user = await this.usersService.checkUserInfo(email);
+    return this.segmentPort.saveSegment(newSegment, user.userId);
   }
 
   async getSegmentDetails(segmentId: number): Promise<Segment> {

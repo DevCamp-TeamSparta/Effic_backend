@@ -20,13 +20,11 @@ export class AccessTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const token = this.authService.extractTokenFromHeader(req);
-    if (!token) throw new UnauthorizedException();
+    if (!token) throw new UnauthorizedException('AccessToken Error');
 
     const payload = await this.jwtService.verifyAsync(token, {
       secret: jwtConfig.secretKey,
     });
-
-    console.log('payload: ', payload);
 
     req.payload = payload;
     return true;
