@@ -13,8 +13,8 @@ export class CreateSegmentDto {
   segmentName: string;
 
   @IsString()
-  @IsNotEmpty()
-  segmentDescription: string;
+  @IsOptional()
+  segmentDescription?: string;
 
   @Type(() => Date)
   @IsDate()
