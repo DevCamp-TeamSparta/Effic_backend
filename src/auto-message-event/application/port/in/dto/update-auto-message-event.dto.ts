@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
@@ -29,10 +30,12 @@ export class UpdateAutoMessageEventDto {
   clickRate?: number | null;
 
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   scheduledEndDate?: Date;
 
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   createdDate?: Date;
 
