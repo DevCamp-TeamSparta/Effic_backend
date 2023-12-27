@@ -28,7 +28,7 @@ export class CreateTargetReservationTimeDto {
   receiverNumberColumnName: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   delayDays: number;
 
   @IsNotEmpty()
