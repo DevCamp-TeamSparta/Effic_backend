@@ -23,7 +23,7 @@ export class SegmentService implements ISegmentUseCase {
   ) {}
 
   async createSegment(dto: CreateSegmentDto): Promise<any> {
-    const { segmentName, segmentDescription, createdAt, updatedAt } = dto;
+    const { segmentName, segmentDescription, createdAt, userId } = dto;
     const newSegment = new Segment(
       segmentName,
       segmentDescription,
@@ -32,7 +32,7 @@ export class SegmentService implements ISegmentUseCase {
       null,
       null,
     );
-    return this.segmentPort.saveSegment(newSegment);
+    return this.segmentPort.saveSegment(newSegment, userId);
   }
 
   async getSegmentDetails(segmentId: number): Promise<Segment> {

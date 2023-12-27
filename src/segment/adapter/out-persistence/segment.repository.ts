@@ -16,8 +16,14 @@ export class SegmentRepository implements ISegmentPort {
     private readonly messageHistoryRepository: Repository<MessageHistoryOrmEntity>,
   ) {}
 
-  async saveSegment(segment: Segment): Promise<SegmentOrmEntity> {
-    const segmentOrmEntity = SegmentMapper.mapToSegmentOrmEntity(segment);
+  async saveSegment(
+    segment: Segment,
+    userId: number,
+  ): Promise<SegmentOrmEntity> {
+    const segmentOrmEntity = SegmentMapper.mapToSegmentOrmEntity(
+      segment,
+      userId,
+    );
 
     const savedSegmentOrmEntity = await this.segmentRepository.save(
       segmentOrmEntity,

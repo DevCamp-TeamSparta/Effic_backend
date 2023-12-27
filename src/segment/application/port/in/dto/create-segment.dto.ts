@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsDate,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   isDate,
@@ -25,4 +26,8 @@ export class CreateSegmentDto {
   @IsDate()
   @IsOptional()
   updatedAt?: Date;
+
+  @IsNumber()
+  @IsNotEmpty()
+  userId: number;
 }

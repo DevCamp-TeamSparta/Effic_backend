@@ -14,13 +14,14 @@ export class SegmentMapper {
     return SegmentEntity;
   }
 
-  static mapToSegmentOrmEntity(segment: Segment) {
+  static mapToSegmentOrmEntity(segment: Segment, userId: number) {
     const segmentEntity = new SegmentOrmEntity();
     segmentEntity.segmentName = segment.segmentName;
     segmentEntity.segmentDescription = segment.segmentDescription;
     segmentEntity.segmentQuery = segment.segmentQuery;
     segmentEntity.filterQuery = segment.filterQuery;
     segmentEntity.createdAt = segment.createdAt;
+    segmentEntity.userId = userId;
 
     return segmentEntity;
   }

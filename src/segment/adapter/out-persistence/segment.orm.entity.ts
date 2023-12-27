@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('Segment')
 export class SegmentOrmEntity {
@@ -22,4 +29,8 @@ export class SegmentOrmEntity {
 
   @Column({ nullable: true })
   updatedAt: Date;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  userId: number;
 }
