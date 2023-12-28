@@ -5,6 +5,7 @@ import { GetSegmentDetailsDto } from './dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from './dto/create-filter-query-by-variable-value.dto';
 import { CreateFilterQueryByFatigueLevelDto } from './dto/create-filter-query-by-fatigue-level.dto';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
+import { UpdateSegmentDto } from './dto/update-segment.dto';
 
 export interface ISegmentUseCase {
   createSegment(createSegmentDto: CreateSegmentDto): Promise<SegmentOrmEntity>;
@@ -12,6 +13,7 @@ export interface ISegmentUseCase {
     segmentId: number,
     email: string,
   ): Promise<SegmentOrmEntity>;
+  updateSegment(dto: UpdateSegmentDto): Promise<SegmentOrmEntity>;
   updateSegmentQuery(
     updateSegmentQueryDto: UpdateSegmentQueryDto,
   ): Promise<Segment>;

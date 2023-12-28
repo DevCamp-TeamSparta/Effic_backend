@@ -6,6 +6,7 @@ import { Segment } from 'src/segment/domain/segment';
 import { SegmentMapper } from './segment.mapper';
 import { ISegmentPort } from 'src/segment/application/port/out/segment.port';
 import { MessageHistoryOrmEntity } from './message-history.orm.entity';
+import { UpdateSegmentDto } from 'src/segment/application/port/in/dto/update-segment.dto';
 
 @Injectable()
 export class SegmentRepository implements ISegmentPort {
@@ -29,6 +30,24 @@ export class SegmentRepository implements ISegmentPort {
       segmentOrmEntity,
     );
     return savedSegmentOrmEntity;
+  }
+
+  async updateSegment(dto: UpdateSegmentDto): Promise<SegmentOrmEntity> {
+    const { segmentId, segmentName, segmentDescription, updatedAt } = dto;
+    const segmentOrmEntity = await this.segmentRepository.findOneBy({
+      segmentId,
+    });
+    if (!segmentOrmEntity) throw new Error('Segment not found');
+
+    if (segmentName) segmentOrmEntity.segmentName = segmentName;
+    if (segmentDescription)
+      segmentOrmEntity.segmentDescription = segmentDescription;
+
+    segmentOrmEntity.updatedAt = updatedAt;
+
+    await this.segmentRepository.save(segmentOrmEntity);
+
+    return segmentOrmEntity;
   }
 
   async getSegmentDetails(segmentId: number): Promise<SegmentOrmEntity> {

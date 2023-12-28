@@ -24,6 +24,7 @@ import {
 } from 'src/segment/application/port/in/segment.use-case';
 import { Segment } from 'src/segment/domain/segment';
 import { SegmentOrmEntity } from '../out-persistence/segment.orm.entity';
+import { UpdateSegmentDto } from 'src/segment/application/port/in/dto/update-segment.dto';
 
 @Controller('segment')
 export class SegmentController {
@@ -40,6 +41,15 @@ export class SegmentController {
     this.logger.verbose('createSegment');
     dto.email = req.payload.email;
     return this.segmentUseCase.createSegment(dto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Put()
+  @HttpCode(HttpStatus.CREATED)
+  async updateSegment(@Req() req, @Body() dto: UpdateSegmentDto) {
+    this.logger.verbose('updateSegment');
+    dto.email = req.payload.email;
+    return this.segmentUseCase.updateSegment(dto);
   }
 
   @UseGuards(AccessTokenGuard)

@@ -20,6 +20,9 @@ import { CreateFilterQueryByVariableValueDto } from '../port/in/dto/create-filte
 import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter-query-by-fatigue-level.dto';
 import { UsersService } from 'src/users/service/users.service';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
+import { UpdateSegmentDto } from '../port/in/dto/update-segment.dto';
+import { SegmentMapper } from 'src/segment/adapter/out-persistence/segment.mapper';
+import * as moment from 'moment-timezone';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -44,6 +47,18 @@ export class SegmentService implements ISegmentUseCase {
     );
     const user = await this.usersService.checkUserInfo(email);
     return this.segmentPort.saveSegment(newSegment, user.userId);
+  }
+
+  async updateSegment(dto: UpdateSegmentDto): Promise<SegmentOrmEntity> {
+    this.logger.verbose('updateSegment');
+    const { segmentId, email } = dto;
+
+    await this.checkUserIsSegmentCreator(email, segmentId);
+
+    const updatedAt = new Date();
+    dto.updatedAt = updatedAt;
+
+    return this.segmentPort.updateSegment(dto);
   }
 
   async getSegmentDetails(
