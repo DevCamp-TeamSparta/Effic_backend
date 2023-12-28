@@ -83,12 +83,6 @@ export class SegmentController {
     return this.segmentUseCase.getAllSegments(email);
   }
 
-  @Post('/records')
-  @HttpCode(HttpStatus.OK)
-  async getSegmentRecords(@Body() dto: GetSegmentDetailsDto) {
-    return this.segmentUseCase.getSegmentRecords(dto);
-  }
-
   @Post('/tables')
   @HttpCode(HttpStatus.OK)
   async getSegmentTables(@Body() dto: GetSegmentDetailsDto) {
