@@ -75,6 +75,15 @@ export class SegmentController {
     return this.segmentUseCase.excuteSegmentQuery(segmentId, email);
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Get('/all')
+  @HttpCode(HttpStatus.OK)
+  async getAllSegments(@Req() req) {
+    this.logger.verbose('getAllSegments');
+    const email = req.payload.email;
+    return this.segmentUseCase.getAllSegments(email);
+  }
+
   /** To do: userId에 해당하는 segment의 segmentName을 return하도록 수정 */
   @Get('/segmentNames')
   @HttpCode(HttpStatus.OK)

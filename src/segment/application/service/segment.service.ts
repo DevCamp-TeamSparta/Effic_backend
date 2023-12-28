@@ -81,6 +81,12 @@ export class SegmentService implements ISegmentUseCase {
     return result;
   }
 
+  async getAllSegments(email: string): Promise<Segment[]> {
+    this.logger.verbose('getAllSegments');
+    const user = await this.usersService.checkUserInfo(email);
+    return await this.segmentPort.getAllSegments(user.userId);
+  }
+
   async getSegmentNames(): Promise<{ id: number; name: string }[]> {
     return await this.segmentPort.getSegmentNames();
   }
