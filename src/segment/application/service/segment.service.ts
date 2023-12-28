@@ -36,6 +36,7 @@ export class SegmentService implements ISegmentUseCase {
   ) {}
 
   async createSegment(dto: CreateSegmentDto): Promise<SegmentOrmEntity> {
+    this.logger.verbose('createSegment');
     const { segmentName, segmentDescription, createdAt, email } = dto;
     const newSegment = new Segment(
       segmentName,
@@ -102,6 +103,7 @@ export class SegmentService implements ISegmentUseCase {
   }
 
   async getSegmentTables(dto: GetSegmentDetailsDto): Promise<any[]> {
+    this.logger.verbose('getSegmentTables');
     const { databaseName } = dto;
 
     const query = `SELECT table_name FROM information_schema.tables WHERE table_schema = '${databaseName}';`;
@@ -111,6 +113,7 @@ export class SegmentService implements ISegmentUseCase {
   }
 
   async getSegmentColumns(dto: GetSegmentDetailsDto): Promise<any[]> {
+    this.logger.verbose('getSegmentColumns');
     const { databaseName, tableName } = dto;
 
     const query = `SELECT column_name FROM information_schema.columns WHERE table_schema = '${databaseName}' AND table_name = '${tableName}';`;
@@ -120,6 +123,7 @@ export class SegmentService implements ISegmentUseCase {
   }
 
   async createFilterQueryWhenNoFilter(segmentId: number): Promise<void> {
+    this.logger.verbose('createFilterQueryWhenNoFilter');
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
     if (segment.filterQuery)
@@ -135,6 +139,7 @@ export class SegmentService implements ISegmentUseCase {
   async createFilterQueryByVariableValue(
     dto: CreateFilterQueryByVariableValueDto,
   ): Promise<any> {
+    this.logger.verbose('createFilterQueryByVariableValue');
     const { segmentId, columnName, value, excludeValue } = dto;
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
@@ -173,6 +178,7 @@ export class SegmentService implements ISegmentUseCase {
   async createFilterQueryByFatigueLevel(
     dto: CreateFilterQueryByFatigueLevelDto,
   ): Promise<void> {
+    this.logger.verbose('createFilterQueryByFatigueLevel');
     const { segmentId, receiverNumberColumnName, fatigueLevelDays } = dto;
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
