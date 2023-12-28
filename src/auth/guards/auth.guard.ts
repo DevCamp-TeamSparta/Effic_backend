@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as dotenv from 'dotenv';
@@ -12,12 +13,14 @@ dotenv.config();
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
+  private logger = new Logger('AccessTokenGuard');
   constructor(
     private jwtService: JwtService,
     private authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    this.logger.verbose('AccessTokenGuard');
     const req = context.switchToHttp().getRequest();
     const token = this.authService.extractTokenFromHeader(req);
     if (!token) throw new UnauthorizedException('AccessToken Error');
@@ -33,12 +36,14 @@ export class AccessTokenGuard implements CanActivate {
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
+  private logger = new Logger('RefreshTokenGuard');
   constructor(
     private jwtService: JwtService,
     private authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    this.logger.verbose('RefreshTokenGuard');
     const req = context.switchToHttp().getRequest();
 
     const token = this.authService.extractTokenFromHeader(req);
