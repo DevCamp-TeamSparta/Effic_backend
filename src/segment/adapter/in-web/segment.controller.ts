@@ -131,12 +131,15 @@ export class SegmentController {
     return this.segmentUseCase.createFilterQueryByVariableValue(dto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/filter-query/fatigue-level')
   @HttpCode(HttpStatus.CREATED)
   async createFilterQueryByFatigueLevel(
+    @Req() req,
     @Body() dto: CreateFilterQueryByFatigueLevelDto,
   ): Promise<void> {
     this.logger.verbose('createFilterQueryByFatigueLevel');
+    dto.email = req.payload.email;
     return this.segmentUseCase.createFilterQueryByFatigueLevel(dto);
   }
 }

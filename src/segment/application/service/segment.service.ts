@@ -191,9 +191,10 @@ export class SegmentService implements ISegmentUseCase {
     dto: CreateFilterQueryByFatigueLevelDto,
   ): Promise<void> {
     this.logger.verbose('createFilterQueryByFatigueLevel');
-    const { segmentId, receiverNumberColumnName, fatigueLevelDays } = dto;
+    const { segmentId, receiverNumberColumnName, fatigueLevelDays, email } =
+      dto;
 
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+    const segment = await this.checkUserIsSegmentCreator(email, segmentId);
 
     const queryResult = await this.clientDbService.executeQuery(
       segment.filterQuery,

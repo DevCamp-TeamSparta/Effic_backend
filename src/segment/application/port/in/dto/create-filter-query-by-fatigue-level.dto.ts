@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateFilterQueryByFatigueLevelDto {
   @IsNumber()
@@ -12,4 +12,8 @@ export class CreateFilterQueryByFatigueLevelDto {
   @IsNumber()
   @IsNotEmpty()
   fatigueLevelDays: number;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
 }
