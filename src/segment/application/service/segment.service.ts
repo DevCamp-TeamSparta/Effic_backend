@@ -152,9 +152,9 @@ export class SegmentService implements ISegmentUseCase {
     dto: CreateFilterQueryByVariableValueDto,
   ): Promise<any> {
     this.logger.verbose('createFilterQueryByVariableValue');
-    const { segmentId, columnName, value, excludeValue } = dto;
+    const { segmentId, columnName, value, excludeValue, email } = dto;
 
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+    const segment = await this.checkUserIsSegmentCreator(email, segmentId);
 
     let modifiedQuery = segment.filterQuery.trim();
     if (modifiedQuery.endsWith(';')) {

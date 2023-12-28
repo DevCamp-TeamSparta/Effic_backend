@@ -119,12 +119,15 @@ export class SegmentController {
     return this.segmentUseCase.createFilterQueryWhenNoFilter(segmentId, email);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/filter-query/variable-value')
   @HttpCode(HttpStatus.CREATED)
   async createFilterQueryByVariableValue(
+    @Req() req,
     @Body() dto: CreateFilterQueryByVariableValueDto,
   ): Promise<void> {
     this.logger.verbose('createFilterQueryByVariableValue');
+    dto.email = req.payload.email;
     return this.segmentUseCase.createFilterQueryByVariableValue(dto);
   }
 

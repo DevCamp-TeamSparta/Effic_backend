@@ -1,4 +1,10 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateFilterQueryByVariableValueDto {
   @IsNotEmpty()
@@ -16,4 +22,8 @@ export class CreateFilterQueryByVariableValueDto {
   @IsNotEmpty()
   @IsBoolean()
   excludeValue: boolean;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
 }
