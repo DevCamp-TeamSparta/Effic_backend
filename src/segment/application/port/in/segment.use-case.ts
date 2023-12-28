@@ -18,7 +18,7 @@ export interface ISegmentUseCase {
     updateSegmentQueryDto: UpdateSegmentQueryDto,
   ): Promise<Segment>;
   excuteSegmentQuery(segmentId: number, email: string): Promise<any>;
-  getAllSegments(email: string): Promise<Segment[]>;
+  getAllSegments(email: string): Promise<SegmentOrmEntity[]>;
   getSegmentTables(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentColumns(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
 

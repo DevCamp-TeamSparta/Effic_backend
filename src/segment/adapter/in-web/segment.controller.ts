@@ -87,7 +87,7 @@ export class SegmentController {
   @UseGuards(AccessTokenGuard)
   @Get('/all')
   @HttpCode(HttpStatus.OK)
-  async getAllSegments(@Req() req) {
+  async getAllSegments(@Req() req): Promise<SegmentOrmEntity[]> {
     this.logger.verbose('getAllSegments');
     const email = req.payload.email;
     return this.segmentUseCase.getAllSegments(email);

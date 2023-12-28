@@ -76,16 +76,16 @@ export class SegmentRepository implements ISegmentPort {
     return updatedSegment;
   }
 
-  async getAllSegments(userId: number): Promise<Segment[]> {
+  async getAllSegments(userId: number): Promise<SegmentOrmEntity[]> {
     const segmentOrmEntities = await this.segmentRepository.find({
       where: { userId },
     });
 
-    const segments = segmentOrmEntities.map((segmentOrmEntity) =>
-      SegmentMapper.mapToUserQuery(segmentOrmEntity),
-    );
+    // const segments = segmentOrmEntities.map((segmentOrmEntity) =>
+    //   SegmentMapper.mapToUserQuery(segmentOrmEntity),
+    // );
 
-    return segments;
+    return segmentOrmEntities;
   }
 
   async updateFilterQuery(
