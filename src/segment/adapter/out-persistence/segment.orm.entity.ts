@@ -32,5 +32,8 @@ export class SegmentOrmEntity {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ name: 'userId' })
   userId: number;
 }

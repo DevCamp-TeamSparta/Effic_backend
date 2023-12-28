@@ -31,15 +31,13 @@ export class SegmentRepository implements ISegmentPort {
     return savedSegmentOrmEntity;
   }
 
-  async getSegmentDetails(segmentId: number): Promise<Segment> {
-    const segmentOrmEntity = await this.segmentRepository.findOneBy({
-      segmentId,
+  async getSegmentDetails(segmentId: number): Promise<SegmentOrmEntity> {
+    const segmentOrmEntity = await this.segmentRepository.findOne({
+      where: { segmentId },
     });
     if (!segmentOrmEntity) throw new Error('Segment not found');
 
-    const segment = SegmentMapper.mapToUserQuery(segmentOrmEntity);
-
-    return segment;
+    return segmentOrmEntity;
   }
 
   async updateSegmentQuery(

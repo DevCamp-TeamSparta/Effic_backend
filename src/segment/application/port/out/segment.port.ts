@@ -4,8 +4,8 @@ import { Segment } from 'src/segment/domain/segment';
 
 export interface ISegmentPort {
   saveSegment(segment: Segment, userId: number): Promise<SegmentOrmEntity>;
+  getSegmentDetails(segmentId: number): Promise<SegmentOrmEntity>;
   updateSegmentQuery(segmentId: number, segmentQuery: string): Promise<Segment>;
-  getSegmentDetails(segmentId: number): Promise<Segment>;
   getSegmentNames(): Promise<{ id: number; name: string }[]>;
   getSegmentColumn(columnName: string): Promise<any[]>;
   updateFilterQuery(segmentId: number, filterQuery: string): Promise<Segment>;

@@ -1,4 +1,11 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ISegmentUseCase } from '../port/in/segment.use-case';
 import { ISegmentPort, ISegmentPortSymbol } from '../port/out/segment.port';
 import { CreateSegmentDto } from '../port/in/dto/create-segment.dto';
@@ -13,9 +20,11 @@ import { CreateFilterQueryByVariableValueDto } from '../port/in/dto/create-filte
 import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter-query-by-fatigue-level.dto';
 import { GetSegmentColumnDto } from '../port/in/dto/get-segment-column.dto';
 import { UsersService } from 'src/users/service/users.service';
+import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
+  private logger = new Logger('SegmentService');
   constructor(
     @Inject(ISegmentPortSymbol)
     private readonly segmentPort: ISegmentPort,
@@ -24,7 +33,7 @@ export class SegmentService implements ISegmentUseCase {
     private usersService: UsersService,
   ) {}
 
-  async createSegment(dto: CreateSegmentDto): Promise<any> {
+  async createSegment(dto: CreateSegmentDto): Promise<SegmentOrmEntity> {
     const { segmentName, segmentDescription, createdAt, email } = dto;
     const newSegment = new Segment(
       segmentName,
@@ -38,8 +47,15 @@ export class SegmentService implements ISegmentUseCase {
     return this.segmentPort.saveSegment(newSegment, user.userId);
   }
 
-  async getSegmentDetails(segmentId: number): Promise<Segment> {
+  async getSegmentDetails(
+    segmentId: number,
+    email: string,
+  ): Promise<SegmentOrmEntity> {
+    this.logger.verbose('getSegmentDetails');
+    const user = await this.usersService.checkUserInfo(email);
     const segmentDetails = await this.segmentPort.getSegmentDetails(segmentId);
+    if (segmentDetails.userId !== user.userId)
+      throw new UnauthorizedException();
     return segmentDetails;
   }
 
@@ -48,7 +64,7 @@ export class SegmentService implements ISegmentUseCase {
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
     if (!segment) throw new Error('Segment not found');
 
-    segment.updateSegmentQuery(segmentQuery);
+    // segment.updateSegmentQuery(segmentQuery);
 
     return await this.segmentPort.updateSegmentQuery(
       segmentId,

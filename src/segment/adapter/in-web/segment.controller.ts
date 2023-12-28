@@ -24,6 +24,7 @@ import {
   ISegmentUseCaseSymbol,
 } from 'src/segment/application/port/in/segment.use-case';
 import { Segment } from 'src/segment/domain/segment';
+import { SegmentOrmEntity } from '../out-persistence/segment.orm.entity';
 
 @Controller('segment')
 export class SegmentController {
@@ -42,11 +43,15 @@ export class SegmentController {
     return this.segmentUseCase.createSegment(dto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/detail')
   async getSegmentDetails(
+    @Req() req,
     @Body('segmentId', ParseIntPipe) segmentId: number,
-  ): Promise<Segment> {
-    return this.segmentUseCase.getSegmentDetails(segmentId);
+  ): Promise<SegmentOrmEntity> {
+    this.logger.verbose('getSegmentDetails');
+    const email = req.payload.email;
+    return this.segmentUseCase.getSegmentDetails(segmentId, email);
   }
 
   @Put('/query')
