@@ -69,18 +69,6 @@ export class SegmentRepository implements ISegmentPort {
     return segments;
   }
 
-  async getSegmentColumn(columnName: string): Promise<any[]> {
-    const result = await this.segmentRepository
-      .createQueryBuilder('segment')
-      .select(`segment.${columnName}`)
-      .addSelect('segment.id')
-      .getRawMany();
-
-    // console.log(result);
-
-    return result;
-  }
-
   async updateFilterQuery(
     segmentId: number,
     filterQuery: string,
