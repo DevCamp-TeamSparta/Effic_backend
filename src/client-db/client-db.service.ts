@@ -1,12 +1,18 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import * as mysql from 'mysql2/promise';
 import { IClientDbService } from './client-db.interface';
 
 @Injectable()
 export class ClientDbService implements IClientDbService {
+  private logger = new Logger('ClientDbService');
   private connectionPool: mysql.Pool | null = null;
 
   async connectToDb(connectionDetails: mysql.PoolOptions): Promise<void> {
+    this.logger.verbose('connectToDb');
     this.connectionPool = mysql.createPool({
       host: connectionDetails.host,
       user: connectionDetails.user,
@@ -15,45 +21,49 @@ export class ClientDbService implements IClientDbService {
       port: connectionDetails.port,
       connectionLimit: 10, // connection pool은 몇 개로 해야하는가?
     });
-    console.log('MySQL connectionPool created...');
+    this.logger.log('MySQL connectionPool created...');
   }
 
   async testConnection(): Promise<boolean> {
+    this.logger.verbose('testConnection');
     if (!this.connectionPool) return false;
 
     try {
       const connection = await this.connectionPool.getConnection();
       const ping = await connection.ping();
-      console.log('test connection status...', ping);
+      this.logger.log(`test connection status...${ping}`);
       connection.release();
-      console.log('test connection release...');
+      this.logger.log(`test connection release...`);
       return true;
     } catch (error) {
-      console.error('Error pinging database:', error);
+      this.logger.error(error);
       return false;
     }
   }
 
   async executeQuery(query: string): Promise<any> {
-    if (!this.connectionPool)
+    if (!this.connectionPool) {
+      this.logger.error('Connection pool is not initialized');
       throw new InternalServerErrorException(
         'Connection pool is not initialized',
       );
+    }
+
     try {
       const connection = await this.connectionPool.getConnection();
       const ping = await connection.ping();
-      console.log('connection status...', ping);
+      this.logger.log(`connection status...${ping}`);
       try {
-        console.log('executing query: ', query);
+        this.logger.log(`executing query: ${query}`);
         const [rows] = await connection.query(query);
         return rows;
       } finally {
         connection.release();
-        console.log('connection release...');
+        this.logger.log('connection release...');
       }
     } catch (error) {
-      console.error('Error executing query:', error);
-      throw error;
+      this.logger.error(error);
+      throw new InternalServerErrorException();
     }
   }
 }
