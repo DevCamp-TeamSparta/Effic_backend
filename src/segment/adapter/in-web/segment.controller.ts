@@ -84,13 +84,6 @@ export class SegmentController {
     return this.segmentUseCase.getAllSegments(email);
   }
 
-  /** To do: userId에 해당하는 segment의 segmentName을 return하도록 수정 */
-  @Get('/segmentNames')
-  @HttpCode(HttpStatus.OK)
-  async getSegmentNames() {
-    return this.segmentUseCase.getSegmentNames();
-  }
-
   @Post('/column')
   @HttpCode(HttpStatus.OK)
   async getSegmentColumn(@Body() dto: GetSegmentColumnDto) {

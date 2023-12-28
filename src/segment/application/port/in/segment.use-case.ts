@@ -19,7 +19,6 @@ export interface ISegmentUseCase {
   excuteSegmentQuery(segmentId: number, email: string): Promise<any>;
   getAllSegments(email: string): Promise<Segment[]>;
 
-  getSegmentNames(): Promise<{ id: number; name: string }[]>; // 삭제해야함
   getSegmentColumn(dto: GetSegmentColumnDto);
   getSegmentRecords(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentTables(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;

@@ -87,10 +87,6 @@ export class SegmentService implements ISegmentUseCase {
     return await this.segmentPort.getAllSegments(user.userId);
   }
 
-  async getSegmentNames(): Promise<{ id: number; name: string }[]> {
-    return await this.segmentPort.getSegmentNames();
-  }
-
   async getSegmentColumn(dto: GetSegmentColumnDto): Promise<any> {
     const { columnName } = dto;
     return await this.segmentPort.getSegmentColumn(columnName);

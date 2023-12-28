@@ -7,7 +7,6 @@ export interface ISegmentPort {
   getSegmentDetails(segmentId: number): Promise<SegmentOrmEntity>;
   updateSegmentQuery(segmentId: number, segmentQuery: string): Promise<Segment>;
   getAllSegments(userId: number): Promise<Segment[]>;
-  getSegmentNames(): Promise<{ id: number; name: string }[]>; // 삭제해야함
   getSegmentColumn(columnName: string): Promise<any[]>;
   updateFilterQuery(segmentId: number, filterQuery: string): Promise<Segment>;
   saveMessageHistory(

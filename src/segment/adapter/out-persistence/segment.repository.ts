@@ -69,18 +69,6 @@ export class SegmentRepository implements ISegmentPort {
     return segments;
   }
 
-  /** To do: user 기능과 연결 필요 */
-  async getSegmentNames(): Promise<{ id: number; name: string }[]> {
-    const segments = await this.segmentRepository.find();
-
-    const segmentIdandNames = segments.map((segment) => ({
-      id: segment.segmentId,
-      name: segment.segmentName,
-    }));
-
-    return segmentIdandNames;
-  }
-
   async getSegmentColumn(columnName: string): Promise<any[]> {
     const result = await this.segmentRepository
       .createQueryBuilder('segment')
