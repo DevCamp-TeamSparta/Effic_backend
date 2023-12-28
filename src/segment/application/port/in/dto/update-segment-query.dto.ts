@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateSegmentQueryDto {
   @IsNumber()
@@ -8,4 +8,8 @@ export class UpdateSegmentQueryDto {
   @IsString()
   @IsNotEmpty()
   segmentQuery: string;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
 }

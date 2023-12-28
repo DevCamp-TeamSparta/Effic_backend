@@ -47,7 +47,6 @@ export class SegmentRepository implements ISegmentPort {
     const segmentOrmEntity = await this.segmentRepository.findOneBy({
       segmentId,
     });
-
     if (!segmentOrmEntity) throw new Error('Segment not found');
 
     segmentOrmEntity.segmentQuery = segmentQuery;

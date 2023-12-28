@@ -54,9 +54,12 @@ export class SegmentController {
     return this.segmentUseCase.getSegmentDetails(segmentId, email);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Put('/query')
   @HttpCode(HttpStatus.CREATED)
-  async updateSegmentQuery(@Body() dto: UpdateSegmentQueryDto) {
+  async updateSegmentQuery(@Req() req, @Body() dto: UpdateSegmentQueryDto) {
+    this.logger.verbose('updateSegmentQuery');
+    dto.email = req.payload.email;
     return this.segmentUseCase.updateSegmentQuery(dto);
   }
 

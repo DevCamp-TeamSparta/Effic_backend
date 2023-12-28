@@ -60,16 +60,15 @@ export class SegmentService implements ISegmentUseCase {
   }
 
   async updateSegmentQuery(dto: UpdateSegmentQueryDto): Promise<Segment> {
-    const { segmentId, segmentQuery } = dto;
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
-    if (!segment) throw new Error('Segment not found');
+    this.logger.verbose('updateSegmentQuery');
+    const { segmentId, segmentQuery, email } = dto;
 
-    // segment.updateSegmentQuery(segmentQuery);
+    const user = await this.usersService.checkUserInfo(email);
+    const segmentDetails = await this.segmentPort.getSegmentDetails(segmentId);
+    if (segmentDetails.userId !== user.userId)
+      throw new UnauthorizedException();
 
-    return await this.segmentPort.updateSegmentQuery(
-      segmentId,
-      segment.segmentQuery,
-    );
+    return await this.segmentPort.updateSegmentQuery(segmentId, segmentQuery);
   }
 
   async excuteSegmentQuery(segmentId: number) {
