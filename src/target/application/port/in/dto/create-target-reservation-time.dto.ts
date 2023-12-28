@@ -19,7 +19,7 @@ export class CreateTargetReservationTimeDto {
   @IsNumber()
   segmentId: number;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   timeColumnName: string;
 
@@ -27,7 +27,7 @@ export class CreateTargetReservationTimeDto {
   @IsString()
   receiverNumberColumnName: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   delayDays: number;
 
@@ -38,12 +38,12 @@ export class CreateTargetReservationTimeDto {
 
   @IsDate()
   @Type(() => Date)
-  @IsOptional()
-  endDate?: Date;
+  @IsNotEmpty()
+  endDate: Date;
 
   @IsBoolean()
-  @IsOptional()
-  isRecurring?: boolean;
+  @IsNotEmpty()
+  isRecurring: boolean;
 
   @IsString({ each: true })
   @IsOptional()
