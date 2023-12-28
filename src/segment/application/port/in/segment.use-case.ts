@@ -4,7 +4,6 @@ import { UpdateSegmentQueryDto } from './dto/update-segment-query.dto';
 import { GetSegmentDetailsDto } from './dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from './dto/create-filter-query-by-variable-value.dto';
 import { CreateFilterQueryByFatigueLevelDto } from './dto/create-filter-query-by-fatigue-level.dto';
-import { GetSegmentColumnDto } from './dto/get-segment-column.dto';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 
 export interface ISegmentUseCase {

@@ -16,7 +16,6 @@ import { AccessTokenGuard } from 'src/auth/guards/auth.guard';
 import { CreateFilterQueryByFatigueLevelDto } from 'src/segment/application/port/in/dto/create-filter-query-by-fatigue-level.dto';
 import { CreateFilterQueryByVariableValueDto } from 'src/segment/application/port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateSegmentDto } from 'src/segment/application/port/in/dto/create-segment.dto';
-import { GetSegmentColumnDto } from 'src/segment/application/port/in/dto/get-segment-column.dto';
 import { GetSegmentDetailsDto } from 'src/segment/application/port/in/dto/get-segment-details.dto';
 import { UpdateSegmentQueryDto } from 'src/segment/application/port/in/dto/update-segment-query.dto';
 import {

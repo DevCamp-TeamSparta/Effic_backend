@@ -18,7 +18,6 @@ import {
 import { GetSegmentDetailsDto } from '../port/in/dto/get-segment-details.dto';
 import { CreateFilterQueryByVariableValueDto } from '../port/in/dto/create-filter-query-by-variable-value.dto';
 import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter-query-by-fatigue-level.dto';
-import { GetSegmentColumnDto } from '../port/in/dto/get-segment-column.dto';
 import { UsersService } from 'src/users/service/users.service';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 
