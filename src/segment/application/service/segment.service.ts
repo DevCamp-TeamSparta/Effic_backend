@@ -52,10 +52,11 @@ export class SegmentService implements ISegmentUseCase {
     email: string,
   ): Promise<SegmentOrmEntity> {
     this.logger.verbose('getSegmentDetails');
-    const user = await this.usersService.checkUserInfo(email);
-    const segmentDetails = await this.segmentPort.getSegmentDetails(segmentId);
-    if (segmentDetails.userId !== user.userId)
-      throw new UnauthorizedException();
+
+    const segmentDetails = await this.checkUserIsSegmentCreator(
+      email,
+      segmentId,
+    );
     return segmentDetails;
   }
 
@@ -63,10 +64,7 @@ export class SegmentService implements ISegmentUseCase {
     this.logger.verbose('updateSegmentQuery');
     const { segmentId, segmentQuery, email } = dto;
 
-    const user = await this.usersService.checkUserInfo(email);
-    const segmentDetails = await this.segmentPort.getSegmentDetails(segmentId);
-    if (segmentDetails.userId !== user.userId)
-      throw new UnauthorizedException();
+    await this.checkUserIsSegmentCreator(email, segmentId);
 
     return await this.segmentPort.updateSegmentQuery(segmentId, segmentQuery);
   }
@@ -232,5 +230,18 @@ export class SegmentService implements ISegmentUseCase {
     modifiedQuery += ';';
 
     await this.segmentPort.updateFilterQuery(segmentId, modifiedQuery);
+  }
+
+  private async checkUserIsSegmentCreator(
+    email: string,
+    segmentId: number,
+  ): Promise<SegmentOrmEntity> {
+    const user = await this.usersService.checkUserInfo(email);
+    const segmentDetails = await this.segmentPort.getSegmentDetails(segmentId);
+
+    if (user.userId !== segmentDetails.userId)
+      throw new UnauthorizedException();
+
+    return segmentDetails;
   }
 }
