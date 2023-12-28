@@ -69,20 +69,16 @@ export class SegmentService implements ISegmentUseCase {
     return await this.segmentPort.updateSegmentQuery(segmentId, segmentQuery);
   }
 
-  async excuteSegmentQuery(segmentId: number) {
+  async excuteSegmentQuery(segmentId: number, email: string) {
+    this.logger.verbose('excuteSegmentQuery');
+    await this.checkUserIsSegmentCreator(email, segmentId);
+
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
-    console.log(segment.segmentQuery);
-
-    try {
-      const result = await this.clientDbService.executeQuery(
-        segment.segmentQuery,
-      );
-      return result;
-    } catch (error) {
-      console.error('Error executing query:', error);
-      throw error;
-    }
+    const result = await this.clientDbService.executeQuery(
+      segment.segmentQuery,
+    );
+    return result;
   }
 
   async getSegmentNames(): Promise<{ id: number; name: string }[]> {

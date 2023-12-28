@@ -63,12 +63,16 @@ export class SegmentController {
     return this.segmentUseCase.updateSegmentQuery(dto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/query')
   @HttpCode(HttpStatus.OK)
   async excuteSegmentQuery(
+    @Req() req,
     @Body('segmentId', ParseIntPipe) segmentId: number,
   ): Promise<any> {
-    return this.segmentUseCase.excuteSegmentQuery(segmentId);
+    this.logger.verbose('excuteSegmentQuery');
+    const email = req.payload.email;
+    return this.segmentUseCase.excuteSegmentQuery(segmentId, email);
   }
 
   /** To do: userId에 해당하는 segment의 segmentName을 return하도록 수정 */
