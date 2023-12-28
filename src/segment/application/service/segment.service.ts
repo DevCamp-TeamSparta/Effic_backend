@@ -77,11 +77,14 @@ export class SegmentService implements ISegmentUseCase {
 
   async updateSegmentQuery(dto: UpdateSegmentQueryDto): Promise<Segment> {
     this.logger.verbose('updateSegmentQuery');
-    const { segmentId, segmentQuery, email } = dto;
+    const { segmentId, email } = dto;
 
     await this.checkUserIsSegmentCreator(email, segmentId);
 
-    return await this.segmentPort.updateSegmentQuery(segmentId, segmentQuery);
+    const updatedAt = new Date();
+    dto.updatedAt = updatedAt;
+
+    return await this.segmentPort.updateSegmentQuery(dto);
   }
 
   async excuteSegmentQuery(segmentId: number, email: string) {

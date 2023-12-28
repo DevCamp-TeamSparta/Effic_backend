@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -22,7 +23,6 @@ import {
   ISegmentUseCase,
   ISegmentUseCaseSymbol,
 } from 'src/segment/application/port/in/segment.use-case';
-import { Segment } from 'src/segment/domain/segment';
 import { SegmentOrmEntity } from '../out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from 'src/segment/application/port/in/dto/update-segment.dto';
 
@@ -53,10 +53,10 @@ export class SegmentController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Post('/detail')
+  @Get('/detail')
   async getSegmentDetails(
     @Req() req,
-    @Body('segmentId', ParseIntPipe) segmentId: number,
+    @Query('segmentId', ParseIntPipe) segmentId: number,
   ): Promise<SegmentOrmEntity> {
     this.logger.verbose('getSegmentDetails');
     const email = req.payload.email;

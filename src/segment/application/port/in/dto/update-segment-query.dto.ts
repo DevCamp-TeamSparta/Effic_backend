@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateSegmentQueryDto {
   @IsNumber()
@@ -12,4 +12,8 @@ export class UpdateSegmentQueryDto {
   @IsString()
   @IsOptional()
   email?: string;
+
+  @IsDate()
+  @IsOptional()
+  updatedAt?: Date;
 }
