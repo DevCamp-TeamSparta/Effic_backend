@@ -15,9 +15,13 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
 
   async saveAutoMessageEvent(
     autoMessageEvent: AutoMessageEvent,
+    userId: number,
   ): Promise<AutoMessageEventOrmEntity> {
     const autoMessageEventOrmEntity =
-      AutoMessageEventMapper.mapToAutoMessageEventOrmEntity(autoMessageEvent);
+      AutoMessageEventMapper.mapToAutoMessageEventOrmEntity(
+        autoMessageEvent,
+        userId,
+      );
 
     const savedAutoMessageEventOrmEntity =
       await this.autoMessageEventRepository.save(autoMessageEventOrmEntity);

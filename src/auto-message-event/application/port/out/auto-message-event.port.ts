@@ -4,6 +4,7 @@ import { AutoMessageEvent } from 'src/auto-message-event/domain/auto-message-eve
 export interface IAutoMessageEventPort {
   saveAutoMessageEvent(
     autoMessageEvent: AutoMessageEvent,
+    userId: number,
   ): Promise<AutoMessageEventOrmEntity>;
   getAllAutoMessageEvents(): Promise<any>;
   getAutoMessageEventById(

@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('AutoMessageEvent')
 export class AutoMessageEventOrmEntity {
@@ -25,4 +32,11 @@ export class AutoMessageEventOrmEntity {
 
   @Column()
   isActive: boolean;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column({ name: 'userId' })
+  userId: number;
 }

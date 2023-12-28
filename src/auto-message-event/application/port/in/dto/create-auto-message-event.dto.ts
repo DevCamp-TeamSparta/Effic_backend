@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  isNotEmpty,
 } from 'class-validator';
 
 export class CreateAutoMessageEventDto {
@@ -27,12 +28,19 @@ export class CreateAutoMessageEventDto {
 
   @Type(() => Date)
   @IsDate()
-  scheduledEndDate: Date;
+  @IsOptional()
+  scheduledEndDate?: Date;
 
   @Type(() => Date)
   @IsDate()
+  @IsNotEmpty()
   createdDate: Date;
 
   @IsBoolean()
+  @IsNotEmpty()
   isActive: boolean;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
 }

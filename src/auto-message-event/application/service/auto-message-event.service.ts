@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateAutoMessageEventDto } from '../port/in/dto/create-auto-message-event.dto';
 import { AutoMessageEvent } from 'src/auto-message-event/domain/auto-message-event';
 import { IAutoMessageEventUseCase } from '../port/in/auto-message-event.use-case';
@@ -8,18 +8,27 @@ import {
 } from '../port/out/auto-message-event.port';
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 import { UpdateAutoMessageEventDto } from '../port/in/dto/update-auto-message-event.dto';
+import { UsersService } from 'src/users/service/users.service';
 
 @Injectable()
 export class AutoMessageEventService implements IAutoMessageEventUseCase {
+  private logger = new Logger('AutoMessageEventService');
   constructor(
     @Inject(IAutoMessageEventPortSymbol)
     private readonly autoMessageEventPort: IAutoMessageEventPort,
+    private usersService: UsersService,
   ) {}
   async createAutoMessageEvent(
     dto: CreateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity> {
-    const { autoMessageEventName, scheduledEndDate, createdDate, isActive } =
-      dto;
+    this.logger.verbose('createAutoMessageEvent');
+    const {
+      autoMessageEventName,
+      scheduledEndDate,
+      createdDate,
+      isActive,
+      email,
+    } = dto;
 
     const newAutoMessageEvent = new AutoMessageEvent(
       autoMessageEventName,
@@ -31,7 +40,12 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
       isActive,
     );
 
-    return this.autoMessageEventPort.saveAutoMessageEvent(newAutoMessageEvent);
+    const user = await this.usersService.checkUserInfo(email);
+
+    return this.autoMessageEventPort.saveAutoMessageEvent(
+      newAutoMessageEvent,
+      user.userId,
+    );
   }
 
   async getAllAutoMessageEvents(): Promise<any> {

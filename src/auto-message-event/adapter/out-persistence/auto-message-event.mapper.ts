@@ -2,7 +2,10 @@ import { AutoMessageEvent } from 'src/auto-message-event/domain/auto-message-eve
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 
 export class AutoMessageEventMapper {
-  static mapToAutoMessageEventOrmEntity(autoMessageEvent: AutoMessageEvent) {
+  static mapToAutoMessageEventOrmEntity(
+    autoMessageEvent: AutoMessageEvent,
+    userId: number,
+  ) {
     const autoMessageEventEntity = new AutoMessageEventOrmEntity();
 
     autoMessageEventEntity.autoMessageEventName =
@@ -13,6 +16,7 @@ export class AutoMessageEventMapper {
     autoMessageEventEntity.scheduledEndDate = autoMessageEvent.scheduledEndDate;
     autoMessageEventEntity.createdDate = autoMessageEvent.createdDate;
     autoMessageEventEntity.isActive = autoMessageEvent.isActive;
+    autoMessageEventEntity.userId = userId;
 
     return autoMessageEventEntity;
   }
