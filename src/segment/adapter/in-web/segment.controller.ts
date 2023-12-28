@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  Logger,
   ParseIntPipe,
   Post,
   Put,
@@ -26,6 +27,7 @@ import { Segment } from 'src/segment/domain/segment';
 
 @Controller('segment')
 export class SegmentController {
+  private logger = new Logger('SegmentController');
   constructor(
     @Inject(ISegmentUseCaseSymbol)
     private readonly segmentUseCase: ISegmentUseCase,
@@ -35,6 +37,7 @@ export class SegmentController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createSegment(@Req() req, @Body() dto: CreateSegmentDto) {
+    this.logger.verbose('createSegment');
     dto.email = req.payload.email;
     return this.segmentUseCase.createSegment(dto);
   }
