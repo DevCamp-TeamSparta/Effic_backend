@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Inject,
@@ -125,9 +126,17 @@ export class SegmentService implements ISegmentUseCase {
     return result.map((row) => row['COLUMN_NAME']);
   }
 
-  async createFilterQueryWhenNoFilter(segmentId: number): Promise<void> {
+  async createFilterQueryWhenNoFilter(
+    segmentId: number,
+    email: string,
+  ): Promise<void> {
     this.logger.verbose('createFilterQueryWhenNoFilter');
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+    const segment = await this.checkUserIsSegmentCreator(email, segmentId);
+
+    if (!segment.segmentQuery)
+      throw new BadRequestException(
+        'Segment 테이블에 SegmentQuery가 존재하지 않음',
+      );
 
     if (segment.filterQuery)
       throw new HttpException(

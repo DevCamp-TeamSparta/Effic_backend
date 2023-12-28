@@ -105,12 +105,15 @@ export class SegmentController {
     return this.segmentUseCase.getSegmentColumns(dto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/filter-query/no-filter')
   @HttpCode(HttpStatus.CREATED)
   async createFilterQueryWhenNoFilter(
+    @Req() req,
     @Body('segmentId', ParseIntPipe) segmentId: number,
   ): Promise<void> {
-    return this.segmentUseCase.createFilterQueryWhenNoFilter(segmentId);
+    const email = req.payload.email;
+    return this.segmentUseCase.createFilterQueryWhenNoFilter(segmentId, email);
   }
 
   @Post('/filter-query/variable-value')

@@ -19,10 +19,13 @@ export interface ISegmentUseCase {
   ): Promise<Segment>;
   excuteSegmentQuery(segmentId: number, email: string): Promise<any>;
   getAllSegments(email: string): Promise<Segment[]>;
-
   getSegmentTables(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
   getSegmentColumns(getSegmentDetailsDto: GetSegmentDetailsDto): Promise<any>;
-  createFilterQueryWhenNoFilter(segmentId: number): Promise<void>;
+
+  createFilterQueryWhenNoFilter(
+    segmentId: number,
+    email: string,
+  ): Promise<void>;
   createFilterQueryByVariableValue(
     createFilterQueryDto: CreateFilterQueryByVariableValueDto,
   ): Promise<any>;
