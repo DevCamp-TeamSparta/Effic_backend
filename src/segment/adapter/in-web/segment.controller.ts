@@ -96,12 +96,14 @@ export class SegmentController {
   @Post('/tables')
   @HttpCode(HttpStatus.OK)
   async getSegmentTables(@Body() dto: GetSegmentDetailsDto) {
+    this.logger.verbose('getSegmentTables');
     return this.segmentUseCase.getSegmentTables(dto);
   }
 
   @Post('/columns')
   @HttpCode(HttpStatus.OK)
   async getSegmentColumns(@Body() dto: GetSegmentDetailsDto) {
+    this.logger.verbose('getSegmentColumns');
     return this.segmentUseCase.getSegmentColumns(dto);
   }
 
@@ -112,6 +114,7 @@ export class SegmentController {
     @Req() req,
     @Body('segmentId', ParseIntPipe) segmentId: number,
   ): Promise<void> {
+    this.logger.verbose('createFilterQueryWhenNoFilter');
     const email = req.payload.email;
     return this.segmentUseCase.createFilterQueryWhenNoFilter(segmentId, email);
   }
@@ -121,6 +124,7 @@ export class SegmentController {
   async createFilterQueryByVariableValue(
     @Body() dto: CreateFilterQueryByVariableValueDto,
   ): Promise<void> {
+    this.logger.verbose('createFilterQueryByVariableValue');
     return this.segmentUseCase.createFilterQueryByVariableValue(dto);
   }
 
@@ -129,6 +133,7 @@ export class SegmentController {
   async createFilterQueryByFatigueLevel(
     @Body() dto: CreateFilterQueryByFatigueLevelDto,
   ): Promise<void> {
+    this.logger.verbose('createFilterQueryByFatigueLevel');
     return this.segmentUseCase.createFilterQueryByFatigueLevel(dto);
   }
 }
