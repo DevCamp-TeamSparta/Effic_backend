@@ -9,7 +9,6 @@ import {
   ISegmentPortSymbol,
 } from 'src/segment/application/port/out/segment.port';
 import { ITargetPort, ITargetPortSymbol } from '../port/out/target.port';
-import { ISmsPort, ISmsPortSymbol } from '../port/out/sms.port';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
@@ -31,8 +30,6 @@ export class TargetService implements ITargetUseCase {
     private readonly clientDbService: IClientDbService,
     @Inject(ITargetPortSymbol)
     private readonly targetPort: ITargetPort,
-    @Inject(ISmsPortSymbol)
-    private readonly smsPort: ISmsPort,
   ) {}
 
   private makeSignature(): string {
