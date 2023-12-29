@@ -40,10 +40,13 @@ export class AutoMessageEventController {
     return this.autoMessageEventUseCase.createAutoMessageEvent(dto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Get('/all')
   @HttpCode(HttpStatus.OK)
-  async getAllAutoMessageEvents(): Promise<any> {
-    return this.autoMessageEventUseCase.getAllAutoMessageEvents();
+  async getAllAutoMessageEvents(@Req() req): Promise<any> {
+    this.logger.verbose('getAllAutoMessageEvents');
+    const email = req.payload.email;
+    return this.autoMessageEventUseCase.getAllAutoMessageEvents(email);
   }
 
   @Put()

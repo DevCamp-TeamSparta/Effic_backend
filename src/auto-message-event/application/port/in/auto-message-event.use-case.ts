@@ -6,7 +6,7 @@ export interface IAutoMessageEventUseCase {
   createAutoMessageEvent(
     dto: CreateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity>;
-  getAllAutoMessageEvents(): Promise<any>;
+  getAllAutoMessageEvents(email: string): Promise<any>;
   updateAutoMessageEvent(
     dto: UpdateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity>;

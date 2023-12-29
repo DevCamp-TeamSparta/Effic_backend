@@ -48,8 +48,9 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
     );
   }
 
-  async getAllAutoMessageEvents(): Promise<any> {
-    return await this.autoMessageEventPort.getAllAutoMessageEvents();
+  async getAllAutoMessageEvents(email: string): Promise<any> {
+    const user = await this.usersService.checkUserInfo(email);
+    return await this.autoMessageEventPort.getAllAutoMessageEvents(user.userId);
   }
 
   async updateAutoMessageEvent(

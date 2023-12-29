@@ -6,7 +6,7 @@ export interface IAutoMessageEventPort {
     autoMessageEvent: AutoMessageEvent,
     userId: number,
   ): Promise<AutoMessageEventOrmEntity>;
-  getAllAutoMessageEvents(): Promise<any>;
+  getAllAutoMessageEvents(userId: number): Promise<any>;
   getAutoMessageEventById(
     autoMessageEventId: number,
   ): Promise<AutoMessageEventOrmEntity>;
