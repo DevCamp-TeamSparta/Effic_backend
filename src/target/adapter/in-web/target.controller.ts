@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { CreateMessageContentDto } from 'src/target/application/port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from 'src/target/application/port/in/dto/create-target-reservation-time.dto';
-import { FilterTargetDto } from 'src/target/application/port/in/dto/filter-target.dto';
 import { SmsTargetDto } from 'src/target/application/port/in/dto/sms-target.dto';
 import { SmsTestDto } from 'src/target/application/port/in/dto/sms-test.dto';
 import { SanitizePhoneNumberPipe } from 'src/target/application/port/in/pipe/sanitize-phone-number.pipe';
@@ -24,12 +23,6 @@ export class TargetController {
     @Inject(ITargetUseCaseSymbol)
     private readonly targetUseCase: ITargetUseCase,
   ) {}
-
-  @Post('/filter')
-  @HttpCode(HttpStatus.OK)
-  async filterTarget(@Body() dto: FilterTargetDto) {
-    return this.targetUseCase.filterTarget(dto);
-  }
 
   @Post('/sms')
   @HttpCode(HttpStatus.CREATED)

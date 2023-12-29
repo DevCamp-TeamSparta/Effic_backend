@@ -9,7 +9,6 @@ import {
   ISegmentPortSymbol,
 } from 'src/segment/application/port/out/segment.port';
 import { ITargetPort, ITargetPortSymbol } from '../port/out/target.port';
-import { FilterTargetDto } from '../port/in/dto/filter-target.dto';
 import { SmsTargetDto } from '../port/in/dto/sms-target.dto';
 import { ISmsPort, ISmsPortSymbol } from '../port/out/sms.port';
 import * as crypto from 'crypto';
@@ -36,26 +35,6 @@ export class TargetService implements ITargetUseCase {
     @Inject(ISmsPortSymbol)
     private readonly smsPort: ISmsPort,
   ) {}
-
-  async filterTarget(filterTargetDto: FilterTargetDto): Promise<void> {
-    const { segmentId, columnName, filterData, excludeFilterData } =
-      filterTargetDto;
-
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
-    let excuteQuery = segment.segmentQuery;
-
-    excuteQuery = excuteQuery.trim().slice(0, -1);
-
-    const filterQuery = `${excuteQuery} WHERE ${columnName} = '${filterData}';`;
-
-    // console.log(filterQuery);
-
-    const queryResult = await this.clientDbService.executeQuery(filterQuery);
-
-    // console.log(queryResult);
-
-    const filterPhoneNumbers = queryResult.map((entry) => entry.PhoneNumber);
-  }
 
   async smsTarget(smsTargetDto: SmsTargetDto): Promise<void> {
     const { smsContent, senderNumber } = smsTargetDto;
