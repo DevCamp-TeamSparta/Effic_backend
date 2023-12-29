@@ -54,6 +54,23 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
     );
   }
 
+  async getAutoMessageEventDetail(
+    autoMessageEventId: number,
+    email: string,
+  ): Promise<AutoMessageEventOrmEntity> {
+    this.logger.verbose('getAutoMessageEventDetail');
+    const user = await this.usersService.checkUserInfo(email);
+
+    const existingEvent =
+      await this.autoMessageEventPort.getAutoMessageEventById(
+        autoMessageEventId,
+      );
+    if (!existingEvent) throw new NotFoundException();
+    if (user.userId !== existingEvent.userId) throw new UnauthorizedException();
+
+    return existingEvent;
+  }
+
   async getAllAutoMessageEvents(email: string): Promise<any> {
     this.logger.verbose('getAllAutoMessageEvents');
     const user = await this.usersService.checkUserInfo(email);

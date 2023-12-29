@@ -6,8 +6,10 @@ import {
   HttpStatus,
   Inject,
   Logger,
+  ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -38,6 +40,20 @@ export class AutoMessageEventController {
     this.logger.verbose('createAutoMessageEvent');
     dto.email = req.payload.email;
     return this.autoMessageEventUseCase.createAutoMessageEvent(dto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/detail')
+  async getAutoMessageEventDetail(
+    @Req() req,
+    @Query('autoMessageEventId', ParseIntPipe) autoMessageEventId: number,
+  ): Promise<AutoMessageEventOrmEntity> {
+    this.logger.verbose('getSegmentDetails');
+    const email = req.payload.email;
+    return this.autoMessageEventUseCase.getAutoMessageEventDetail(
+      autoMessageEventId,
+      email,
+    );
   }
 
   @UseGuards(AccessTokenGuard)
