@@ -146,6 +146,7 @@ export class TargetService implements ITargetUseCase {
   async createTargetReservationTime(
     dto: CreateTargetReservationTimeDto,
   ): Promise<void> {
+    this.logger.verbose('createTargetReservationTime');
     const {
       targetIds,
       segmentId,
@@ -156,7 +157,10 @@ export class TargetService implements ITargetUseCase {
       endDate,
       isRecurring,
       weekDays,
+      email,
     } = dto;
+
+    await this.segmentUseCase.checkUserIsSegmentCreator(email, segmentId);
 
     const reservationTimeDate = new Date(reservationTime);
     const phoneNumberToTargetIdMap = await this.targetPort.getReceiverNumbers(

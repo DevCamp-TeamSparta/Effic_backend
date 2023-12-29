@@ -48,4 +48,8 @@ export class CreateTargetReservationTimeDto {
   @IsString({ each: true })
   @IsOptional()
   weekDays?: string[];
+
+  @IsString()
+  @IsOptional()
+  email?: string;
 }

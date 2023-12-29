@@ -47,11 +47,15 @@ export class TargetController {
     return this.targetUseCase.createMessageContent(dto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('/reservation-time')
   @HttpCode(HttpStatus.CREATED)
   async createTargetReservationTime(
+    @Req() req,
     @Body() dto: CreateTargetReservationTimeDto,
   ): Promise<void> {
+    this.logger.verbose('createTargetReservationTime');
+    dto.email = req.payload.email;
     return this.targetUseCase.createTargetReservationTime(dto);
   }
 }
