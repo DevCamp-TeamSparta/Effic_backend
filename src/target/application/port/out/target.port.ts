@@ -1,4 +1,4 @@
-import { TargetOrmEntity } from 'src/target/adapter/out-persistence/entity/target.orm.entity';
+import { TargetOrmEntity } from 'src/target/adapter/out-persistence/target.orm.entity';
 
 export interface ITargetPort {
   saveTarget(
