@@ -15,7 +15,6 @@ import { ISmsPort, ISmsPortSymbol } from '../port/out/sms.port';
 import * as crypto from 'crypto';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import { CreateTargetTrigger2Dto } from '../port/in/dto/create-target-trigger2.dto';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from '../port/in/dto/create-target-reservation-time.dto';
 import { SmsTestDto } from '../port/in/dto/sms-test.dto';
@@ -37,30 +36,6 @@ export class TargetService implements ITargetUseCase {
     @Inject(ISmsPortSymbol)
     private readonly smsPort: ISmsPort,
   ) {}
-
-  async createTargetTrigger2(
-    createTargetTrigger2Dto: CreateTargetTrigger2Dto,
-  ): Promise<void> {
-    const { segmentId, sendDateTime } = createTargetTrigger2Dto;
-
-    const segment = await this.segmentPort.getSegmentDetails(segmentId);
-
-    const excuteQuery = segment.segmentQuery;
-
-    const queryResult = await this.clientDbService.executeQuery(excuteQuery);
-
-    const targets = queryResult.map((customer) => {
-      return {
-        customerName: customer.CustomerName,
-        phoneNumber: customer.PhoneNumber,
-        sendDateTime: sendDateTime,
-      };
-    });
-
-    for (const target of targets) {
-      await this.targetPort.saveTarget(target, true);
-    }
-  }
 
   async filterTarget(filterTargetDto: FilterTargetDto): Promise<void> {
     const { segmentId, columnName, filterData, excludeFilterData } =

@@ -9,8 +9,6 @@ import {
 } from '@nestjs/common';
 import { CreateMessageContentDto } from 'src/target/application/port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from 'src/target/application/port/in/dto/create-target-reservation-time.dto';
-import { CreateTargetTrigger1Dto } from 'src/target/application/port/in/dto/create-target-trigger1.dto';
-import { CreateTargetTrigger2Dto } from 'src/target/application/port/in/dto/create-target-trigger2.dto';
 import { FilterTargetDto } from 'src/target/application/port/in/dto/filter-target.dto';
 import { SmsTargetDto } from 'src/target/application/port/in/dto/sms-target.dto';
 import { SmsTestDto } from 'src/target/application/port/in/dto/sms-test.dto';
@@ -26,12 +24,6 @@ export class TargetController {
     @Inject(ITargetUseCaseSymbol)
     private readonly targetUseCase: ITargetUseCase,
   ) {}
-
-  @Post('/trigger2')
-  @HttpCode(HttpStatus.CREATED)
-  async createSegmentTrigger2(@Body() dto: CreateTargetTrigger2Dto) {
-    return this.targetUseCase.createTargetTrigger2(dto);
-  }
 
   @Post('/filter')
   @HttpCode(HttpStatus.OK)
