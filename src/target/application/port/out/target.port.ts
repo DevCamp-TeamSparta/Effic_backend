@@ -23,6 +23,8 @@ export interface ITargetPort {
     sentStatus: boolean;
   }): Promise<TargetOrmEntity>;
   getTargetData(targetId: number): Promise<TargetOrmEntity | null>;
+  getUnsentTargets(): Promise<TargetOrmEntity[]>;
+  updateSentStatus(targetId: number, sentStatus: boolean): Promise<void>;
 }
 
 export const ITargetPortSymbol = Symbol('ITargetPortSymbol');

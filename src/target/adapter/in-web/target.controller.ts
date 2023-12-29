@@ -58,4 +58,12 @@ export class TargetController {
     dto.email = req.payload.email;
     return this.targetUseCase.createTargetReservationTime(dto);
   }
+
+  /**Cron 서버 */
+  @Post('/reserved-message')
+  @HttpCode(HttpStatus.OK)
+  async sendReservedMessage(): Promise<void> {
+    this.logger.verbose('sendReservedMessage');
+    return this.targetUseCase.sendReservedMessage();
+  }
 }

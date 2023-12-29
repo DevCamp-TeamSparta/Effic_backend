@@ -8,6 +8,7 @@ export interface ITargetUseCase {
   createTargetReservationTime(
     dto: CreateTargetReservationTimeDto,
   ): Promise<void>;
+  sendReservedMessage(): Promise<void>;
 }
 
 export const ITargetUseCaseSymbol = Symbol('ITargetUseCaseSymbol');

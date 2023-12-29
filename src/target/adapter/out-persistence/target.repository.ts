@@ -106,4 +106,23 @@ export class TargetRepository implements ITargetPort {
 
     await this.targetRepository.remove(target);
   }
+
+  async getUnsentTargets(): Promise<TargetOrmEntity[]> {
+    return this.targetRepository.find({
+      where: {
+        sentStatus: false,
+      },
+    });
+  }
+
+  async updateSentStatus(targetId: number, sentStatus: boolean): Promise<void> {
+    const target = await this.targetRepository.findOne({
+      where: { targetId },
+    });
+
+    if (!target) throw new Error(`Target with ID ${targetId} not found`);
+
+    target.sentStatus = sentStatus;
+    await this.targetRepository.save(target);
+  }
 }

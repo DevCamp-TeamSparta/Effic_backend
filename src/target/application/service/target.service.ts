@@ -193,6 +193,22 @@ export class TargetService implements ITargetUseCase {
     }
   }
 
+  async sendReservedMessage(): Promise<void> {
+    this.logger.verbose('sendReservedMessage');
+
+    const targets = await this.targetPort.getUnsentTargets();
+
+    for (const target of targets) {
+      const reservedAt = new Date(target.reservedAt);
+      const currentTime = new Date();
+
+      if (reservedAt <= currentTime) {
+        await this.targetPort.updateSentStatus(target.targetId, true);
+        this.logger.log(`Message sent: ${JSON.stringify(target)}`);
+      }
+    }
+  }
+
   private makeSignature(): string {
     const message = [];
     const hmac = crypto.createHmac('sha256', SECRET_KEY);
