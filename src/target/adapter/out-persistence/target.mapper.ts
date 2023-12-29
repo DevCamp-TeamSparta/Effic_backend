@@ -1,5 +1,5 @@
 import { Target } from 'src/target/domain/target';
-import { TargetOrmEntity } from '../entity/target.orm.entity';
+import { TargetOrmEntity } from './target.orm.entity';
 
 export class TargetMapper {
   static mapToTarget(targetOrm: TargetOrmEntity): Target {

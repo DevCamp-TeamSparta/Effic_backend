@@ -7,9 +7,9 @@ import { ITargetUseCaseSymbol } from './application/port/in/target.use-case';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 import { ITargetPortSymbol } from './application/port/out/target.port';
-import { TargetRepository } from './adapter/out-persistence/repository/target.repository';
-import { TargetOrmEntity } from './adapter/out-persistence/entity/target.orm.entity';
+import { TargetRepository } from './adapter/out-persistence/target.repository';
 import { MessageHistoryOrmEntity } from 'src/segment/adapter/out-persistence/message-history.orm.entity';
+import { TargetOrmEntity } from './adapter/out-persistence/target.orm.entity';
 
 @Module({
   imports: [

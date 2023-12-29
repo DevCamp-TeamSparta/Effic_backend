@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ITargetPort } from 'src/target/application/port/out/target.port';
 import { Repository, In } from 'typeorm';
-import { TargetOrmEntity } from '../entity/target.orm.entity';
-import { TargetMapper } from '../mapper/target.mapper';
 import { Target } from 'src/target/domain/target';
+import { TargetOrmEntity } from './target.orm.entity';
+import { TargetMapper } from './target.mapper';
 
 @Injectable()
 export class TargetRepository implements ITargetPort {
