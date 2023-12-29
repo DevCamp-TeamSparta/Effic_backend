@@ -1,7 +1,10 @@
 interface TargetData {
+  targetId?: number;
+  sentStatus?: boolean;
   messageTitle: string;
   messageContent: string;
   receiverNumber: string;
   reservedAt: Date | null;
-  targetId: number;
+  hostnumber: string;
+  advertiseInfo: boolean;
 }

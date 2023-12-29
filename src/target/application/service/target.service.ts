@@ -101,6 +101,8 @@ export class TargetService implements ITargetUseCase {
       messageTitle,
       messageContentTemplate,
       receiverNumberColumnName,
+      hostnumber,
+      advertiseInfo,
       email,
     } = dto;
 
@@ -125,11 +127,13 @@ export class TargetService implements ITargetUseCase {
       }
 
       const receiverNumber = record[receiverNumberColumnName];
-      const targetData = {
-        messageTitle: messageTitle,
-        messageContent: messageContent,
-        receiverNumber: receiverNumber,
+      const targetData: TargetData = {
+        messageTitle,
+        messageContent,
+        receiverNumber,
         reservedAt: null,
+        hostnumber,
+        advertiseInfo,
       };
 
       const savedEntity = await this.targetPort.saveTarget(targetData, false);

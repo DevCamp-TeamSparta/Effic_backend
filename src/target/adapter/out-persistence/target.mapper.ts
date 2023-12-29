@@ -9,6 +9,8 @@ export class TargetMapper {
       targetOrm.reservedAt,
       targetOrm.receiverNumber,
       targetOrm.sentStatus,
+      targetOrm.hostnumber,
+      targetOrm.advertiseInfo,
     );
   }
 
@@ -19,6 +21,8 @@ export class TargetMapper {
     targetOrm.reservedAt = target.reservedAt;
     targetOrm.sentStatus = target.sentStatus;
     targetOrm.receiverNumber = target.receiverNumber;
+    targetOrm.hostnumber = target.hostnumber;
+    targetOrm.advertiseInfo = target.advertiseInfo;
     return targetOrm;
   }
 }

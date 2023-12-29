@@ -13,21 +13,15 @@ export class TargetRepository implements ITargetPort {
     private readonly targetRepository: Repository<TargetOrmEntity>,
   ) {}
 
-  async saveTarget(
-    targetData: {
-      messageTitle: string;
-      messageContent: string;
-      receiverNumber: string;
-      reservedAt: Date | null;
-    },
-    sentStatus: boolean,
-  ) {
+  async saveTarget(targetData: TargetData, sentStatus: boolean) {
     const domainTarget = new Target(
       targetData.messageTitle,
       targetData.messageContent,
       targetData.reservedAt,
       targetData.receiverNumber,
       sentStatus,
+      targetData.hostnumber,
+      targetData.advertiseInfo,
     );
 
     const targetOrmEntity = TargetMapper.mapToTargetOrmEntity(domainTarget);
@@ -75,19 +69,15 @@ export class TargetRepository implements ITargetPort {
     return target;
   }
 
-  async createTarget(targetData: {
-    messageTitle: string;
-    messageContent: string;
-    receiverNumber: string;
-    reservedAt: Date | null;
-    sentStatus: boolean;
-  }): Promise<TargetOrmEntity> {
+  async createTarget(targetData: TargetData): Promise<TargetOrmEntity> {
     const domainTarget = new Target(
       targetData.messageTitle,
       targetData.messageContent,
       targetData.reservedAt,
       targetData.receiverNumber,
       targetData.sentStatus,
+      targetData.hostnumber,
+      targetData.advertiseInfo,
     );
 
     const targetOrmEntity = TargetMapper.mapToTargetOrmEntity(domainTarget);

@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateMessageContentDto {
   @IsString()
@@ -16,6 +22,14 @@ export class CreateMessageContentDto {
   @IsNumber()
   @IsNotEmpty()
   segmentId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  hostnumber: string;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  advertiseInfo: boolean;
 
   @IsString()
   @IsOptional()

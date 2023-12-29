@@ -1,3 +1,5 @@
+import { BooleanExpression } from 'mongoose';
+import { Col } from 'sequelize/types/utils';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('Target')
@@ -19,4 +21,10 @@ export class TargetOrmEntity {
 
   @Column()
   sentStatus: boolean;
+
+  @Column()
+  hostnumber: string;
+
+  @Column()
+  advertiseInfo: boolean;
 }
