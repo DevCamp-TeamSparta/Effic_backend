@@ -32,6 +32,11 @@ export interface ISegmentUseCase {
   createFilterQueryByFatigueLevel(
     dto: CreateFilterQueryByFatigueLevelDto,
   ): Promise<any>;
+
+  checkUserIsSegmentCreator(
+    email: string,
+    segmentId: number,
+  ): Promise<SegmentOrmEntity>;
 }
 
 export const ISegmentUseCaseSymbol = Symbol('ISegmentUseCaseSymbol');

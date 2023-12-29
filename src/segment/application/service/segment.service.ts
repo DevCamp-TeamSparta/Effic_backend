@@ -22,8 +22,6 @@ import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter
 import { UsersService } from 'src/users/service/users.service';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from '../port/in/dto/update-segment.dto';
-import { SegmentMapper } from 'src/segment/adapter/out-persistence/segment.mapper';
-import * as moment from 'moment-timezone';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -246,7 +244,7 @@ export class SegmentService implements ISegmentUseCase {
     await this.segmentPort.updateFilterQuery(segmentId, modifiedQuery);
   }
 
-  private async checkUserIsSegmentCreator(
+  async checkUserIsSegmentCreator(
     email: string,
     segmentId: number,
   ): Promise<SegmentOrmEntity> {

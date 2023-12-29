@@ -35,6 +35,6 @@ import {
       useClass: SegmentService,
     },
   ],
-  exports: [ISegmentPortSymbol],
+  exports: [ISegmentPortSymbol, ISegmentUseCaseSymbol],
 })
 export class SegmentModule {}

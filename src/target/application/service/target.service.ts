@@ -1,4 +1,4 @@
-import { Inject, Injectable, RequestMapping } from '@nestjs/common';
+import { Inject, Injectable, Logger, RequestMapping } from '@nestjs/common';
 import { ITargetUseCase } from '../port/in/target.use-case';
 import {
   IClientDbService,
@@ -15,6 +15,10 @@ import * as dotenv from 'dotenv';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from '../port/in/dto/create-target-reservation-time.dto';
 import { SmsTestDto } from '../port/in/dto/sms-test.dto';
+import {
+  ISegmentUseCase,
+  ISegmentUseCaseSymbol,
+} from 'src/segment/application/port/in/segment.use-case';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -23,6 +27,7 @@ const SMS_SERVICE_ID = process.env.NAVER_SMS_SERVICE_ID;
 
 @Injectable()
 export class TargetService implements ITargetUseCase {
+  private logger = new Logger('TargetService');
   constructor(
     @Inject(ISegmentPortSymbol)
     private readonly segmentPort: ISegmentPort,
@@ -30,27 +35,9 @@ export class TargetService implements ITargetUseCase {
     private readonly clientDbService: IClientDbService,
     @Inject(ITargetPortSymbol)
     private readonly targetPort: ITargetPort,
+    @Inject(ISegmentUseCaseSymbol)
+    private readonly segmentUseCase: ISegmentUseCase,
   ) {}
-
-  private makeSignature(): string {
-    const message = [];
-    const hmac = crypto.createHmac('sha256', SECRET_KEY);
-    const space = ' ';
-    const newLine = '\n';
-    const method = 'POST';
-    const timestamp = Date.now().toString();
-    message.push(method);
-    message.push(space);
-    message.push(`/sms/v2/services/${SMS_SERVICE_ID}/messages`);
-    message.push(newLine);
-    message.push(timestamp);
-    message.push(newLine);
-    message.push(ACCESS_KEY_ID);
-    //message 배열에 위의 내용들을 담아준 후에
-    const signature = hmac.update(message.join('')).digest('base64');
-    //message.join('') 으로 만들어진 string 을 hmac 에 담고, base64로 인코딩
-    return signature.toString();
-  }
 
   async smsTest(dto: SmsTestDto): Promise<void> {
     const { content, phoneNumber } = dto;
@@ -108,12 +95,16 @@ export class TargetService implements ITargetUseCase {
   async createMessageContent(
     dto: CreateMessageContentDto,
   ): Promise<TargetData[]> {
+    this.logger.verbose('createMessageContent');
     const {
       segmentId,
       messageTitle,
       messageContentTemplate,
       receiverNumberColumnName,
+      email,
     } = dto;
+
+    await this.segmentUseCase.checkUserIsSegmentCreator(email, segmentId);
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
@@ -196,6 +187,26 @@ export class TargetService implements ITargetUseCase {
         reservationTimeDate,
       );
     }
+  }
+
+  private makeSignature(): string {
+    const message = [];
+    const hmac = crypto.createHmac('sha256', SECRET_KEY);
+    const space = ' ';
+    const newLine = '\n';
+    const method = 'POST';
+    const timestamp = Date.now().toString();
+    message.push(method);
+    message.push(space);
+    message.push(`/sms/v2/services/${SMS_SERVICE_ID}/messages`);
+    message.push(newLine);
+    message.push(timestamp);
+    message.push(newLine);
+    message.push(ACCESS_KEY_ID);
+    //message 배열에 위의 내용들을 담아준 후에
+    const signature = hmac.update(message.join('')).digest('base64');
+    //message.join('') 으로 만들어진 string 을 hmac 에 담고, base64로 인코딩
+    return signature.toString();
   }
 
   private async handleRecurringReservations(
