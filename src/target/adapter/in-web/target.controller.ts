@@ -27,12 +27,6 @@ export class TargetController {
     private readonly targetUseCase: ITargetUseCase,
   ) {}
 
-  @Post('/trigger1')
-  @HttpCode(HttpStatus.CREATED)
-  async createSegmentTrigger1(@Body() dto: CreateTargetTrigger1Dto) {
-    return this.targetUseCase.createTargetTrigger1(dto);
-  }
-
   @Post('/trigger2')
   @HttpCode(HttpStatus.CREATED)
   async createSegmentTrigger2(@Body() dto: CreateTargetTrigger2Dto) {
