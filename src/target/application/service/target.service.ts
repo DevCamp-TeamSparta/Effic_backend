@@ -9,7 +9,6 @@ import {
   ISegmentPortSymbol,
 } from 'src/segment/application/port/out/segment.port';
 import { ITargetPort, ITargetPortSymbol } from '../port/out/target.port';
-import { SmsTargetDto } from '../port/in/dto/sms-target.dto';
 import { ISmsPort, ISmsPortSymbol } from '../port/out/sms.port';
 import * as crypto from 'crypto';
 import axios from 'axios';
@@ -35,12 +34,6 @@ export class TargetService implements ITargetUseCase {
     @Inject(ISmsPortSymbol)
     private readonly smsPort: ISmsPort,
   ) {}
-
-  async smsTarget(smsTargetDto: SmsTargetDto): Promise<void> {
-    const { smsContent, senderNumber } = smsTargetDto;
-
-    await this.smsPort.saveSms(smsContent, senderNumber);
-  }
 
   private makeSignature(): string {
     const message = [];
