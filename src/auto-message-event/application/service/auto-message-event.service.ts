@@ -1,4 +1,10 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateAutoMessageEventDto } from '../port/in/dto/create-auto-message-event.dto';
 import { AutoMessageEvent } from 'src/auto-message-event/domain/auto-message-event';
 import { IAutoMessageEventUseCase } from '../port/in/auto-message-event.use-case';
@@ -49,6 +55,7 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
   }
 
   async getAllAutoMessageEvents(email: string): Promise<any> {
+    this.logger.verbose('getAllAutoMessageEvents');
     const user = await this.usersService.checkUserInfo(email);
     return await this.autoMessageEventPort.getAllAutoMessageEvents(user.userId);
   }
@@ -56,20 +63,28 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
   async updateAutoMessageEvent(
     dto: UpdateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity> {
-    const { autoMessageEventId, autoMessageEventName, scheduledEndDate } = dto;
+    this.logger.verbose('updateAutoMessageEvent');
+    const {
+      autoMessageEventId,
+      autoMessageEventName,
+      scheduledEndDate,
+      email,
+    } = dto;
+
+    const user = await this.usersService.checkUserInfo(email);
 
     const existingEvent =
       await this.autoMessageEventPort.getAutoMessageEventById(
         autoMessageEventId,
       );
     if (!existingEvent) throw new NotFoundException();
+    if (user.userId !== existingEvent.userId) throw new UnauthorizedException();
 
-    if (autoMessageEventName !== undefined) {
+    if (autoMessageEventName !== undefined)
       existingEvent.autoMessageEventName = autoMessageEventName;
-    }
-    if (scheduledEndDate !== undefined) {
+
+    if (scheduledEndDate !== undefined)
       existingEvent.scheduledEndDate = scheduledEndDate;
-    }
 
     return await this.autoMessageEventPort.updateAutoMessageEventById(
       autoMessageEventId,

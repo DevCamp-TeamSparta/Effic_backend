@@ -42,4 +42,8 @@ export class UpdateAutoMessageEventDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsString()
+  @IsOptional()
+  email?: string;
 }

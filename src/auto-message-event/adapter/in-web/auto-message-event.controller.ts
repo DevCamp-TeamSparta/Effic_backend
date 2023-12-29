@@ -49,11 +49,15 @@ export class AutoMessageEventController {
     return this.autoMessageEventUseCase.getAllAutoMessageEvents(email);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Put()
   @HttpCode(HttpStatus.OK)
   async updateAutoMessageEvent(
+    @Req() req,
     @Body() dto: UpdateAutoMessageEventDto,
   ): Promise<any> {
+    this.logger.verbose('updateAutoMessageEvent');
+    dto.email = req.payload.email;
     return this.autoMessageEventUseCase.updateAutoMessageEvent(dto);
   }
 }

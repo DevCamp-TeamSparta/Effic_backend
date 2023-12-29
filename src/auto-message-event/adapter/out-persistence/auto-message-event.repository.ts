@@ -29,7 +29,7 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
   }
 
   async getAllAutoMessageEvents(userId: number): Promise<AutoMessageEvent[]> {
-    return await this.autoMessageEventRepository.find();
+    return await this.autoMessageEventRepository.find({ where: { userId } });
   }
 
   async getAutoMessageEventById(
