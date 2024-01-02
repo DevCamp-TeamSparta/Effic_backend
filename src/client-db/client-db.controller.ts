@@ -13,8 +13,10 @@ import {
   IClientDbServiceSymbol,
 } from './client-db.interface';
 import { ConnectToDatabaseDto } from './connect-to-db.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('client-db')
+@ApiTags('Client DB API')
 export class ClientDbController {
   private logger = new Logger('ClientDbController');
   constructor(

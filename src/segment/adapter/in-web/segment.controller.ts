@@ -25,8 +25,10 @@ import {
 } from 'src/segment/application/port/in/segment.use-case';
 import { SegmentOrmEntity } from '../out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from 'src/segment/application/port/in/dto/update-segment.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('segment')
+@ApiTags('Segment API')
 export class SegmentController {
   private logger = new Logger('SegmentController');
   constructor(

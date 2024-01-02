@@ -10,8 +10,10 @@ import {
 import { ResultsService } from '../service/results.service';
 import * as jwt from 'jsonwebtoken';
 import { BizmessageResultsService } from '../service/biz-results.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('results')
+@ApiTags('Results API')
 export class ResultsController {
   private logger = new Logger('ResultsController');
   constructor(

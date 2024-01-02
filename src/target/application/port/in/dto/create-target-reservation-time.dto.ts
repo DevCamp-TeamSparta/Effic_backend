@@ -38,8 +38,8 @@ export class CreateTargetReservationTimeDto {
 
   @IsDate()
   @Type(() => Date)
-  @IsNotEmpty()
-  endDate: Date;
+  @IsOptional()
+  endDate?: Date;
 
   @IsBoolean()
   @IsNotEmpty()

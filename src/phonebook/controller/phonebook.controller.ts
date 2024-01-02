@@ -18,8 +18,10 @@ import { UpdatePhonebookDto } from '../dto/update-phonebook.dto';
 import { UsersService } from 'src/users/service/users.service';
 import { MemberValidatonPipe } from '../pipe/create-member-validation-pipe';
 import { AddMemberValidatonPipe } from '../pipe/add-member-validation-pipe';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('phonebook')
+@ApiTags('Phonebook API')
 export class PhonebookController {
   private logger = new Logger('PhonebookController');
   constructor(

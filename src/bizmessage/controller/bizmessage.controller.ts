@@ -16,8 +16,10 @@ import { UsersService } from 'src/users/service/users.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DefaultBizbodyValidationPipe } from '../pipe/defualt-bizbody-validation-pipe';
 import { FilterReceiverDto } from '../dto/filter-receiver.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('bizmessage')
+@ApiTags('Bizmessage API')
 export class BizmessageController {
   private logger = new Logger('BizmessageController');
   constructor(

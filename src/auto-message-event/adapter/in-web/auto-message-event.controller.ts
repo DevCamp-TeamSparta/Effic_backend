@@ -21,8 +21,10 @@ import {
 import { AutoMessageEventOrmEntity } from '../out-persistence/auto-message-event.orm.entity';
 import { UpdateAutoMessageEventDto } from 'src/auto-message-event/application/port/in/dto/update-auto-message-event.dto';
 import { AccessTokenGuard } from 'src/auth/guards/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('auto-message-event')
+@ApiTags('Auto Message Event API')
 export class AutoMessageEventController {
   private logger = new Logger('AutoMessageEventController');
   constructor(

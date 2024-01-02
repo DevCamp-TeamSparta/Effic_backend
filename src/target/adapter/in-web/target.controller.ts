@@ -10,6 +10,7 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/auth.guard';
 import { CreateMessageContentDto } from 'src/target/application/port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from 'src/target/application/port/in/dto/create-target-reservation-time.dto';
@@ -21,6 +22,7 @@ import {
 } from 'src/target/application/port/in/target.use-case';
 
 @Controller('target')
+@ApiTags('Target API')
 export class TargetController {
   private logger = new Logger('TargetController');
   constructor(

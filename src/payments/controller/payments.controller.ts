@@ -14,8 +14,10 @@ import { Payment } from '../payments.entity';
 import { CompletePaymentDto } from '../dto/complete-payment.dto';
 import * as jwt from 'jsonwebtoken';
 import { RefundPaymentDto } from '../dto/refund-payment.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('payments')
+@ApiTags('Payments API')
 export class PaymentsController {
   private logger = new Logger('PaymentsController');
   constructor(private paymentsService: PaymentsService) {}

@@ -1,7 +1,9 @@
 import { Controller, Logger, Get } from '@nestjs/common';
 import { ShorturlService } from '../service/shorturl.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('shorturl')
+@ApiTags('Shorturl API')
 export class ShorturlController {
   private logger = new Logger('ShorturlController');
   constructor(private shorturlService: ShorturlService) {}

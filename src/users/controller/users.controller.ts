@@ -23,8 +23,10 @@ import {
   AccessTokenGuard,
   RefreshTokenGuard,
 } from 'src/auth/guards/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('users')
+@ApiTags('Users API')
 export class UsersController {
   private logger = new Logger('UsersController');
   constructor(private usersService: UsersService) {}

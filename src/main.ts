@@ -3,10 +3,12 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { json, urlencoded } from 'express';
 import 'dotenv/config';
+import { setupSwagger } from './util/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useLogger(new Logger('global', { timestamp: true }));
+  setupSwagger(app);
 
   app.useGlobalPipes(
     new ValidationPipe({

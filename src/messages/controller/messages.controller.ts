@@ -18,8 +18,10 @@ import { CheckHostNumberDto } from '../dto/check-number.dto';
 import { FilterReceiverDto } from '../dto/filter-receiver.dto';
 import * as jwt from 'jsonwebtoken';
 import { AuthGuard } from 'src/auth.guard';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('messages')
+@ApiTags('Messages API')
 @UseGuards(AuthGuard)
 export class MessagesController {
   private logger = new Logger('MessagesController');
