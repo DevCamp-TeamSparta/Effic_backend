@@ -25,7 +25,7 @@ import {
 } from 'src/segment/application/port/in/segment.use-case';
 import { SegmentOrmEntity } from '../out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from 'src/segment/application/port/in/dto/update-segment.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('segment')
 @ApiTags('Segment API')
@@ -38,6 +38,14 @@ export class SegmentController {
 
   @UseGuards(AccessTokenGuard)
   @Post()
+  @ApiOperation({
+    summary: 'Segment 생성 API',
+    description: 'Segment를 생성함',
+  })
+  @ApiCreatedResponse({
+    description: '생성된 Segment를 반환',
+    type: SegmentOrmEntity,
+  })
   @HttpCode(HttpStatus.CREATED)
   async createSegment(@Req() req, @Body() dto: CreateSegmentDto) {
     this.logger.verbose('createSegment');
