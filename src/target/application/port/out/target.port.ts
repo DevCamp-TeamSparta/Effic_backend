@@ -1,4 +1,3 @@
-import { BooleanExpression } from 'mongoose';
 import { TargetOrmEntity } from 'src/target/adapter/out-persistence/target.orm.entity';
 
 export interface ITargetPort {
