@@ -239,6 +239,7 @@ export class TargetService implements ITargetUseCase {
         segmentId,
         updatedAtColumnName,
         autoMessageEventLastRunTime,
+        receiverNumberColumnName,
       } = autoMessageEvent;
 
       const segmentDetail = await this.segmentPort.getSegmentDetails(segmentId);
@@ -269,6 +270,8 @@ export class TargetService implements ITargetUseCase {
       if (!autoMessageEvent.isReserved) {
         const { email, hostnumber, title, content, advertiseInfo } =
           autoMessageEvent;
+
+        // updatedResult에서 {receiverNumberColumnName}에 해당하는 값(=전화번호) 추출
 
         const receiverList = [];
 
