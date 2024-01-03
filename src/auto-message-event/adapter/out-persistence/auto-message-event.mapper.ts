@@ -5,6 +5,7 @@ export class AutoMessageEventMapper {
   static mapToAutoMessageEventOrmEntity(
     autoMessageEvent: AutoMessageEvent,
     userId: number,
+    segmentId: number,
   ) {
     const autoMessageEventEntity = new AutoMessageEventOrmEntity();
 
@@ -17,6 +18,7 @@ export class AutoMessageEventMapper {
     autoMessageEventEntity.createdDate = autoMessageEvent.createdDate;
     autoMessageEventEntity.isActive = autoMessageEvent.isActive;
     autoMessageEventEntity.userId = userId;
+    autoMessageEventEntity.segmentId = segmentId;
 
     return autoMessageEventEntity;
   }

@@ -38,6 +38,11 @@ export class CreateAutoMessageEventDto {
   @IsOptional()
   email?: string;
 
+  /**AME의 세그먼트 정보 */
+  @IsNumber()
+  @IsNotEmpty()
+  segmentId: number;
+
   /**사용자가 입력한 데이터들 */
 
   /**AME에 사용된 고객 DB 정보 */

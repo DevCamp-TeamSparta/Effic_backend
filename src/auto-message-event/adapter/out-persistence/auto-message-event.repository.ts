@@ -16,11 +16,13 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
   async saveAutoMessageEvent(
     autoMessageEvent: AutoMessageEvent,
     userId: number,
+    segmentId: number,
   ): Promise<AutoMessageEventOrmEntity> {
     const autoMessageEventOrmEntity =
       AutoMessageEventMapper.mapToAutoMessageEventOrmEntity(
         autoMessageEvent,
         userId,
+        segmentId,
       );
 
     const savedAutoMessageEventOrmEntity =

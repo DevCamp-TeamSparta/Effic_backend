@@ -24,6 +24,7 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
     private readonly autoMessageEventPort: IAutoMessageEventPort,
     private usersService: UsersService,
   ) {}
+
   async createAutoMessageEvent(
     dto: CreateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity> {
@@ -34,6 +35,7 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
       createdDate,
       isActive,
       email,
+      segmentId,
     } = dto;
 
     const newAutoMessageEvent = new AutoMessageEvent(
@@ -51,6 +53,7 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
     return this.autoMessageEventPort.saveAutoMessageEvent(
       newAutoMessageEvent,
       user.userId,
+      segmentId,
     );
   }
 
