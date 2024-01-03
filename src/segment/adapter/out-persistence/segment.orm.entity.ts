@@ -1,3 +1,4 @@
+import { ClientDbOrmEntity } from 'src/client-db/client-db.orm.entity';
 import { User } from 'src/users/user.entity';
 import {
   Column,
@@ -36,4 +37,9 @@ export class SegmentOrmEntity {
 
   @Column({ name: 'userId' })
   userId: number;
+
+  @ManyToOne(() => ClientDbOrmEntity)
+  @JoinColumn({ name: 'clinetDbId' })
+  @Column({ name: 'clientDbId' })
+  clientDbId: number;
 }

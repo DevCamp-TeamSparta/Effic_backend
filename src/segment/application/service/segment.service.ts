@@ -37,7 +37,8 @@ export class SegmentService implements ISegmentUseCase {
 
   async createSegment(dto: CreateSegmentDto): Promise<SegmentOrmEntity> {
     this.logger.verbose('createSegment');
-    const { segmentName, segmentDescription, createdAt, email } = dto;
+    const { segmentName, segmentDescription, createdAt, email, clientDbId } =
+      dto;
     const newSegment = new Segment(
       segmentName,
       segmentDescription,
@@ -47,7 +48,7 @@ export class SegmentService implements ISegmentUseCase {
       null,
     );
     const user = await this.usersService.checkUserInfo(email);
-    return this.segmentPort.saveSegment(newSegment, user.userId);
+    return this.segmentPort.saveSegment(newSegment, user.userId, clientDbId);
   }
 
   async updateSegment(dto: UpdateSegmentDto): Promise<SegmentOrmEntity> {

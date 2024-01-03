@@ -14,7 +14,11 @@ export class SegmentMapper {
     return SegmentEntity;
   }
 
-  static mapToSegmentOrmEntity(segment: Segment, userId: number) {
+  static mapToSegmentOrmEntity(
+    segment: Segment,
+    userId: number,
+    clientDbId: number,
+  ) {
     const segmentEntity = new SegmentOrmEntity();
     segmentEntity.segmentName = segment.segmentName;
     segmentEntity.segmentDescription = segment.segmentDescription;
@@ -22,6 +26,7 @@ export class SegmentMapper {
     segmentEntity.filterQuery = segment.filterQuery;
     segmentEntity.createdAt = segment.createdAt;
     segmentEntity.userId = userId;
+    segmentEntity.clientDbId = clientDbId;
 
     return segmentEntity;
   }

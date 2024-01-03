@@ -21,10 +21,12 @@ export class SegmentRepository implements ISegmentPort {
   async saveSegment(
     segment: Segment,
     userId: number,
+    clientDbId: number,
   ): Promise<SegmentOrmEntity> {
     const segmentOrmEntity = SegmentMapper.mapToSegmentOrmEntity(
       segment,
       userId,
+      clientDbId,
     );
 
     const savedSegmentOrmEntity = await this.segmentRepository.save(

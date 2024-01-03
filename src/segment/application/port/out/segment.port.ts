@@ -6,7 +6,11 @@ import { UpdateSegmentQueryDto } from '../in/dto/update-segment-query.dto';
 import { UpdateClientDbDto } from '../in/dto/update-client-db.dto';
 
 export interface ISegmentPort {
-  saveSegment(segment: Segment, userId: number): Promise<SegmentOrmEntity>;
+  saveSegment(
+    segment: Segment,
+    userId: number,
+    clientDbId: number,
+  ): Promise<SegmentOrmEntity>;
   updateSegment(dto: UpdateSegmentDto): Promise<SegmentOrmEntity>;
   getSegmentDetails(segmentId: number): Promise<SegmentOrmEntity>;
   updateSegmentQuery(dto: UpdateSegmentQueryDto): Promise<Segment>;
