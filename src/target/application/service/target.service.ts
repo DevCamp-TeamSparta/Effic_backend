@@ -213,6 +213,11 @@ export class TargetService implements ITargetUseCase {
     }
   }
 
+  async automateTargetDataProcessing(): Promise<void> {
+    this.logger.verbose('automateTargetDataProcessing');
+    return;
+  }
+
   private makeSignature(): string {
     const message = [];
     const hmac = crypto.createHmac('sha256', SECRET_KEY);

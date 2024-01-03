@@ -68,4 +68,12 @@ export class TargetController {
     this.logger.verbose('sendReservedMessage');
     return this.targetUseCase.sendReservedMessage();
   }
+
+  /**Cron 서버 */
+  @Post('/auto')
+  @HttpCode(HttpStatus.OK)
+  async automateTargetDataProcessing(): Promise<void> {
+    this.logger.verbose('automateTargetDataProcessing');
+    return this.targetUseCase.automateTargetDataProcessing();
+  }
 }
