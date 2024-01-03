@@ -20,7 +20,6 @@ export interface ISegmentPort {
   getMessageHistoryByPhoneNumber(
     phoneNumber: string,
   ): Promise<MessageHistoryOrmEntity[]>;
-  updateClientDb(dto: UpdateClientDbDto): Promise<SegmentOrmEntity>;
 }
 
 export const ISegmentPortSymbol = Symbol('ISegmentPortSymbol');

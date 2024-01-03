@@ -1,15 +1,28 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import * as mysql from 'mysql2/promise';
 import { IClientDbService } from './client-db.interface';
+import { ConnectToDatabaseDto } from './connect-to-db.dto';
+import { IClientDbPort, IClientDbPortSymbol } from './client-db.port';
 
 @Injectable()
 export class ClientDbService implements IClientDbService {
   private logger = new Logger('ClientDbService');
   private connectionPool: mysql.Pool | null = null;
+
+  constructor(
+    @Inject(IClientDbPortSymbol)
+    private readonly clientDbPort: IClientDbPort,
+  ) {}
+
+  async saveClinetDbInfo(dto: ConnectToDatabaseDto) {
+    this.logger.verbose('saveClinetDbInfo');
+    return await this.clientDbPort.saveClientDbInfo(dto);
+  }
 
   async connectToDb(connectionDetails: mysql.PoolOptions): Promise<void> {
     this.logger.verbose('connectToDb');

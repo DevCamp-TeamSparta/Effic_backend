@@ -36,20 +36,4 @@ export class SegmentOrmEntity {
 
   @Column({ name: 'userId' })
   userId: number;
-
-  /**고객 DB 관련 정보 */
-  @Column({ nullable: true })
-  host?: string;
-
-  @Column({ nullable: true })
-  username?: string;
-
-  @Column({ nullable: true })
-  password?: string;
-
-  @Column({ nullable: true })
-  database?: string;
-
-  @Column({ nullable: true })
-  port?: number;
 }

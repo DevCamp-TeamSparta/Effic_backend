@@ -257,9 +257,4 @@ export class SegmentService implements ISegmentUseCase {
 
     return segmentDetails;
   }
-
-  async updateClientDb(dto: UpdateClientDbDto) {
-    this.logger.verbose('updateClientDb');
-    return await this.segmentPort.updateClientDb(dto);
-  }
 }

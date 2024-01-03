@@ -38,8 +38,6 @@ export interface ISegmentUseCase {
     email: string,
     segmentId: number,
   ): Promise<SegmentOrmEntity>;
-
-  updateClientDb(dto: UpdateClientDbDto);
 }
 
 export const ISegmentUseCaseSymbol = Symbol('ISegmentUseCaseSymbol');

@@ -24,6 +24,13 @@ export class ClientDbController {
     private readonly clientDbService: IClientDbService,
   ) {}
 
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async saveClientDbInfo(@Body() dto: ConnectToDatabaseDto) {
+    this.logger.verbose('saveClientDbInfo');
+    return await this.clientDbService.saveClinetDbInfo(dto);
+  }
+
   @Post('/connect')
   @HttpCode(HttpStatus.OK)
   async connectToDatabase(@Body() dto: ConnectToDatabaseDto) {

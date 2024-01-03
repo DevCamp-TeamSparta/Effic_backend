@@ -153,11 +153,4 @@ export class SegmentController {
     dto.email = req.payload.email;
     return this.segmentUseCase.createFilterQueryByFatigueLevel(dto);
   }
-
-  @Post('/client-db')
-  @HttpCode(HttpStatus.CREATED)
-  async updateClientDb(@Body() dto: UpdateClientDbDto) {
-    this.logger.verbose('updateClientDb');
-    return this.segmentUseCase.updateClientDb(dto);
-  }
 }
