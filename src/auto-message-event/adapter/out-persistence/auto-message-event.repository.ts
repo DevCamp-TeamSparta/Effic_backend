@@ -67,4 +67,8 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
 
     return updatedAutoMessageEventOrmEntity;
   }
+
+  async cronGetAllAutoMessageEvents(): Promise<AutoMessageEventOrmEntity[]> {
+    return await this.autoMessageEventRepository.find();
+  }
 }

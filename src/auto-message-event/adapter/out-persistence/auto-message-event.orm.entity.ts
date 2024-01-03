@@ -40,5 +40,8 @@ export class AutoMessageEventOrmEntity {
 
   @ManyToOne(() => SegmentOrmEntity)
   @JoinColumn({ name: 'segmentId' })
+  segment: SegmentOrmEntity;
+
+  @Column()
   segmentId: number;
 }

@@ -16,6 +16,7 @@ export interface IAutoMessageEventPort {
     autoMessageEventName?: string,
     scheduledEndDate?: Date,
   ): Promise<AutoMessageEventOrmEntity>;
+  cronGetAllAutoMessageEvents(): Promise<AutoMessageEventOrmEntity[]>;
 }
 
 export const IAutoMessageEventPortSymbol = Symbol(

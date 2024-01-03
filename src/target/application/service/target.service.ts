@@ -19,6 +19,14 @@ import {
   ISegmentUseCase,
   ISegmentUseCaseSymbol,
 } from 'src/segment/application/port/in/segment.use-case';
+import {
+  IAutoMessageEventPort,
+  IAutoMessageEventPortSymbol,
+} from 'src/auto-message-event/application/port/out/auto-message-event.port';
+import {
+  IClientDbPort,
+  IClientDbPortSymbol,
+} from 'src/client-db/client-db.port';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -33,10 +41,14 @@ export class TargetService implements ITargetUseCase {
     private readonly segmentPort: ISegmentPort,
     @Inject(IClientDbServiceSymbol)
     private readonly clientDbService: IClientDbService,
+    @Inject(IClientDbPortSymbol)
+    private readonly clientDbPort: IClientDbPort,
     @Inject(ITargetPortSymbol)
     private readonly targetPort: ITargetPort,
     @Inject(ISegmentUseCaseSymbol)
     private readonly segmentUseCase: ISegmentUseCase,
+    @Inject(IAutoMessageEventPortSymbol)
+    private readonly autoMessageEventPort: IAutoMessageEventPort,
   ) {}
 
   async smsTest(dto: SmsTestDto): Promise<void> {
@@ -215,6 +227,16 @@ export class TargetService implements ITargetUseCase {
 
   async automateTargetDataProcessing(): Promise<void> {
     this.logger.verbose('automateTargetDataProcessing');
+    const records =
+      await this.autoMessageEventPort.cronGetAllAutoMessageEvents();
+
+    for (const record of records) {
+      const segmentId = record.segmentId;
+      const segmentDetail = await this.segmentPort.getSegmentDetails(segmentId);
+      const clientDbId = segmentDetail.clientDbId;
+      const clientDbInfo = await this.clientDbPort.getClientDbInfo(clientDbId);
+      await this.clientDbService.connectToDb(clientDbInfo);
+    }
     return;
   }
 

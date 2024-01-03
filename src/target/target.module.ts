@@ -19,6 +19,12 @@ import {
 import { UsersService } from 'src/users/service/users.service';
 import { AuthService } from 'src/auth/service/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { IAutoMessageEventPortSymbol } from 'src/auto-message-event/application/port/out/auto-message-event.port';
+import { AutoMessageEventRepository } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.repository';
+import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
+import { IClientDbPortSymbol } from 'src/client-db/client-db.port';
+import { ClinetDbRepository } from 'src/client-db/client-db.repository';
+import { ClientDbOrmEntity } from 'src/client-db/client-db.orm.entity';
 
 @Module({
   imports: [
@@ -26,6 +32,8 @@ import { JwtService } from '@nestjs/jwt';
       SegmentOrmEntity,
       TargetOrmEntity,
       MessageHistoryOrmEntity,
+      AutoMessageEventOrmEntity,
+      ClientDbOrmEntity,
     ]),
   ],
   controllers: [TargetController],
@@ -50,6 +58,14 @@ import { JwtService } from '@nestjs/jwt';
     {
       provide: ITargetPortSymbol,
       useClass: TargetRepository,
+    },
+    {
+      provide: IAutoMessageEventPortSymbol,
+      useClass: AutoMessageEventRepository,
+    },
+    {
+      provide: IClientDbPortSymbol,
+      useClass: ClinetDbRepository,
     },
   ],
 })

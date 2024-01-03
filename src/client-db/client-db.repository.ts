@@ -28,4 +28,13 @@ export class ClinetDbRepository implements IClientDbPort {
     );
     return savedClientDbOrmEntity;
   }
+
+  async getClientDbInfo(clientDbId: number): Promise<ClientDbOrmEntity> {
+    const ClientDbOrmEntity = await this.clientDbRepository.findOne({
+      where: { clientDbId },
+    });
+    if (!ClientDbOrmEntity) throw new Error('clientDbInfo not found');
+
+    return ClientDbOrmEntity;
+  }
 }

@@ -40,5 +40,8 @@ export class SegmentOrmEntity {
 
   @ManyToOne(() => ClientDbOrmEntity)
   @JoinColumn({ name: 'clinetDbId' })
+  clientDb: ClientDbOrmEntity;
+
+  @Column()
   clientDbId: number;
 }
