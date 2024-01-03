@@ -46,4 +46,52 @@ export class UpdateAutoMessageEventDto {
   @IsString()
   @IsOptional()
   email?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isReserved?: boolean;
+
+  @IsString()
+  @IsOptional()
+  updatedAtColumnName?: string;
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  autoMessageEventLastRunTime?: Date;
+
+  /** */
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  reservationTime?: Date;
+
+  @IsOptional()
+  @IsNumber({}, { each: true })
+  targetIds?: number[];
+
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
+
+  @IsOptional()
+  @IsString()
+  receiverNumberColumnName?: string;
+
+  @IsOptional()
+  @IsString({ each: true })
+  weekDays?: string[];
+
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  endDate?: Date;
+
+  @IsOptional()
+  @IsString()
+  timeColumnName?: string;
+
+  @IsOptional()
+  @IsNumber()
+  delayDays?: number;
 }

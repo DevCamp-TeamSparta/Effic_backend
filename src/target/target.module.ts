@@ -25,6 +25,7 @@ import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-pe
 import { IClientDbPortSymbol } from 'src/client-db/client-db.port';
 import { ClinetDbRepository } from 'src/client-db/client-db.repository';
 import { ClientDbOrmEntity } from 'src/client-db/client-db.orm.entity';
+import { MessageModule } from 'src/messages/messages.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ClientDbOrmEntity } from 'src/client-db/client-db.orm.entity';
       AutoMessageEventOrmEntity,
       ClientDbOrmEntity,
     ]),
+    MessageModule,
   ],
   controllers: [TargetController],
   providers: [

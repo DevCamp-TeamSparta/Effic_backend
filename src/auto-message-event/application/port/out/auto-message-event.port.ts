@@ -1,5 +1,6 @@
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 import { AutoMessageEvent } from 'src/auto-message-event/domain/auto-message-event';
+import { UpdateAutoMessageEventDto } from '../in/dto/update-auto-message-event.dto';
 
 export interface IAutoMessageEventPort {
   saveAutoMessageEvent(
@@ -12,9 +13,7 @@ export interface IAutoMessageEventPort {
     autoMessageEventId: number,
   ): Promise<AutoMessageEventOrmEntity>;
   updateAutoMessageEventById(
-    autoMessageEventId: number,
-    autoMessageEventName?: string,
-    scheduledEndDate?: Date,
+    dto: UpdateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity>;
   cronGetAllAutoMessageEvents(): Promise<AutoMessageEventOrmEntity[]>;
 }

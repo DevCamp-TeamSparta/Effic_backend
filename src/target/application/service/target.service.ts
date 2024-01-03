@@ -27,6 +27,8 @@ import {
   IClientDbPort,
   IClientDbPortSymbol,
 } from 'src/client-db/client-db.port';
+import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
+import { MessagesService } from 'src/messages/service/messages.service';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -49,6 +51,7 @@ export class TargetService implements ITargetUseCase {
     private readonly segmentUseCase: ISegmentUseCase,
     @Inject(IAutoMessageEventPortSymbol)
     private readonly autoMessageEventPort: IAutoMessageEventPort,
+    private messagesService: MessagesService,
   ) {}
 
   async smsTest(dto: SmsTestDto): Promise<void> {
@@ -227,17 +230,108 @@ export class TargetService implements ITargetUseCase {
 
   async automateTargetDataProcessing(): Promise<void> {
     this.logger.verbose('automateTargetDataProcessing');
-    const records =
+    const autoMessageEvents =
       await this.autoMessageEventPort.cronGetAllAutoMessageEvents();
 
-    for (const record of records) {
-      const segmentId = record.segmentId;
+    for (const autoMessageEvent of autoMessageEvents) {
+      const {
+        autoMessageEventId,
+        segmentId,
+        updatedAtColumnName,
+        autoMessageEventLastRunTime,
+      } = autoMessageEvent;
+
       const segmentDetail = await this.segmentPort.getSegmentDetails(segmentId);
-      const clientDbId = segmentDetail.clientDbId;
-      const clientDbInfo = await this.clientDbPort.getClientDbInfo(clientDbId);
-      await this.clientDbService.connectToDb(clientDbInfo);
+
+      await this.connectToClientDatabase(segmentDetail.clientDbId);
+
+      const filterQueryResults = await this.clientDbService.executeQuery(
+        segmentDetail.filterQuery,
+      );
+
+      const updatedResult = filterQueryResults.filter((filterQueryResult) => {
+        const updatedAtValue = new Date(filterQueryResult[updatedAtColumnName]);
+        return updatedAtValue >= autoMessageEventLastRunTime;
+      });
+
+      const updateAutoMessageEventDto = {
+        autoMessageEventId,
+        autoMessageEventLastRunTime: new Date(),
+      };
+
+      if (autoMessageEvent.isReserved) {
+        await this.cronTargetReservationTime(autoMessageEvent, updatedResult);
+        await this.autoMessageEventPort.updateAutoMessageEventById(
+          updateAutoMessageEventDto,
+        );
+      }
+
+      if (!autoMessageEvent.isReserved) {
+        const { email, hostnumber, title, content, advertiseInfo } =
+          autoMessageEvent;
+
+        const receiverList = [];
+
+        const defaultMessageDto = {
+          hostnumber,
+          title,
+          content,
+          receiverList,
+          advertiseInfo,
+        };
+        await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
+        await this.autoMessageEventPort.updateAutoMessageEventById(
+          updateAutoMessageEventDto,
+        );
+      }
     }
     return;
+  }
+
+  private async cronTargetReservationTime(
+    autoMessageEvent: AutoMessageEventOrmEntity,
+    queryResult,
+  ): Promise<void> {
+    const {
+      reservationTime,
+      targetIds,
+      isRecurring,
+      receiverNumberColumnName,
+      weekDays,
+      endDate,
+      timeColumnName,
+      delayDays,
+    } = autoMessageEvent;
+
+    const reservationTimeDate = new Date(reservationTime);
+    const phoneNumberToTargetIdMap = await this.targetPort.getReceiverNumbers(
+      targetIds,
+    );
+
+    if (isRecurring) {
+      await this.handleRecurringReservations(
+        queryResult,
+        phoneNumberToTargetIdMap,
+        receiverNumberColumnName,
+        weekDays,
+        endDate,
+        reservationTimeDate,
+      );
+    } else {
+      await this.handleNonRecurringReservations(
+        queryResult,
+        phoneNumberToTargetIdMap,
+        timeColumnName,
+        receiverNumberColumnName,
+        delayDays,
+        reservationTimeDate,
+      );
+    }
+  }
+
+  private async connectToClientDatabase(clientDbId: number): Promise<void> {
+    const clientDbInfo = await this.clientDbPort.getClientDbInfo(clientDbId);
+    await this.clientDbService.connectToDb(clientDbInfo);
   }
 
   private makeSignature(): string {

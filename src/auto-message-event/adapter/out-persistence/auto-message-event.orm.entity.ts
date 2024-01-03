@@ -17,13 +17,13 @@ export class AutoMessageEventOrmEntity {
   autoMessageEventName: string;
 
   @Column({ nullable: true })
-  totalSentCount: number | null;
+  isReserved: boolean;
 
   @Column({ nullable: true })
-  clickCount: number | null;
+  updatedAtColumnName: string;
 
   @Column({ nullable: true })
-  clickRate: number | null;
+  autoMessageEventLastRunTime: Date;
 
   @Column()
   scheduledEndDate: Date;
@@ -36,6 +36,9 @@ export class AutoMessageEventOrmEntity {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Column()
   userId: number;
 
   @ManyToOne(() => SegmentOrmEntity)
@@ -44,4 +47,55 @@ export class AutoMessageEventOrmEntity {
 
   @Column()
   segmentId: number;
+
+  /**cronTargetReservationTime에 필요한 정보 */
+  @Column({ nullable: true })
+  reservationTime: Date;
+
+  @Column('int', { array: true, nullable: true })
+  targetIds: number[];
+
+  @Column({ nullable: true })
+  isRecurring: boolean;
+
+  @Column({ nullable: true })
+  receiverNumberColumnName: string;
+
+  @Column('text', { array: true, nullable: true })
+  weekDays: string[];
+
+  @Column({ nullable: true })
+  endDate: Date;
+
+  @Column({ nullable: true })
+  timeColumnName: string;
+
+  @Column({ nullable: true })
+  delayDays: number;
+
+  /**즉시 발송에 필요한 정보 */
+  @Column({ nullable: true })
+  email: string;
+
+  @Column({ nullable: true })
+  hostnumber: string;
+
+  @Column({ nullable: true })
+  title: string;
+
+  @Column({ nullable: true })
+  content: string;
+
+  @Column({ nullable: true })
+  advertiseInfo: boolean;
+
+  /**통계에 필요한 정보 */
+  @Column({ nullable: true })
+  totalSentCount: number | null;
+
+  @Column({ nullable: true })
+  clickCount: number | null;
+
+  @Column({ nullable: true })
+  clickRate: number | null;
 }

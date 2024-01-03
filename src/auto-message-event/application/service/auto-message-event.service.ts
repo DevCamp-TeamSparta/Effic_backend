@@ -106,10 +106,6 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
     if (scheduledEndDate !== undefined)
       existingEvent.scheduledEndDate = scheduledEndDate;
 
-    return await this.autoMessageEventPort.updateAutoMessageEventById(
-      autoMessageEventId,
-      autoMessageEventName,
-      scheduledEndDate,
-    );
+    return await this.autoMessageEventPort.updateAutoMessageEventById(dto);
   }
 }

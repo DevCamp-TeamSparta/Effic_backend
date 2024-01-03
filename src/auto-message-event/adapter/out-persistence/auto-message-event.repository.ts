@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { AutoMessageEventOrmEntity } from './auto-message-event.orm.entity';
 import { AutoMessageEvent } from 'src/auto-message-event/domain/auto-message-event';
 import { AutoMessageEventMapper } from './auto-message-event.mapper';
+import { UpdateAutoMessageEventDto } from 'src/auto-message-event/application/port/in/dto/update-auto-message-event.dto';
 
 @Injectable()
 export class AutoMessageEventRepository implements IAutoMessageEventPort {
@@ -43,23 +44,19 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
   }
 
   async updateAutoMessageEventById(
-    autoMessageEventId: number,
-    autoMessageEventName?: string,
-    scheduledEndDate?: Date,
+    dto: UpdateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity> {
+    const { autoMessageEventId, ...updateData } = dto;
+
     const autoMessageEventOrmEntity =
-      await this.autoMessageEventRepository.findOneBy({
-        autoMessageEventId,
-      });
+      await this.autoMessageEventRepository.findOneBy({ autoMessageEventId });
 
     if (!autoMessageEventOrmEntity) throw new NotFoundException();
 
-    if (autoMessageEventName) {
-      autoMessageEventOrmEntity.autoMessageEventName = autoMessageEventName;
-    }
-
-    if (scheduledEndDate) {
-      autoMessageEventOrmEntity.scheduledEndDate = scheduledEndDate;
+    for (const [key, value] of Object.entries(updateData)) {
+      if (value !== undefined) {
+        autoMessageEventOrmEntity[key] = value;
+      }
     }
 
     const updatedAutoMessageEventOrmEntity =
