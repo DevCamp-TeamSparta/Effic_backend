@@ -6,6 +6,7 @@ import { CreateFilterQueryByVariableValueDto } from './dto/create-filter-query-b
 import { CreateFilterQueryByFatigueLevelDto } from './dto/create-filter-query-by-fatigue-level.dto';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from './dto/update-segment.dto';
+import { UpdateClientDbDto } from './dto/update-client-db.dto';
 
 export interface ISegmentUseCase {
   createSegment(createSegmentDto: CreateSegmentDto): Promise<SegmentOrmEntity>;
@@ -37,6 +38,8 @@ export interface ISegmentUseCase {
     email: string,
     segmentId: number,
   ): Promise<SegmentOrmEntity>;
+
+  updateClientDb(dto: UpdateClientDbDto);
 }
 
 export const ISegmentUseCaseSymbol = Symbol('ISegmentUseCaseSymbol');

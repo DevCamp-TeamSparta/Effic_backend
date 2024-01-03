@@ -22,6 +22,7 @@ import { CreateFilterQueryByFatigueLevelDto } from '../port/in/dto/create-filter
 import { UsersService } from 'src/users/service/users.service';
 import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from '../port/in/dto/update-segment.dto';
+import { UpdateClientDbDto } from '../port/in/dto/update-client-db.dto';
 
 @Injectable()
 export class SegmentService implements ISegmentUseCase {
@@ -255,5 +256,10 @@ export class SegmentService implements ISegmentUseCase {
       throw new UnauthorizedException();
 
     return segmentDetails;
+  }
+
+  async updateClientDb(dto: UpdateClientDbDto) {
+    this.logger.verbose('updateClientDb');
+    return await this.segmentPort.updateClientDb(dto);
   }
 }

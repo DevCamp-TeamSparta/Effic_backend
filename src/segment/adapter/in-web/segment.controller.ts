@@ -26,6 +26,7 @@ import {
 import { SegmentOrmEntity } from '../out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from 'src/segment/application/port/in/dto/update-segment.dto';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UpdateClientDbDto } from 'src/segment/application/port/in/dto/update-client-db.dto';
 
 @Controller('segment')
 @ApiTags('Segment API')
@@ -151,5 +152,12 @@ export class SegmentController {
     this.logger.verbose('createFilterQueryByFatigueLevel');
     dto.email = req.payload.email;
     return this.segmentUseCase.createFilterQueryByFatigueLevel(dto);
+  }
+
+  @Post('/client-db')
+  @HttpCode(HttpStatus.CREATED)
+  async updateClientDb(@Body() dto: UpdateClientDbDto) {
+    this.logger.verbose('updateClientDb');
+    return this.segmentUseCase.updateClientDb(dto);
   }
 }

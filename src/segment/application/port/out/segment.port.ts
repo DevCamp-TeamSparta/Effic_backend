@@ -3,6 +3,7 @@ import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.or
 import { Segment } from 'src/segment/domain/segment';
 import { UpdateSegmentDto } from '../in/dto/update-segment.dto';
 import { UpdateSegmentQueryDto } from '../in/dto/update-segment-query.dto';
+import { UpdateClientDbDto } from '../in/dto/update-client-db.dto';
 
 export interface ISegmentPort {
   saveSegment(segment: Segment, userId: number): Promise<SegmentOrmEntity>;
@@ -19,6 +20,7 @@ export interface ISegmentPort {
   getMessageHistoryByPhoneNumber(
     phoneNumber: string,
   ): Promise<MessageHistoryOrmEntity[]>;
+  updateClientDb(dto: UpdateClientDbDto): Promise<SegmentOrmEntity>;
 }
 
 export const ISegmentPortSymbol = Symbol('ISegmentPortSymbol');
