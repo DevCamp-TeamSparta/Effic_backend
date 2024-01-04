@@ -29,6 +29,7 @@ import {
 } from 'src/client-db/client-db.port';
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 import { MessagesService } from 'src/messages/service/messages.service';
+import { UsersRepository } from 'src/users/users.repository';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -52,6 +53,7 @@ export class TargetService implements ITargetUseCase {
     @Inject(IAutoMessageEventPortSymbol)
     private readonly autoMessageEventPort: IAutoMessageEventPort,
     private messagesService: MessagesService,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async smsTest(dto: SmsTestDto): Promise<void> {
@@ -239,12 +241,24 @@ export class TargetService implements ITargetUseCase {
         segmentId,
         updatedAtColumnName,
         autoMessageEventLastRunTime,
-        receiverNumberColumnName,
+        isReserved,
+        targetIds,
       } = autoMessageEvent;
+
+      if (!autoMessageEventLastRunTime) {
+        const updateAutoMessageEventDto = {
+          autoMessageEventId,
+          autoMessageEventLastRunTime: new Date('2000-01-01T00:00:00.000Z'),
+        };
+        await this.autoMessageEventPort.updateAutoMessageEventById(
+          updateAutoMessageEventDto,
+        );
+      }
 
       const segmentDetail = await this.segmentPort.getSegmentDetails(segmentId);
 
       await this.connectToClientDatabase(segmentDetail.clientDbId);
+      const email = await this.getUserEmailById(segmentDetail.userId);
 
       const filterQueryResults = await this.clientDbService.executeQuery(
         segmentDetail.filterQuery,
@@ -260,35 +274,46 @@ export class TargetService implements ITargetUseCase {
         autoMessageEventLastRunTime: new Date(),
       };
 
-      if (autoMessageEvent.isReserved) {
+      if (isReserved) {
         await this.cronTargetReservationTime(autoMessageEvent, updatedResult);
         await this.autoMessageEventPort.updateAutoMessageEventById(
           updateAutoMessageEventDto,
         );
       }
 
-      if (!autoMessageEvent.isReserved) {
-        const { email, hostnumber, title, content, advertiseInfo } =
-          autoMessageEvent;
+      if (!isReserved) {
+        for (const targetId of targetIds) {
+          const targetData = await this.targetPort.getTargetData(targetId);
 
-        // updatedResult에서 {receiverNumberColumnName}에 해당하는 값(=전화번호) 추출
+          const receiverList = [];
+          receiverList.push({
+            phone: targetData.receiverNumber.replace(/-/g, ''),
+          });
 
-        const receiverList = [];
+          const defaultMessageDto = {
+            hostnumber: targetData.hostnumber,
+            title: targetData.messageTitle,
+            content: targetData.messageContent,
+            receiverList: receiverList,
+            advertiseInfo: targetData.advertiseInfo,
+          };
 
-        const defaultMessageDto = {
-          hostnumber,
-          title,
-          content,
-          receiverList,
-          advertiseInfo,
-        };
-        await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
-        await this.autoMessageEventPort.updateAutoMessageEventById(
-          updateAutoMessageEventDto,
-        );
+          await this.messagesService.sendDefaultMessage(
+            email,
+            defaultMessageDto,
+          );
+          await this.autoMessageEventPort.updateAutoMessageEventById(
+            updateAutoMessageEventDto,
+          );
+        }
       }
     }
     return;
+  }
+
+  private async getUserEmailById(userId: number) {
+    const user = await this.usersRepository.findOneByUserId(userId);
+    return user.email;
   }
 
   private async cronTargetReservationTime(
