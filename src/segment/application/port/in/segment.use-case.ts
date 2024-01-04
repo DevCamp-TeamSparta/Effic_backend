@@ -14,6 +14,7 @@ export interface ISegmentUseCase {
     segmentId: number,
     email: string,
   ): Promise<SegmentOrmEntity>;
+  getSegmentDateColumn(segmentId: number, email: string);
   updateSegment(dto: UpdateSegmentDto): Promise<SegmentOrmEntity>;
   updateSegmentQuery(
     updateSegmentQueryDto: UpdateSegmentQueryDto,

@@ -75,6 +75,17 @@ export class SegmentController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Get('/date-column')
+  async getSegmentDateColumn(
+    @Req() req,
+    @Query('segmentId', ParseIntPipe) segmentId: number,
+  ): Promise<SegmentOrmEntity> {
+    this.logger.verbose('getSegmentDateColumn');
+    const email = req.payload.email;
+    return this.segmentUseCase.getSegmentDateColumn(segmentId, email);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Put('/query')
   @HttpCode(HttpStatus.CREATED)
   async updateSegmentQuery(@Req() req, @Body() dto: UpdateSegmentQueryDto) {

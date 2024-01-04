@@ -76,6 +76,26 @@ export class SegmentService implements ISegmentUseCase {
     return segmentDetails;
   }
 
+  async getSegmentDateColumn(segmentId: number, email: string) {
+    await this.checkUserIsSegmentCreator(email, segmentId);
+
+    const segment = await this.segmentPort.getSegmentDetails(segmentId);
+
+    const result = await this.clientDbService.executeQuery(
+      segment.segmentQuery,
+    );
+
+    const dateColumns = [];
+
+    const sampleRow = result[0];
+    for (const key in sampleRow) {
+      const value = sampleRow[key];
+      if (value instanceof Date) dateColumns.push(key);
+    }
+
+    return dateColumns;
+  }
+
   async updateSegmentQuery(dto: UpdateSegmentQueryDto): Promise<Segment> {
     this.logger.verbose('updateSegmentQuery');
     const { segmentId, email } = dto;
