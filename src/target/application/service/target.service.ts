@@ -159,6 +159,7 @@ export class TargetService implements ITargetUseCase {
         reservedAt: null,
         hostnumber,
         advertiseInfo,
+        email,
       };
 
       const savedEntity = await this.targetPort.saveTarget(targetData, false);
@@ -228,12 +229,30 @@ export class TargetService implements ITargetUseCase {
     const targets = await this.targetPort.getUnsentTargets();
 
     for (const target of targets) {
+      if (target.reservedAt === null) continue;
+
       const reservedAt = new Date(target.reservedAt);
       const currentTime = new Date();
 
       if (reservedAt <= currentTime) {
         await this.targetPort.updateSentStatus(target.targetId, true);
-        this.logger.log(`Message sent: ${JSON.stringify(target)}`);
+        const receiverList = [];
+        receiverList.push({
+          phone: target.receiverNumber.replace(/-/g, ''),
+        });
+
+        const defaultMessageDto = {
+          hostnumber: target.hostnumber,
+          title: target.messageTitle,
+          content: target.messageContent,
+          receiverList: receiverList,
+          advertiseInfo: target.advertiseInfo,
+        };
+
+        await this.messagesService.sendDefaultMessage(
+          target.email,
+          defaultMessageDto,
+        );
       }
     }
   }
@@ -272,6 +291,8 @@ export class TargetService implements ITargetUseCase {
       await this.connectToClientDatabase(segmentDetail.clientDbId);
       const email = await this.getUserEmailById(segmentDetail.userId);
 
+      console.log(email);
+
       const filterQueryResults = await this.clientDbService.executeQuery(
         segmentDetail.filterQuery,
       );
@@ -294,6 +315,7 @@ export class TargetService implements ITargetUseCase {
           receiverNumberColumnName,
           hostnumber,
           advertiseInfo,
+          email,
         );
 
         const updatedTargetIds = [];
@@ -319,6 +341,7 @@ export class TargetService implements ITargetUseCase {
           receiverNumberColumnName,
           hostnumber,
           advertiseInfo,
+          email,
         );
 
         const updatedTargetIds = [];
@@ -362,6 +385,7 @@ export class TargetService implements ITargetUseCase {
     receiverNumberColumnName: string,
     hostnumber: string,
     advertiseInfo: boolean,
+    email: string,
   ): Promise<TargetData[]> {
     const createdTargets: TargetData[] = [];
 
@@ -384,6 +408,7 @@ export class TargetService implements ITargetUseCase {
         reservedAt: null,
         hostnumber,
         advertiseInfo,
+        email,
       };
 
       const savedEntity = await this.targetPort.saveTarget(targetData, false);

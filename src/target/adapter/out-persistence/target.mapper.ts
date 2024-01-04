@@ -11,6 +11,7 @@ export class TargetMapper {
       targetOrm.sentStatus,
       targetOrm.hostnumber,
       targetOrm.advertiseInfo,
+      targetOrm.email,
     );
   }
 
@@ -23,6 +24,7 @@ export class TargetMapper {
     targetOrm.receiverNumber = target.receiverNumber;
     targetOrm.hostnumber = target.hostnumber;
     targetOrm.advertiseInfo = target.advertiseInfo;
+    targetOrm.email = target.email;
     return targetOrm;
   }
 }

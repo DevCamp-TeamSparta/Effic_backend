@@ -25,4 +25,7 @@ export class TargetOrmEntity {
 
   @Column()
   advertiseInfo: boolean;
+
+  @Column()
+  email: string;
 }

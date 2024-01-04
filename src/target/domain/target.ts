@@ -6,6 +6,7 @@ export class Target {
   public receiverNumber: string;
   public hostnumber: string;
   public advertiseInfo: boolean;
+  public email: string;
 
   constructor(
     messageTitle: string,
@@ -15,6 +16,7 @@ export class Target {
     sentStatus = false,
     hostnumber: string,
     advertiseInfo: boolean,
+    email: string,
   ) {
     this.messageTitle = messageTitle;
     this.messageContent = messageContent;
@@ -23,5 +25,6 @@ export class Target {
     this.receiverNumber = receiverNumber;
     this.hostnumber = hostnumber;
     this.advertiseInfo = advertiseInfo;
+    this.email = email;
   }
 }

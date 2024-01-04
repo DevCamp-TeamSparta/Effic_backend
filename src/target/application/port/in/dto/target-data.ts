@@ -7,4 +7,5 @@ interface TargetData {
   reservedAt: Date | null;
   hostnumber: string;
   advertiseInfo: boolean;
+  email: string;
 }
