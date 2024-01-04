@@ -17,6 +17,10 @@ export class UpdateAutoMessageEventDto {
   @IsString()
   autoMessageEventName?: string;
 
+  @IsNumber()
+  @IsOptional()
+  segmentId?: number;
+
   @IsOptional()
   @IsNumber()
   totalSentCount?: number | null;
