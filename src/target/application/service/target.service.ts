@@ -243,6 +243,7 @@ export class TargetService implements ITargetUseCase {
         autoMessageEventLastRunTime,
         isReserved,
         targetIds,
+        receiverNumberColumnName,
       } = autoMessageEvent;
 
       if (!autoMessageEventLastRunTime) {
@@ -281,7 +282,24 @@ export class TargetService implements ITargetUseCase {
         );
       }
 
+      /**임시 구현 */
+      const messageTitle = '';
+      const messageContentTemplate = '';
+      const hostnumber = '';
+      const advertiseInfo = true;
+
       if (!isReserved) {
+        const updatedTargets = await this.cronCreateMessageContent(
+          updatedResult,
+          messageTitle,
+          messageContentTemplate,
+          receiverNumberColumnName,
+          hostnumber,
+          advertiseInfo,
+        );
+
+        // To do : updatedTargets에서 targetIds 추출
+
         for (const targetId of targetIds) {
           const targetData = await this.targetPort.getTargetData(targetId);
 
@@ -309,6 +327,47 @@ export class TargetService implements ITargetUseCase {
       }
     }
     return;
+  }
+
+  private async cronCreateMessageContent(
+    queryResult,
+    messageTitle: string,
+    messageContentTemplate: string,
+    receiverNumberColumnName: string,
+    hostnumber: string,
+    advertiseInfo: boolean,
+  ): Promise<TargetData[]> {
+    const createdTargets: TargetData[] = [];
+
+    for (const record of queryResult) {
+      let messageContent = messageContentTemplate;
+      for (const key in record) {
+        if (record.hasOwnProperty(key)) {
+          const value = record[key] || '';
+          const placeholder = new RegExp(`\\$\\{${key}\\}`, 'g');
+          messageContent = messageContent.replace(placeholder, value);
+        }
+      }
+
+      const receiverNumber = record[receiverNumberColumnName];
+      const targetData: TargetData = {
+        messageTitle,
+        messageContent,
+        receiverNumber,
+        reservedAt: null,
+        hostnumber,
+        advertiseInfo,
+      };
+
+      const savedEntity = await this.targetPort.saveTarget(targetData, false);
+
+      createdTargets.push({
+        ...targetData,
+        targetId: savedEntity.targetId,
+      });
+    }
+
+    return createdTargets;
   }
 
   private async getUserEmailById(userId: number) {

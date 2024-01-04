@@ -81,10 +81,10 @@ export class AutoMessageEventOrmEntity {
   hostnumber: string;
 
   @Column({ nullable: true })
-  title: string;
+  messageTitle: string;
 
   @Column({ nullable: true })
-  content: string;
+  messageContentTemplate: string;
 
   @Column({ nullable: true })
   advertiseInfo: boolean;
