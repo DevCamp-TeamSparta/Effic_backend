@@ -61,7 +61,9 @@ export class TargetController {
     return this.targetUseCase.createTargetReservationTime(dto);
   }
 
-  /**Cron 서버 */
+  /**Cron 서버
+   * - Target 테이블을 순회하면서 예약된 문자 발송
+   */
   @Post('/reserved-message')
   @HttpCode(HttpStatus.OK)
   async sendReservedMessage(): Promise<void> {
@@ -69,7 +71,9 @@ export class TargetController {
     return this.targetUseCase.sendReservedMessage();
   }
 
-  /**Cron 서버 */
+  /**Cron 서버
+   * - 자동화 기능
+   */
   @Post('/auto')
   @HttpCode(HttpStatus.OK)
   async automateTargetDataProcessing(): Promise<void> {
