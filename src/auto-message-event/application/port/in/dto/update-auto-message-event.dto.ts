@@ -64,6 +64,22 @@ export class UpdateAutoMessageEventDto {
   @IsDate()
   autoMessageEventLastRunTime?: Date;
 
+  @IsOptional()
+  @IsBoolean()
+  advertiseInfo?: boolean;
+
+  @IsOptional()
+  @IsString()
+  hostnumber?: string;
+
+  @IsOptional()
+  @IsString()
+  messageContentTemplate?: string;
+
+  @IsOptional()
+  @IsString()
+  messageTitle?: string;
+
   /** */
   @IsOptional()
   @Type(() => Date)
