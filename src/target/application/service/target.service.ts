@@ -36,6 +36,7 @@ import {
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 import { MessagesService } from 'src/messages/service/messages.service';
 import { UsersRepository } from 'src/users/users.repository';
+import { SendTestMessageDto } from '../port/in/dto/send-test-message.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -113,6 +114,25 @@ export class TargetService implements ITargetUseCase {
       });
 
     return;
+  }
+
+  async sendTestMessage(dto: SendTestMessageDto): Promise<void> {
+    const { hostnumber, title, content, receiverNumber, advertiseInfo, email } =
+      dto;
+    const receiverList = [];
+    receiverList.push({
+      phone: receiverNumber,
+    });
+
+    const defaultMessageDto = {
+      hostnumber,
+      title,
+      content,
+      receiverList,
+      advertiseInfo,
+    };
+
+    await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
   }
 
   async createMessageContent(
