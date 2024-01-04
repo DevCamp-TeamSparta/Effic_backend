@@ -45,7 +45,7 @@ export class AutoMessageEventOrmEntity {
   // @JoinColumn({ name: 'segmentId' })
   // segment: SegmentOrmEntity;
 
-  @Column()
+  @Column({ nullable: true })
   segmentId: number;
 
   /**cronTargetReservationTime에 필요한 정보 */
