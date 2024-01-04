@@ -36,8 +36,6 @@ import {
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 import { MessagesService } from 'src/messages/service/messages.service';
 import { UsersRepository } from 'src/users/users.repository';
-import { deflate } from 'zlib';
-import { DefaultBizbodyValidationPipe } from 'src/bizmessage/pipe/defualt-bizbody-validation-pipe';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
