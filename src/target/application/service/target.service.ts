@@ -242,8 +242,11 @@ export class TargetService implements ITargetUseCase {
         updatedAtColumnName,
         autoMessageEventLastRunTime,
         isReserved,
-        targetIds,
         receiverNumberColumnName,
+        messageTitle,
+        messageContentTemplate,
+        hostnumber,
+        advertiseInfo,
       } = autoMessageEvent;
 
       if (!autoMessageEventLastRunTime) {
@@ -282,12 +285,6 @@ export class TargetService implements ITargetUseCase {
         );
       }
 
-      /**임시 구현 */
-      const messageTitle = '';
-      const messageContentTemplate = '';
-      const hostnumber = '';
-      const advertiseInfo = true;
-
       if (!isReserved) {
         const updatedTargets = await this.cronCreateMessageContent(
           updatedResult,
@@ -298,9 +295,12 @@ export class TargetService implements ITargetUseCase {
           advertiseInfo,
         );
 
-        // To do : updatedTargets에서 targetIds 추출
+        const updatedTargetIds = [];
+        for (const target of updatedTargets) {
+          updatedTargetIds.push(target.targetId);
+        }
 
-        for (const targetId of targetIds) {
+        for (const targetId of updatedTargetIds) {
           const targetData = await this.targetPort.getTargetData(targetId);
 
           const receiverList = [];
@@ -350,6 +350,7 @@ export class TargetService implements ITargetUseCase {
       }
 
       const receiverNumber = record[receiverNumberColumnName];
+
       const targetData: TargetData = {
         messageTitle,
         messageContent,
