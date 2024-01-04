@@ -40,8 +40,8 @@ export class CreateAutoMessageEventDto {
 
   /**AME의 세그먼트 정보 */
   @IsNumber()
-  @IsNotEmpty()
-  segmentId: number;
+  @IsOptional()
+  segmentId?: number;
 
   /**사용자가 입력한 데이터들 */
 
