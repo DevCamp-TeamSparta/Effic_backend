@@ -1,4 +1,4 @@
-import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
+// import { SegmentOrmEntity } from 'src/segment/adapter/out-persistence/segment.orm.entity';
 import { User } from 'src/users/user.entity';
 import {
   Column,
@@ -41,9 +41,9 @@ export class AutoMessageEventOrmEntity {
   @Column()
   userId: number;
 
-  @ManyToOne(() => SegmentOrmEntity)
-  @JoinColumn({ name: 'segmentId' })
-  segment: SegmentOrmEntity;
+  // @ManyToOne(() => SegmentOrmEntity)
+  // @JoinColumn({ name: 'segmentId' })
+  // segment: SegmentOrmEntity;
 
   @Column()
   segmentId: number;
