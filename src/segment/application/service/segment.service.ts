@@ -139,14 +139,14 @@ export class SegmentService implements ISegmentUseCase {
     return result.map((row) => row['tablename']);
   }
 
-  async getSegmentColumns(dto: GetSegmentDetailsDto): Promise<any[]> {
+  async getSegmentColumns(dto: GetSegmentDetailsDto): Promise<string[]> {
     this.logger.verbose('getSegmentColumns');
-    const { databaseName, tableName } = dto;
+    const { tableName } = dto;
 
-    const query = `SELECT column_name FROM information_schema.columns WHERE table_schema = '${databaseName}' AND table_name = '${tableName}';`;
+    const query = `SELECT column_name FROM information_schema.columns WHERE table_name = '${tableName}';`;
     const result = await this.clientDbService.executeQueryPg(query);
 
-    return result.map((row) => row['COLUMN_NAME']);
+    return result.map((row) => row['column_name']);
   }
 
   async createFilterQueryWhenNoFilter(

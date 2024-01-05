@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class GetSegmentDetailsDto {
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
-  databaseName: string;
+  @IsOptional()
+  databaseName?: string;
 
   @ApiProperty()
   @IsOptional()

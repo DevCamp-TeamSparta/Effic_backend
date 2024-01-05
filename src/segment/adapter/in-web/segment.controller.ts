@@ -130,6 +130,13 @@ export class SegmentController {
   }
 
   @Post('/columns')
+  @ApiOperation({
+    summary: '컬럼명 조회',
+    description: '테이블의 컬럼명을 조회',
+  })
+  @ApiCreatedResponse({
+    description: '테이블의 컬럼명을 반환',
+  })
   @HttpCode(HttpStatus.OK)
   async getSegmentColumns(@Body() dto: GetSegmentDetailsDto) {
     this.logger.verbose('getSegmentColumns');
