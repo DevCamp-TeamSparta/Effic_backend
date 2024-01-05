@@ -315,6 +315,8 @@ export class TargetService implements ITargetUseCase {
       await this.connectToClientDatabase(segmentDetail.clientDbId);
       const email = await this.getUserEmailById(segmentDetail.userId);
 
+      if (!segmentDetail.filterQuery) continue;
+
       const filterQueryResults = await this.clientDbService.executeQueryPg(
         segmentDetail.filterQuery,
       );
