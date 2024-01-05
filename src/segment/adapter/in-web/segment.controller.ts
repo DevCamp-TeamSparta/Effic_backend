@@ -25,7 +25,12 @@ import {
 } from 'src/segment/application/port/in/segment.use-case';
 import { SegmentOrmEntity } from '../out-persistence/segment.orm.entity';
 import { UpdateSegmentDto } from 'src/segment/application/port/in/dto/update-segment.dto';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdateClientDbDto } from 'src/segment/application/port/in/dto/update-client-db.dto';
 
 @Controller('segment')
@@ -123,6 +128,17 @@ export class SegmentController {
   @ApiCreatedResponse({
     description: 'DB의 테이블명을 반환',
   })
+  @ApiBody({
+    description: 'DB 이름',
+    type: GetSegmentDetailsDto,
+    examples: {
+      example1: {
+        value: {
+          databaseName: 'warehouse',
+        },
+      },
+    },
+  })
   @HttpCode(HttpStatus.OK)
   async getSegmentTables(@Body() dto: GetSegmentDetailsDto) {
     this.logger.verbose('getSegmentTables');
@@ -136,6 +152,17 @@ export class SegmentController {
   })
   @ApiCreatedResponse({
     description: '테이블의 컬럼명을 반환',
+  })
+  @ApiBody({
+    description: '테이블명',
+    type: GetSegmentDetailsDto,
+    examples: {
+      example1: {
+        value: {
+          tableName: 'dbchang_users',
+        },
+      },
+    },
   })
   @HttpCode(HttpStatus.OK)
   async getSegmentColumns(@Body() dto: GetSegmentDetailsDto) {
