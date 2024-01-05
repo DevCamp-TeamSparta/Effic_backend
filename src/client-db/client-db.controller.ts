@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  InternalServerErrorException,
   Logger,
   Post,
 } from '@nestjs/common';
@@ -28,6 +29,13 @@ export class ClientDbController {
   @HttpCode(HttpStatus.CREATED)
   async saveClientDbInfo(@Body() dto: ConnectToDatabaseDto) {
     this.logger.verbose('saveClientDbInfo');
+
+    await this.clientDbService.connectToPg(dto);
+    const ping = await this.clientDbService.testPgConnection();
+    if (!ping)
+      throw new InternalServerErrorException(
+        'Failed to connect to the database',
+      );
     return await this.clientDbService.saveClinetDbInfo(dto);
   }
 
