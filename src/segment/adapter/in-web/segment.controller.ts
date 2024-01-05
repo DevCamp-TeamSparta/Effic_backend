@@ -116,6 +116,13 @@ export class SegmentController {
   }
 
   @Post('/tables')
+  @ApiOperation({
+    summary: '테이블명 조회',
+    description: 'DB의 테이블명을 조회',
+  })
+  @ApiCreatedResponse({
+    description: 'DB의 테이블명을 반환',
+  })
   @HttpCode(HttpStatus.OK)
   async getSegmentTables(@Body() dto: GetSegmentDetailsDto) {
     this.logger.verbose('getSegmentTables');

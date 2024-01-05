@@ -130,10 +130,13 @@ export class SegmentService implements ISegmentUseCase {
     this.logger.verbose('getSegmentTables');
     const { databaseName } = dto;
 
-    const query = `SELECT table_name FROM information_schema.tables WHERE table_schema = '${databaseName}';`;
-    const result = await this.clientDbService.executeQueryPg(query);
+    /**MySQL */
+    // const queryMySQL = `SELECT table_name FROM information_schema.tables WHERE table_schema = '${databaseName}';`;
 
-    return result.map((row) => row['TABLE_NAME']);
+    const queryPg = `SELECT tablename FROM pg_tables WHERE schemaname = 'public';`;
+    const result = await this.clientDbService.executeQueryPg(queryPg);
+
+    return result.map((row) => row['tablename']);
   }
 
   async getSegmentColumns(dto: GetSegmentDetailsDto): Promise<any[]> {
