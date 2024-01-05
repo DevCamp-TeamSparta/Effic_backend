@@ -132,7 +132,10 @@ export class TargetService implements ITargetUseCase {
       advertiseInfo,
     };
 
-    await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
+    this.logger.debug(
+      `\n📨 defaultMessageDto: ${JSON.stringify(defaultMessageDto)}`,
+    );
+    // await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
   }
 
   async createMessageContent(
@@ -267,10 +270,13 @@ export class TargetService implements ITargetUseCase {
           advertiseInfo: target.advertiseInfo,
         };
 
-        await this.messagesService.sendDefaultMessage(
-          target.email,
-          defaultMessageDto,
+        this.logger.debug(
+          `\n📨 defaultMessageDto: ${JSON.stringify(defaultMessageDto)}`,
         );
+        // await this.messagesService.sendDefaultMessage(
+        //   target.email,
+        //   defaultMessageDto,
+        // );
       }
     }
   }
@@ -308,8 +314,6 @@ export class TargetService implements ITargetUseCase {
 
       await this.connectToClientDatabase(segmentDetail.clientDbId);
       const email = await this.getUserEmailById(segmentDetail.userId);
-
-      console.log(email);
 
       const filterQueryResults = await this.clientDbService.executeQueryPg(
         segmentDetail.filterQuery,
@@ -383,10 +387,13 @@ export class TargetService implements ITargetUseCase {
             advertiseInfo: targetData.advertiseInfo,
           };
 
-          await this.messagesService.sendDefaultMessage(
-            email,
-            defaultMessageDto,
+          this.logger.debug(
+            `\n📨 defaultMessageDto: ${JSON.stringify(defaultMessageDto)}`,
           );
+          // await this.messagesService.sendDefaultMessage(
+          //   email,
+          //   defaultMessageDto,
+          // );
           await this.autoMessageEventPort.updateAutoMessageEventById(
             updateAutoMessageEventDto,
           );
