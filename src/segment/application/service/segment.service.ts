@@ -81,7 +81,7 @@ export class SegmentService implements ISegmentUseCase {
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
-    const result = await this.clientDbService.executeQuery(
+    const result = await this.clientDbService.executeQueryPg(
       segment.segmentQuery,
     );
 
@@ -114,7 +114,7 @@ export class SegmentService implements ISegmentUseCase {
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
-    const result = await this.clientDbService.executeQuery(
+    const result = await this.clientDbService.executeQueryPg(
       segment.segmentQuery,
     );
     return result;
@@ -131,7 +131,7 @@ export class SegmentService implements ISegmentUseCase {
     const { databaseName } = dto;
 
     const query = `SELECT table_name FROM information_schema.tables WHERE table_schema = '${databaseName}';`;
-    const result = await this.clientDbService.executeQuery(query);
+    const result = await this.clientDbService.executeQueryPg(query);
 
     return result.map((row) => row['TABLE_NAME']);
   }
@@ -141,7 +141,7 @@ export class SegmentService implements ISegmentUseCase {
     const { databaseName, tableName } = dto;
 
     const query = `SELECT column_name FROM information_schema.columns WHERE table_schema = '${databaseName}' AND table_name = '${tableName}';`;
-    const result = await this.clientDbService.executeQuery(query);
+    const result = await this.clientDbService.executeQueryPg(query);
 
     return result.map((row) => row['COLUMN_NAME']);
   }
@@ -197,7 +197,7 @@ export class SegmentService implements ISegmentUseCase {
 
     await this.segmentPort.updateFilterQuery(segmentId, modifiedQuery);
 
-    const modifiedQueryResult = await this.clientDbService.executeQuery(
+    const modifiedQueryResult = await this.clientDbService.executeQueryPg(
       modifiedQuery,
     );
 
@@ -216,7 +216,7 @@ export class SegmentService implements ISegmentUseCase {
 
     const segment = await this.checkUserIsSegmentCreator(email, segmentId);
 
-    const queryResult = await this.clientDbService.executeQuery(
+    const queryResult = await this.clientDbService.executeQueryPg(
       segment.filterQuery,
     );
     const phoneNumbers = queryResult.map(

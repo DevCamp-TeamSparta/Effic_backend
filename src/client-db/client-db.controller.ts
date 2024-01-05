@@ -31,23 +31,41 @@ export class ClientDbController {
     return await this.clientDbService.saveClinetDbInfo(dto);
   }
 
-  @Post('/connect')
+  /**MySQL */
+
+  @Post('/connect/mysql')
   @HttpCode(HttpStatus.OK)
-  async connectToDatabase(@Body() dto: ConnectToDatabaseDto) {
-    this.logger.verbose('connectToDatabase');
-    await this.clientDbService.connectToDb(dto);
-    const isConnected = await this.clientDbService.testConnection();
+  async connectToMySQL(@Body() dto: ConnectToDatabaseDto) {
+    this.logger.verbose('connectToMySQL');
+    await this.clientDbService.connectToMySQL(dto);
+    return await this.clientDbService.testMySQLConnection();
   }
 
-  @Get('/test')
-  async testDatabaseConnection() {
-    this.logger.verbose('testDatabaseConnection');
-    return await this.clientDbService.testConnection();
+  @Get('/test/mysql')
+  async testMySQLConnection() {
+    this.logger.verbose('testMySQLConnection');
+    return await this.clientDbService.testMySQLConnection();
   }
 
-  @Post('/query')
-  async executeQuery(@Body('query') query: string) {
+  @Post('/query/mysql')
+  async executeQueryMySQL(@Body('query') query: string) {
+    this.logger.verbose('executeQueryMySQL');
+    return await this.clientDbService.executeQueryMySQL(query);
+  }
+
+  /**PostgreSQL */
+
+  @Post('/connect/pg')
+  @HttpCode(HttpStatus.OK)
+  async connectToPg(@Body() dto: ConnectToDatabaseDto) {
+    this.logger.verbose('connectToPg');
+    await this.clientDbService.connectToPg(dto);
+    return await this.clientDbService.testPgConnection();
+  }
+
+  @Post('/query/pg')
+  async executeQueryPg(@Body('query') query: string) {
     this.logger.verbose('executeQuery');
-    return await this.clientDbService.executeQuery(query);
+    return await this.clientDbService.executeQueryPg(query);
   }
 }

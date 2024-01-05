@@ -153,7 +153,7 @@ export class TargetService implements ITargetUseCase {
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
 
-    const queryResult = await this.clientDbService.executeQuery(
+    const queryResult = await this.clientDbService.executeQueryPg(
       segment.filterQuery,
     );
 
@@ -216,7 +216,7 @@ export class TargetService implements ITargetUseCase {
     );
 
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
-    const queryResult = await this.clientDbService.executeQuery(
+    const queryResult = await this.clientDbService.executeQueryPg(
       segment.filterQuery,
     );
 
@@ -311,7 +311,7 @@ export class TargetService implements ITargetUseCase {
 
       console.log(email);
 
-      const filterQueryResults = await this.clientDbService.executeQuery(
+      const filterQueryResults = await this.clientDbService.executeQueryPg(
         segmentDetail.filterQuery,
       );
 
@@ -488,7 +488,7 @@ export class TargetService implements ITargetUseCase {
 
   private async connectToClientDatabase(clientDbId: number): Promise<void> {
     const clientDbInfo = await this.clientDbPort.getClientDbInfo(clientDbId);
-    await this.clientDbService.connectToDb(clientDbInfo);
+    await this.clientDbService.connectToPg(clientDbInfo);
   }
 
   private makeSignature(): string {
