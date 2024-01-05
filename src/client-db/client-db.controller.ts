@@ -14,7 +14,8 @@ import {
   IClientDbServiceSymbol,
 } from './client-db.interface';
 import { ConnectToDatabaseDto } from './connect-to-db.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ClientDbOrmEntity } from './client-db.orm.entity';
 
 @Controller('client-db')
 @ApiTags('Client DB API')
@@ -26,8 +27,19 @@ export class ClientDbController {
   ) {}
 
   @Post()
+  @ApiOperation({
+    summary: '고객 DB 정보 저장',
+    description:
+      '고객 DB 정보를 보내면 옳은 정보인지 테스트 연결, 연결 후 저장',
+  })
+  @ApiCreatedResponse({
+    description: '옳은 정보라면, 저장된 DB 정보를 반환',
+    type: ClientDbOrmEntity,
+  })
   @HttpCode(HttpStatus.CREATED)
-  async saveClientDbInfo(@Body() dto: ConnectToDatabaseDto) {
+  async saveClientDbInfo(
+    @Body() dto: ConnectToDatabaseDto,
+  ): Promise<ClientDbOrmEntity> {
     this.logger.verbose('saveClientDbInfo');
 
     await this.clientDbService.connectToPg(dto);
