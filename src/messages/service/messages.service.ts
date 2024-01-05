@@ -1,4 +1,10 @@
-import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { UsersService } from '../../users/service/users.service';
@@ -20,6 +26,10 @@ import {
   NCP_contentSuffix,
   NCP_SMS_price,
 } from '../../../commons/constants';
+import {
+  ISegmentPort,
+  ISegmentPortSymbol,
+} from 'src/segment/application/port/out/segment.port';
 
 @Injectable()
 export class MessagesService {
@@ -31,6 +41,8 @@ export class MessagesService {
     private readonly messagesRepository: MessagesRepository,
     private readonly messagesContentRepository: MessagesContentRepository,
     private readonly advertiseReceiverListRepository: AdvertiseReceiverListRepository,
+    @Inject(ISegmentPortSymbol)
+    private readonly segmentPort: ISegmentPort,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}
 
@@ -200,6 +212,20 @@ export class MessagesService {
           headers,
         },
       );
+      /**피로도 관리를 위한 문자 발송 기록 */
+      if (response.status === 202) {
+        const res = JSON.parse(response.config.data);
+
+        const content = res.content;
+        const phoneNumber = res.messages[0].to;
+        const requestTime = response.data.requestTime;
+
+        await this.segmentPort.saveMessageHistory(
+          phoneNumber,
+          content,
+          requestTime,
+        );
+      }
       return { body, response, idStrings, shortenedUrls };
     } catch (error) {
       throw new HttpException(error.response.data, HttpStatus.BAD_REQUEST);

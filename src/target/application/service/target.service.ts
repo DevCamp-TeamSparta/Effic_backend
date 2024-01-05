@@ -135,7 +135,7 @@ export class TargetService implements ITargetUseCase {
     this.logger.debug(
       `\n📨 defaultMessageDto: ${JSON.stringify(defaultMessageDto)}`,
     );
-    // await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
+    await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
   }
 
   async createMessageContent(

@@ -34,9 +34,10 @@ import {
   BizmessageImageInfoRepository,
   BizmessageRepository,
 } from 'src/bizmessage/bizmessage.repository';
+import { SegmentModule } from 'src/segment/segment.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([NcpResult, UrlResult])],
+  imports: [TypeOrmModule.forFeature([NcpResult, UrlResult]), SegmentModule],
   controllers: [ResultsController],
   providers: [
     ResultsService,

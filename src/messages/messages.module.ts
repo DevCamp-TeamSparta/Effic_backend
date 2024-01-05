@@ -19,10 +19,12 @@ import { NcpResultsRepository } from 'src/results/repository/results.repository'
 import { UsersService } from 'src/users/service/users.service';
 import { ShorturlService } from 'src/shorturl/service/shorturl.service';
 import { UrlInfosRepository } from 'src/shorturl/shorturl.repository';
+import { SegmentModule } from 'src/segment/segment.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Message, MessageGroup, MessageGroupRepo]),
+    SegmentModule,
   ],
   controllers: [MessagesController],
   providers: [
