@@ -31,6 +31,6 @@ export class CreateSegmentDto {
   email?: string;
 
   @IsNumber()
-  @IsNotEmpty()
-  clientDbId: number;
+  @IsOptional()
+  clientDbId?: number;
 }
