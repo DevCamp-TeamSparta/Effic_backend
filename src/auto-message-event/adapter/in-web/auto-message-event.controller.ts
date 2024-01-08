@@ -106,4 +106,17 @@ export class AutoMessageEventController {
     this.logger.verbose('createAutoMessageEventInput');
     return this.autoMessageEventUseCase.createAutoMessageEventInput(dto);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('/input/detail')
+  async getAutoMessageEventInputDetail(
+    @Req() req,
+    @Query('autoMessageEventInputId', ParseIntPipe)
+    autoMessageEventInputId: number,
+  ): Promise<AutoMessageEventInputOrmEntity> {
+    this.logger.verbose('getAutoMessageEventInputDetail');
+    return await this.autoMessageEventUseCase.getAutoMessageEventInputDetail(
+      autoMessageEventInputId,
+    );
+  }
 }

@@ -97,4 +97,15 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
       await this.autoMessageEventInputRepository.save(dto);
     return savedAutoMessageEventInputOrmEntity;
   }
+
+  async getAutoMessageEventInputDetail(
+    autoMessageEventInputId: number,
+  ): Promise<AutoMessageEventInputOrmEntity> {
+    const autoMessageEventInputOrmEntity =
+      await this.autoMessageEventInputRepository.findOne({
+        where: { autoMessageEventInputId },
+      });
+
+    return autoMessageEventInputOrmEntity;
+  }
 }

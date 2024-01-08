@@ -23,6 +23,9 @@ export interface IAutoMessageEventUseCase {
   createAutoMessageEventInput(
     dto: CreateAutoMessageEventInputDto,
   ): Promise<AutoMessageEventInputOrmEntity>;
+  getAutoMessageEventInputDetail(
+    autoMessageEventId: number,
+  ): Promise<AutoMessageEventInputOrmEntity>;
 }
 
 export const IAutoMessageEventUseCaseSymbol = Symbol(

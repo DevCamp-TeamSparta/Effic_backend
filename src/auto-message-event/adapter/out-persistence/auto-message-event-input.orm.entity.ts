@@ -24,10 +24,10 @@ export class AutoMessageEventInputOrmEntity {
   autoMessageEventName: string;
 
   /**step 1: 발송 대상 설정 */
-  @Column()
+  @Column({ nullable: true })
   selectedSegmentId: number;
 
-  @Column()
+  @Column({ nullable: true })
   selectedValue: string;
 
   /**step 2: 필터링 설정 */

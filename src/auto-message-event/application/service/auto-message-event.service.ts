@@ -138,4 +138,12 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
   ): Promise<AutoMessageEventInputOrmEntity> {
     return await this.autoMessageEventPort.saveAutoMessageEventInput(dto);
   }
+
+  async getAutoMessageEventInputDetail(
+    autoMessageEventInputId: number,
+  ): Promise<AutoMessageEventInputOrmEntity> {
+    return await this.autoMessageEventPort.getAutoMessageEventInputDetail(
+      autoMessageEventInputId,
+    );
+  }
 }

@@ -24,6 +24,9 @@ export interface IAutoMessageEventPort {
   saveAutoMessageEventInput(
     dto: CreateAutoMessageEventInputDto,
   ): Promise<AutoMessageEventInputOrmEntity>;
+  getAutoMessageEventInputDetail(
+    autoMessageEventInputId: number,
+  ): Promise<AutoMessageEventInputOrmEntity>;
 }
 
 export const IAutoMessageEventPortSymbol = Symbol(
