@@ -13,6 +13,7 @@ export interface ISegmentPort {
   ): Promise<SegmentOrmEntity>;
   updateSegment(dto: UpdateSegmentDto): Promise<SegmentOrmEntity>;
   getSegmentDetails(segmentId: number): Promise<SegmentOrmEntity>;
+  deleteSegment(segmentId: number): Promise<SegmentOrmEntity>;
   updateSegmentQuery(dto: UpdateSegmentQueryDto): Promise<Segment>;
   getAllSegments(userId: number): Promise<SegmentOrmEntity[]>;
   updateFilterQuery(segmentId: number, filterQuery: string): Promise<Segment>;

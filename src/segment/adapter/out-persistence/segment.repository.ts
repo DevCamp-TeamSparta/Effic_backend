@@ -62,6 +62,18 @@ export class SegmentRepository implements ISegmentPort {
     return segmentOrmEntity;
   }
 
+  async deleteSegment(segmentId: number): Promise<SegmentOrmEntity> {
+    const segmentOrmEntity = await this.segmentRepository.findOneBy({
+      segmentId,
+    });
+
+    if (!segmentOrmEntity) throw new Error('Segment not found');
+
+    await this.segmentRepository.remove(segmentOrmEntity);
+
+    return segmentOrmEntity;
+  }
+
   async updateSegmentQuery(dto: UpdateSegmentQueryDto): Promise<Segment> {
     const { segmentId, segmentQuery, updatedAt } = dto;
     const segmentOrmEntity = await this.segmentRepository.findOneBy({

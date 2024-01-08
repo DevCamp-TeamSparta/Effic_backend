@@ -76,6 +76,19 @@ export class SegmentService implements ISegmentUseCase {
     return segmentDetails;
   }
 
+  async deleteSegment(
+    segmentId: number,
+    email: string,
+  ): Promise<SegmentOrmEntity> {
+    this.logger.verbose('deleteSegment');
+
+    await this.checkUserIsSegmentCreator(email, segmentId);
+
+    const segment = await this.segmentPort.deleteSegment(segmentId);
+
+    return segment;
+  }
+
   async getSegmentDateColumn(segmentId: number, email: string) {
     await this.checkUserIsSegmentCreator(email, segmentId);
 

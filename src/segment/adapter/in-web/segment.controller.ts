@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -31,7 +32,6 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UpdateClientDbDto } from 'src/segment/application/port/in/dto/update-client-db.dto';
 
 @Controller('segment')
 @ApiTags('Segment API')
@@ -77,6 +77,26 @@ export class SegmentController {
     this.logger.verbose('getSegmentDetails');
     const email = req.payload.email;
     return this.segmentUseCase.getSegmentDetails(segmentId, email);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete()
+  @ApiOperation({
+    summary: 'Segment 삭제 API',
+    description: 'Segment를 삭제함',
+  })
+  @ApiCreatedResponse({
+    description: '삭제한 Segment를 반환',
+    type: SegmentOrmEntity,
+  })
+  @HttpCode(HttpStatus.OK)
+  async deleteSegment(
+    @Req() req,
+    @Query('segmentId', ParseIntPipe) segmentId: number,
+  ) {
+    this.logger.verbose('deleteSegment');
+    const email = req.payload.email;
+    return this.segmentUseCase.deleteSegment(segmentId, email);
   }
 
   @UseGuards(AccessTokenGuard)
