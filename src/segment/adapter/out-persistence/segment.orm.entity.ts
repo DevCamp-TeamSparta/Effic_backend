@@ -42,6 +42,6 @@ export class SegmentOrmEntity {
   @JoinColumn({ name: 'clinetDbId' })
   clientDb: ClientDbOrmEntity;
 
-  @Column()
+  @Column({ nullable: true })
   clientDbId: number;
 }
