@@ -14,6 +14,10 @@ export interface IAutoMessageEventUseCase {
   updateAutoMessageEvent(
     dto: UpdateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity>;
+  deleteAutoMessageEvent(
+    autoMessageEventId: number,
+    email: string,
+  ): Promise<AutoMessageEventOrmEntity>;
 }
 
 export const IAutoMessageEventUseCaseSymbol = Symbol(

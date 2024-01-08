@@ -16,6 +16,9 @@ export interface IAutoMessageEventPort {
     dto: UpdateAutoMessageEventDto,
   ): Promise<AutoMessageEventOrmEntity>;
   cronGetAllAutoMessageEvents(): Promise<AutoMessageEventOrmEntity[]>;
+  deleteAutoMessageEventById(
+    autoMessageEventId: number,
+  ): Promise<AutoMessageEventOrmEntity>;
 }
 
 export const IAutoMessageEventPortSymbol = Symbol(

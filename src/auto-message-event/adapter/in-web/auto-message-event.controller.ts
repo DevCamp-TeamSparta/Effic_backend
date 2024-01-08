@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -77,5 +78,20 @@ export class AutoMessageEventController {
     this.logger.verbose('updateAutoMessageEvent');
     dto.email = req.payload.email;
     return this.autoMessageEventUseCase.updateAutoMessageEvent(dto);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Delete()
+  @HttpCode(HttpStatus.OK)
+  async deleteAutoMessageEvent(
+    @Req() req,
+    @Body('autoMessageEventId') autoMessageEventId: number,
+  ): Promise<any> {
+    this.logger.verbose('deleteAutoMessageEvent');
+    const email = req.payload.email;
+    return this.autoMessageEventUseCase.deleteAutoMessageEvent(
+      autoMessageEventId,
+      email,
+    );
   }
 }

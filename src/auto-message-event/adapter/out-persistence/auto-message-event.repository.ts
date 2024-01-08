@@ -68,4 +68,21 @@ export class AutoMessageEventRepository implements IAutoMessageEventPort {
   async cronGetAllAutoMessageEvents(): Promise<AutoMessageEventOrmEntity[]> {
     return await this.autoMessageEventRepository.find();
   }
+
+  async deleteAutoMessageEventById(
+    autoMessageEventId: number,
+  ): Promise<AutoMessageEventOrmEntity> {
+    const autoMessageEventOrmEntity =
+      await this.autoMessageEventRepository.findOne({
+        where: { autoMessageEventId },
+      });
+
+    if (!autoMessageEventOrmEntity) {
+      throw new NotFoundException(`AutoMessageEvent not found`);
+    }
+
+    await this.autoMessageEventRepository.remove(autoMessageEventOrmEntity);
+
+    return autoMessageEventOrmEntity;
+  }
 }

@@ -108,4 +108,26 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
 
     return await this.autoMessageEventPort.updateAutoMessageEventById(dto);
   }
+
+  async deleteAutoMessageEvent(
+    autoMessageEventId: number,
+    email: string,
+  ): Promise<AutoMessageEventOrmEntity> {
+    this.logger.verbose('deleteAutoMessageEvent');
+    const user = await this.usersService.checkUserInfo(email);
+
+    const existingEvent =
+      await this.autoMessageEventPort.getAutoMessageEventById(
+        autoMessageEventId,
+      );
+    if (!existingEvent) throw new NotFoundException();
+    if (user.userId !== existingEvent.userId) throw new UnauthorizedException();
+
+    const deletedAutoMessageEvent =
+      await this.autoMessageEventPort.deleteAutoMessageEventById(
+        autoMessageEventId,
+      );
+
+    return deletedAutoMessageEvent;
+  }
 }
