@@ -184,6 +184,22 @@ export class SegmentService implements ISegmentUseCase {
     return;
   }
 
+  async deleteFilterQuery(segmentId: number, email: string): Promise<void> {
+    this.logger.verbose('deleteFilterQuery');
+    const segment = await this.checkUserIsSegmentCreator(email, segmentId);
+
+    if (!segment.segmentQuery)
+      throw new BadRequestException('Segment Query does not exists');
+
+    if (!segment.filterQuery)
+      throw new BadRequestException('Filter Query does not exists');
+
+    // segmentQuery로 filterQuery 덮어쓰기
+    await this.segmentPort.updateFilterQuery(segmentId, segment.segmentQuery);
+
+    return;
+  }
+
   async createFilterQueryByVariableValue(
     dto: CreateFilterQueryByVariableValueDto,
   ): Promise<any> {

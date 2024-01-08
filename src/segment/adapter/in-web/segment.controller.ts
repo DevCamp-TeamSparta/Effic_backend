@@ -225,4 +225,20 @@ export class SegmentController {
     dto.email = req.payload.email;
     return this.segmentUseCase.createFilterQueryByFatigueLevel(dto);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @ApiOperation({
+    summary: '필터링 취소 API',
+    description: 'Filter Query를 Segment Query로 덮어씀',
+  })
+  @Delete('/filter-query')
+  @HttpCode(HttpStatus.OK)
+  async deleteFilterQuery(
+    @Req() req,
+    @Body('segmentId', ParseIntPipe) segmentId: number,
+  ): Promise<void> {
+    this.logger.verbose('deleteFilterQuery');
+    const email = req.payload.email;
+    return this.segmentUseCase.deleteFilterQuery(segmentId, email);
+  }
 }

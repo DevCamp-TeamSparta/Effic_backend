@@ -34,6 +34,7 @@ export interface ISegmentUseCase {
   createFilterQueryByFatigueLevel(
     dto: CreateFilterQueryByFatigueLevelDto,
   ): Promise<any>;
+  deleteFilterQuery(segmentId: number, email: string): Promise<void>;
 
   checkUserIsSegmentCreator(
     email: string,
