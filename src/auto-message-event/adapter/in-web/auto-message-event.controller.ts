@@ -22,7 +22,7 @@ import {
 import { AutoMessageEventOrmEntity } from '../out-persistence/auto-message-event.orm.entity';
 import { UpdateAutoMessageEventDto } from 'src/auto-message-event/application/port/in/dto/update-auto-message-event.dto';
 import { AccessTokenGuard } from 'src/auth/guards/auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateAutoMessageEventInputDto } from 'src/auto-message-event/application/port/in/dto/create-auto-message-event-input.dto';
 import { AutoMessageEventInputOrmEntity } from '../out-persistence/auto-message-event-input.orm.entity';
 
@@ -97,6 +97,13 @@ export class AutoMessageEventController {
     );
   }
 
+  @ApiOperation({
+    summary: 'getAutoMessageEventInput 생성 API',
+  })
+  @ApiCreatedResponse({
+    description: '생성한 getAutoMessageEventInput를 반환',
+    type: AutoMessageEventInputOrmEntity,
+  })
   @UseGuards(AccessTokenGuard)
   @Post('/input')
   @HttpCode(HttpStatus.CREATED)
@@ -107,6 +114,13 @@ export class AutoMessageEventController {
     return this.autoMessageEventUseCase.createAutoMessageEventInput(dto);
   }
 
+  @ApiOperation({
+    summary: 'getAutoMessageEventInput 조회 API',
+  })
+  @ApiCreatedResponse({
+    description: '조회한 getAutoMessageEventInput를 반환',
+    type: AutoMessageEventInputOrmEntity,
+  })
   @UseGuards(AccessTokenGuard)
   @Get('/input/detail')
   async getAutoMessageEventInputDetail(
