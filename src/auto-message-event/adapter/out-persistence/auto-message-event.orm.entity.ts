@@ -13,7 +13,7 @@ export class AutoMessageEventOrmEntity {
   @PrimaryGeneratedColumn()
   autoMessageEventId: number;
 
-  @Column()
+  @Column({ nullable: true })
   autoMessageEventName: string;
 
   @Column({ nullable: true })
@@ -25,20 +25,20 @@ export class AutoMessageEventOrmEntity {
   @Column({ nullable: true })
   autoMessageEventLastRunTime: Date;
 
-  @Column()
+  @Column({ nullable: true })
   scheduledEndDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   createdDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   isActive: boolean;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column()
+  @Column({ nullable: true })
   userId: number;
 
   // @ManyToOne(() => SegmentOrmEntity)

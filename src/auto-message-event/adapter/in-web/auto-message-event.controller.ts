@@ -23,6 +23,8 @@ import { AutoMessageEventOrmEntity } from '../out-persistence/auto-message-event
 import { UpdateAutoMessageEventDto } from 'src/auto-message-event/application/port/in/dto/update-auto-message-event.dto';
 import { AccessTokenGuard } from 'src/auth/guards/auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateAutoMessageEventInputDto } from 'src/auto-message-event/application/port/in/dto/create-auto-message-event-input.dto';
+import { AutoMessageEventInputOrmEntity } from '../out-persistence/auto-message-event-input.orm.entity';
 
 @Controller('auto-message-event')
 @ApiTags('Auto Message Event API')
@@ -93,5 +95,15 @@ export class AutoMessageEventController {
       autoMessageEventId,
       email,
     );
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('/input')
+  @HttpCode(HttpStatus.CREATED)
+  async createAutoMessageEventInput(
+    @Body() dto: CreateAutoMessageEventInputDto,
+  ): Promise<AutoMessageEventInputOrmEntity> {
+    this.logger.verbose('createAutoMessageEventInput');
+    return this.autoMessageEventUseCase.createAutoMessageEventInput(dto);
   }
 }

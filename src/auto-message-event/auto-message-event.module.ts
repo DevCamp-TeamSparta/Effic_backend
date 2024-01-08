@@ -13,9 +13,15 @@ import {
 import { UsersService } from 'src/users/service/users.service';
 import { AuthService } from 'src/auth/service/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { AutoMessageEventInputOrmEntity } from './adapter/out-persistence/auto-message-event-input.orm.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AutoMessageEventOrmEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      AutoMessageEventOrmEntity,
+      AutoMessageEventInputOrmEntity,
+    ]),
+  ],
   controllers: [AutoMessageEventController],
   providers: [
     JwtService,

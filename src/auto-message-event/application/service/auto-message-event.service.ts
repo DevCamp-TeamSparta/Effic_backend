@@ -15,6 +15,8 @@ import {
 import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 import { UpdateAutoMessageEventDto } from '../port/in/dto/update-auto-message-event.dto';
 import { UsersService } from 'src/users/service/users.service';
+import { AutoMessageEventInputOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event-input.orm.entity';
+import { CreateAutoMessageEventInputDto } from '../port/in/dto/create-auto-message-event-input.dto';
 
 @Injectable()
 export class AutoMessageEventService implements IAutoMessageEventUseCase {
@@ -129,5 +131,11 @@ export class AutoMessageEventService implements IAutoMessageEventUseCase {
       );
 
     return deletedAutoMessageEvent;
+  }
+
+  async createAutoMessageEventInput(
+    dto: CreateAutoMessageEventInputDto,
+  ): Promise<AutoMessageEventInputOrmEntity> {
+    return await this.autoMessageEventPort.saveAutoMessageEventInput(dto);
   }
 }
