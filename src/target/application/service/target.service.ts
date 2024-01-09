@@ -24,7 +24,6 @@ import {
   IClientDbPort,
   IClientDbPortSymbol,
 } from 'src/client-db/client-db.port';
-import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-persistence/auto-message-event.orm.entity';
 import { MessagesService } from 'src/messages/service/messages.service';
 import { UsersRepository } from 'src/users/users.repository';
 import { SendTestMessageDto } from '../port/in/dto/send-test-message.dto';
@@ -149,37 +148,26 @@ export class TargetService implements ITargetUseCase {
     // segment 생성자와 email이 같은지 확인
     await this.segmentUseCase.checkUserIsSegmentCreator(email, segmentId);
 
-    // { phoneNumber: targetId } 딕셔너리 생성
-    const phoneNumberToTargetIdMap = await this.targetPort.getReceiverNumbers(
-      targetIds,
-    );
-
     const segment = await this.segmentPort.getSegmentDetails(segmentId);
     const queryResult = await this.clientDbService.executeQueryPg(
       segment.filterQuery,
     );
 
-    if (isRecurring) {
-      // 주기 발송
-      await this.handleRecurringReservations(
-        queryResult,
-        phoneNumberToTargetIdMap,
-        receiverNumberColumnName,
-        weekDays,
-        endDate,
-        reservationTime,
-      );
-    } else {
-      // N일 뒤 발송
-      await this.handleNonRecurringReservations(
-        queryResult,
-        phoneNumberToTargetIdMap,
-        timeColumnName,
-        receiverNumberColumnName,
-        delayDays,
-        reservationTime,
-      );
-    }
+    const autoMessageEvent = {
+      reservationTime,
+      isRecurring,
+      receiverNumberColumnName,
+      weekDays,
+      endDate,
+      timeColumnName,
+      delayDays,
+    };
+
+    await this.scheduleTargetReservedAt(
+      autoMessageEvent,
+      targetIds,
+      queryResult,
+    );
   }
 
   async sendReservedMessage(): Promise<void> {
@@ -270,24 +258,24 @@ export class TargetService implements ITargetUseCase {
         autoMessageEventLastRunTime: new Date(),
       };
 
+      const updatedTargets = await this.processAndSaveMessageContent(
+        updatedResult,
+        messageTitle,
+        messageContentTemplate,
+        receiverNumberColumnName,
+        hostnumber,
+        advertiseInfo,
+        email,
+        autoMessageEventId,
+      );
+
+      const updatedTargetIds = [];
+      for (const target of updatedTargets) {
+        updatedTargetIds.push(target.targetId);
+      }
+
       if (isReserved) {
-        const updatedTargets = await this.processAndSaveMessageContent(
-          updatedResult,
-          messageTitle,
-          messageContentTemplate,
-          receiverNumberColumnName,
-          hostnumber,
-          advertiseInfo,
-          email,
-          autoMessageEventId,
-        );
-
-        const updatedTargetIds = [];
-        for (const target of updatedTargets) {
-          updatedTargetIds.push(target.targetId);
-        }
-
-        await this.cronTargetReservationTime(
+        await this.scheduleTargetReservedAt(
           autoMessageEvent,
           updatedTargetIds,
           updatedResult,
@@ -298,22 +286,6 @@ export class TargetService implements ITargetUseCase {
       }
 
       if (!isReserved) {
-        const updatedTargets = await this.processAndSaveMessageContent(
-          updatedResult,
-          messageTitle,
-          messageContentTemplate,
-          receiverNumberColumnName,
-          hostnumber,
-          advertiseInfo,
-          email,
-          autoMessageEventId,
-        );
-
-        const updatedTargetIds = [];
-        for (const target of updatedTargets) {
-          updatedTargetIds.push(target.targetId);
-        }
-
         for (const targetId of updatedTargetIds) {
           const targetData = await this.targetPort.getTargetData(targetId);
 
@@ -400,8 +372,8 @@ export class TargetService implements ITargetUseCase {
     return user.email;
   }
 
-  private async cronTargetReservationTime(
-    autoMessageEvent: AutoMessageEventOrmEntity,
+  private async scheduleTargetReservedAt(
+    autoMessageEvent,
     targetIds: number[],
     queryResult,
   ): Promise<void> {
@@ -415,7 +387,6 @@ export class TargetService implements ITargetUseCase {
       delayDays,
     } = autoMessageEvent;
 
-    const reservationTimeDate = new Date(reservationTime);
     const phoneNumberToTargetIdMap = await this.targetPort.getReceiverNumbers(
       targetIds,
     );
@@ -427,7 +398,7 @@ export class TargetService implements ITargetUseCase {
         receiverNumberColumnName,
         weekDays,
         endDate,
-        reservationTimeDate,
+        reservationTime,
       );
     } else {
       await this.handleNonRecurringReservations(
@@ -436,7 +407,7 @@ export class TargetService implements ITargetUseCase {
         timeColumnName,
         receiverNumberColumnName,
         delayDays,
-        reservationTimeDate,
+        reservationTime,
       );
     }
   }
