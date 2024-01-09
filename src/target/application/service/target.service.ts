@@ -20,7 +20,6 @@ import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from '../port/in/dto/create-target-reservation-time.dto';
-import { SmsTestDto } from '../port/in/dto/sms-test.dto';
 import {
   ISegmentUseCase,
   ISegmentUseCaseSymbol,
@@ -37,7 +36,6 @@ import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-pe
 import { MessagesService } from 'src/messages/service/messages.service';
 import { UsersRepository } from 'src/users/users.repository';
 import { SendTestMessageDto } from '../port/in/dto/send-test-message.dto';
-import { DefaultMessageDto } from 'src/messages/dto/default-message.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -63,59 +61,6 @@ export class TargetService implements ITargetUseCase {
     private messagesService: MessagesService,
     private readonly usersRepository: UsersRepository,
   ) {}
-
-  async smsTest(dto: SmsTestDto): Promise<void> {
-    const { content, phoneNumber } = dto;
-
-    if (typeof phoneNumber == 'number')
-      throw new Error('send string type phoneNumber');
-
-    const body = {
-      type: 'SMS',
-      countryCode: '82',
-      from: '15228016', // 발신자 번호
-      content: `'${content}'`,
-      messages: [
-        {
-          to: phoneNumber, // 수신자 번호
-        },
-      ],
-    };
-    const options = {
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'x-ncp-iam-access-key': ACCESS_KEY_ID,
-        'x-ncp-apigw-timestamp': Date.now().toString(),
-        'x-ncp-apigw-signature-v2': this.makeSignature(),
-      },
-    };
-    axios
-      .post(
-        `https://sens.apigw.ntruss.com/sms/v2/services/${SMS_SERVICE_ID}/messages`,
-        body,
-        options,
-      )
-      .then(async (res) => {
-        // 성공 이벤트
-        if (res.status === 202) {
-          const messageHistory = await this.segmentPort.saveMessageHistory(
-            phoneNumber,
-            content,
-            res.data.requestTime,
-          );
-        }
-      })
-      .catch((err) => {
-        console.error(err.response.data);
-        // Error code : 200인 경우, 다시 같은 번호, 내용으로 메세지 보내기
-        if (err.response?.data?.error?.errorCode === '200') {
-          console.log(`Retrying SMS for phone number: ${phoneNumber}`);
-          return this.smsTest(dto);
-        }
-      });
-
-    return;
-  }
 
   async sendTestMessage(dto: SendTestMessageDto): Promise<void> {
     const {

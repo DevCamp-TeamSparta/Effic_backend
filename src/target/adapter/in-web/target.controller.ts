@@ -15,7 +15,6 @@ import { AccessTokenGuard } from 'src/auth/guards/auth.guard';
 import { CreateMessageContentDto } from 'src/target/application/port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from 'src/target/application/port/in/dto/create-target-reservation-time.dto';
 import { SendTestMessageDto } from 'src/target/application/port/in/dto/send-test-message.dto';
-import { SmsTestDto } from 'src/target/application/port/in/dto/sms-test.dto';
 import { SanitizePhoneNumberPipe } from 'src/target/application/port/in/pipe/sanitize-phone-number.pipe';
 import {
   ITargetUseCase,
@@ -30,13 +29,6 @@ export class TargetController {
     @Inject(ITargetUseCaseSymbol)
     private readonly targetUseCase: ITargetUseCase,
   ) {}
-
-  @Post('/sms/test')
-  @HttpCode(HttpStatus.OK)
-  @UsePipes(new SanitizePhoneNumberPipe())
-  async smsTest(@Body() dto: SmsTestDto) {
-    return this.targetUseCase.smsTest(dto);
-  }
 
   @Post('/test-message')
   @HttpCode(HttpStatus.OK)
