@@ -37,6 +37,7 @@ import { AutoMessageEventOrmEntity } from 'src/auto-message-event/adapter/out-pe
 import { MessagesService } from 'src/messages/service/messages.service';
 import { UsersRepository } from 'src/users/users.repository';
 import { SendTestMessageDto } from '../port/in/dto/send-test-message.dto';
+import { DefaultMessageDto } from 'src/messages/dto/default-message.dto';
 dotenv.config();
 
 const ACCESS_KEY_ID = process.env.NAVER_ACCESS_KEY_ID;
@@ -117,8 +118,15 @@ export class TargetService implements ITargetUseCase {
   }
 
   async sendTestMessage(dto: SendTestMessageDto): Promise<void> {
-    const { hostnumber, title, content, receiverNumber, advertiseInfo, email } =
-      dto;
+    const {
+      hostnumber,
+      title,
+      content,
+      receiverNumber,
+      advertiseInfo,
+      email,
+      autoMessageEventId,
+    } = dto;
     const receiverList = [];
     receiverList.push({
       phone: receiverNumber,
@@ -130,6 +138,7 @@ export class TargetService implements ITargetUseCase {
       content,
       receiverList,
       advertiseInfo,
+      autoMessageEventId,
     };
 
     this.logger.debug(
@@ -150,6 +159,7 @@ export class TargetService implements ITargetUseCase {
       hostnumber,
       advertiseInfo,
       email,
+      autoMessageEventId,
     } = dto;
 
     await this.segmentUseCase.checkUserIsSegmentCreator(email, segmentId);
@@ -181,7 +191,10 @@ export class TargetService implements ITargetUseCase {
         hostnumber,
         advertiseInfo,
         email,
+        autoMessageEventId,
       };
+
+      if (!targetData.receiverNumber) continue;
 
       const savedEntity = await this.targetPort.saveTarget(targetData, false);
 
@@ -268,6 +281,7 @@ export class TargetService implements ITargetUseCase {
           content: target.messageContent,
           receiverList: receiverList,
           advertiseInfo: target.advertiseInfo,
+          autoMessageEventId: target.autoMessageEventId,
         };
 
         this.logger.debug(
@@ -340,6 +354,7 @@ export class TargetService implements ITargetUseCase {
           hostnumber,
           advertiseInfo,
           email,
+          autoMessageEventId,
         );
 
         const updatedTargetIds = [];
@@ -366,6 +381,7 @@ export class TargetService implements ITargetUseCase {
           hostnumber,
           advertiseInfo,
           email,
+          autoMessageEventId,
         );
 
         const updatedTargetIds = [];
@@ -387,6 +403,7 @@ export class TargetService implements ITargetUseCase {
             content: targetData.messageContent,
             receiverList: receiverList,
             advertiseInfo: targetData.advertiseInfo,
+            autoMessageEventId: targetData.autoMessageEventId,
           };
 
           this.logger.debug(
@@ -413,6 +430,7 @@ export class TargetService implements ITargetUseCase {
     hostnumber: string,
     advertiseInfo: boolean,
     email: string,
+    autoMessageEventId: number,
   ): Promise<TargetData[]> {
     const createdTargets: TargetData[] = [];
 
@@ -436,6 +454,7 @@ export class TargetService implements ITargetUseCase {
         hostnumber,
         advertiseInfo,
         email,
+        autoMessageEventId,
       };
 
       const savedEntity = await this.targetPort.saveTarget(targetData, false);

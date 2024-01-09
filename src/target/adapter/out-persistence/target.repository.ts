@@ -23,6 +23,7 @@ export class TargetRepository implements ITargetPort {
       targetData.hostnumber,
       targetData.advertiseInfo,
       targetData.email,
+      targetData.autoMessageEventId,
     );
 
     const targetOrmEntity = TargetMapper.mapToTargetOrmEntity(domainTarget);
@@ -80,6 +81,7 @@ export class TargetRepository implements ITargetPort {
       targetData.hostnumber,
       targetData.advertiseInfo,
       targetData.email,
+      targetData.autoMessageEventId,
     );
 
     const targetOrmEntity = TargetMapper.mapToTargetOrmEntity(domainTarget);

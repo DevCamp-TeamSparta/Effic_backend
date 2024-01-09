@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class SendTestMessageDto {
   @IsString()
@@ -24,4 +24,8 @@ export class SendTestMessageDto {
   @IsString()
   @IsNotEmpty()
   email: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  autoMessageEventId: number;
 }

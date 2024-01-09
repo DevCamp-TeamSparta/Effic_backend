@@ -34,4 +34,8 @@ export class CreateMessageContentDto {
   @IsString()
   @IsOptional()
   email?: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  autoMessageEventId: number;
 }

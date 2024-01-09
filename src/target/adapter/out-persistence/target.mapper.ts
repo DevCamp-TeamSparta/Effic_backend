@@ -12,6 +12,7 @@ export class TargetMapper {
       targetOrm.hostnumber,
       targetOrm.advertiseInfo,
       targetOrm.email,
+      targetOrm.autoMessageEventId,
     );
   }
 
@@ -25,6 +26,7 @@ export class TargetMapper {
     targetOrm.hostnumber = target.hostnumber;
     targetOrm.advertiseInfo = target.advertiseInfo;
     targetOrm.email = target.email;
+    targetOrm.autoMessageEventId = target.autoMessageEventId;
     return targetOrm;
   }
 }

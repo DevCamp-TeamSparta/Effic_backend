@@ -8,4 +8,5 @@ interface TargetData {
   hostnumber: string;
   advertiseInfo: boolean;
   email: string;
+  autoMessageEventId: number;
 }

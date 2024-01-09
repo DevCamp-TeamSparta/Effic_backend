@@ -2,6 +2,7 @@ import {
   IsArray,
   IsBoolean,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -34,4 +35,8 @@ export class DefaultMessageDto {
   @IsArray()
   @IsOptional()
   urlList?: string[];
+
+  @IsNumber()
+  @IsOptional()
+  autoMessageEventId?: number;
 }

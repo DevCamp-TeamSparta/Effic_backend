@@ -28,4 +28,7 @@ export class TargetOrmEntity {
 
   @Column()
   email: string;
+
+  @Column()
+  autoMessageEventId: number;
 }
