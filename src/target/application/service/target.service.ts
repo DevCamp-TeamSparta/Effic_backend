@@ -1,10 +1,4 @@
-import {
-  ConsoleLogger,
-  Inject,
-  Injectable,
-  Logger,
-  RequestMapping,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ITargetUseCase } from '../port/in/target.use-case';
 import {
   IClientDbService,
@@ -15,8 +9,6 @@ import {
   ISegmentPortSymbol,
 } from 'src/segment/application/port/out/segment.port';
 import { ITargetPort, ITargetPortSymbol } from '../port/out/target.port';
-import * as crypto from 'crypto';
-import axios from 'axios';
 import * as dotenv from 'dotenv';
 import { CreateMessageContentDto } from '../port/in/dto/create-message-content.dto';
 import { CreateTargetReservationTimeDto } from '../port/in/dto/create-target-reservation-time.dto';
@@ -154,9 +146,10 @@ export class TargetService implements ITargetUseCase {
       email,
     } = dto;
 
+    // segment 생성자와 email이 같은지 확인
     await this.segmentUseCase.checkUserIsSegmentCreator(email, segmentId);
 
-    const reservationTimeDate = new Date(reservationTime);
+    // { phoneNumber: targetId } 딕셔너리 생성
     const phoneNumberToTargetIdMap = await this.targetPort.getReceiverNumbers(
       targetIds,
     );
@@ -167,22 +160,24 @@ export class TargetService implements ITargetUseCase {
     );
 
     if (isRecurring) {
+      // 주기 발송
       await this.handleRecurringReservations(
         queryResult,
         phoneNumberToTargetIdMap,
         receiverNumberColumnName,
         weekDays,
         endDate,
-        reservationTimeDate,
+        reservationTime,
       );
     } else {
+      // N일 뒤 발송
       await this.handleNonRecurringReservations(
         queryResult,
         phoneNumberToTargetIdMap,
         timeColumnName,
         receiverNumberColumnName,
         delayDays,
-        reservationTimeDate,
+        reservationTime,
       );
     }
   }
@@ -451,6 +446,11 @@ export class TargetService implements ITargetUseCase {
     await this.clientDbService.connectToPg(clientDbInfo);
   }
 
+  /**
+   * FilterQuery의 결과인 queryResult
+   * - queryResult가 target
+   * - target의 각 레코드에 대해 예약 시간을 설정하는 함수
+   */
   private async handleRecurringReservations(
     queryResult: any[],
     phoneNumberToTargetIdMap: Record<string, number>,
@@ -460,6 +460,7 @@ export class TargetService implements ITargetUseCase {
     reservationTimeDate: Date,
   ): Promise<void> {
     const endDateObj = new Date(endDate);
+
     for (const record of queryResult) {
       const targetReceiverNumber = record[receiverNumberColumnName];
       const targetId = phoneNumberToTargetIdMap[targetReceiverNumber];
