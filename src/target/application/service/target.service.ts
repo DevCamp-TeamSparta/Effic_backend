@@ -72,10 +72,8 @@ export class TargetService implements ITargetUseCase {
       email,
       autoMessageEventId,
     } = dto;
-    const receiverList = [];
-    receiverList.push({
-      phone: receiverNumber,
-    });
+
+    const receiverList = this.makeReceiverList(receiverNumber);
 
     const defaultMessageDto = {
       hostnumber,
@@ -92,6 +90,18 @@ export class TargetService implements ITargetUseCase {
     await this.messagesService.sendDefaultMessage(email, defaultMessageDto);
   }
 
+  /**
+   * defaultMessageDto의 형식에 맞추기 위한 함수
+   */
+  private makeReceiverList(receiverNumber: string): string[] {
+    const receiverList = [];
+    receiverList.push({
+      phone: receiverNumber,
+    });
+    return receiverList;
+  }
+
+  /**MessageContent를 생성하고 Target 테이블에 저장 */
   async createMessageContent(
     dto: CreateMessageContentDto,
   ): Promise<TargetData[]> {
@@ -115,41 +125,16 @@ export class TargetService implements ITargetUseCase {
       segment.filterQuery,
     );
 
-    const createdTargets: TargetData[] = [];
-
-    for (const record of queryResult) {
-      let messageContent = messageContentTemplate;
-      for (const key in record) {
-        if (record.hasOwnProperty(key)) {
-          const value = record[key] || '';
-          const placeholder = new RegExp(`\\$\\{${key}\\}`, 'g');
-          messageContent = messageContent.replace(placeholder, value);
-        }
-      }
-
-      const receiverNumber = record[receiverNumberColumnName];
-      const targetData: TargetData = {
-        messageTitle,
-        messageContent,
-        receiverNumber,
-        reservedAt: null,
-        hostnumber,
-        advertiseInfo,
-        email,
-        autoMessageEventId,
-      };
-
-      if (!targetData.receiverNumber) continue;
-
-      const savedEntity = await this.targetPort.saveTarget(targetData, false);
-
-      createdTargets.push({
-        ...targetData,
-        targetId: savedEntity.targetId,
-      });
-    }
-
-    return createdTargets;
+    return this.processAndSaveMessageContent(
+      queryResult,
+      messageTitle,
+      messageContentTemplate,
+      receiverNumberColumnName,
+      hostnumber,
+      advertiseInfo,
+      email,
+      autoMessageEventId,
+    );
   }
 
   async createTargetReservationTime(
@@ -291,7 +276,7 @@ export class TargetService implements ITargetUseCase {
       };
 
       if (isReserved) {
-        const updatedTargets = await this.cronCreateMessageContent(
+        const updatedTargets = await this.processAndSaveMessageContent(
           updatedResult,
           messageTitle,
           messageContentTemplate,
@@ -318,7 +303,7 @@ export class TargetService implements ITargetUseCase {
       }
 
       if (!isReserved) {
-        const updatedTargets = await this.cronCreateMessageContent(
+        const updatedTargets = await this.processAndSaveMessageContent(
           updatedResult,
           messageTitle,
           messageContentTemplate,
@@ -367,7 +352,7 @@ export class TargetService implements ITargetUseCase {
     return;
   }
 
-  private async cronCreateMessageContent(
+  private async processAndSaveMessageContent(
     queryResult,
     messageTitle: string,
     messageContentTemplate: string,
@@ -401,6 +386,8 @@ export class TargetService implements ITargetUseCase {
         email,
         autoMessageEventId,
       };
+
+      if (!targetData.receiverNumber) continue;
 
       const savedEntity = await this.targetPort.saveTarget(targetData, false);
 
@@ -462,26 +449,6 @@ export class TargetService implements ITargetUseCase {
   private async connectToClientDatabase(clientDbId: number): Promise<void> {
     const clientDbInfo = await this.clientDbPort.getClientDbInfo(clientDbId);
     await this.clientDbService.connectToPg(clientDbInfo);
-  }
-
-  private makeSignature(): string {
-    const message = [];
-    const hmac = crypto.createHmac('sha256', SECRET_KEY);
-    const space = ' ';
-    const newLine = '\n';
-    const method = 'POST';
-    const timestamp = Date.now().toString();
-    message.push(method);
-    message.push(space);
-    message.push(`/sms/v2/services/${SMS_SERVICE_ID}/messages`);
-    message.push(newLine);
-    message.push(timestamp);
-    message.push(newLine);
-    message.push(ACCESS_KEY_ID);
-    //message 배열에 위의 내용들을 담아준 후에
-    const signature = hmac.update(message.join('')).digest('base64');
-    //message.join('') 으로 만들어진 string 을 hmac 에 담고, base64로 인코딩
-    return signature.toString();
   }
 
   private async handleRecurringReservations(
