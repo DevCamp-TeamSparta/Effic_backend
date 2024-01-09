@@ -276,6 +276,7 @@ export class MessagesService {
     messageContent.receiverList = messageInfoDto.receiverList;
     messageContent.sentType = messageType;
     messageContent.hostnumber = messageInfoDto.hostnumber;
+    messageContent.autoMessageEventId = messageInfoDto.autoMessageEventId;
 
     const result: any = {};
     await this.entityManager.transaction(async (transactionalEntityManager) => {

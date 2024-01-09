@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { AutoMessageEventOrmEntity } from './auto-message-event.orm.entity';
 
-@Entity('AutoMessageEvent')
+@Entity('AutoMessageEventInput')
 export class AutoMessageEventInputOrmEntity {
   @PrimaryGeneratedColumn()
   autoMessageEventInputId: number;
